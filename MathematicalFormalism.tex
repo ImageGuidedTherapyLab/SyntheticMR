@@ -1,0 +1,208 @@
+%
+%  This simple example illustrates how documents can be
+%  split into smaller segments, each segment processed
+%  by latex2html separately.  This document can be
+%  processed through latex and latex2html with the
+%  corresponding makefile.
+%
+
+\documentclass{article}         % Must use LaTeX 2e
+\usepackage[plainpages=false, colorlinks=true, citecolor=black, filecolor=black, linkcolor=black, urlcolor=black]{hyperref}		
+\usepackage[left=.75in,right=.75in,top=.75in,bottom=.75in]{geometry}
+\usepackage{makeidx,color,boxedminipage}
+\usepackage{graphicx,float}
+\usepackage{amsmath,amsthm,amsfonts,amscd,amssymb} 
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%	Some math support.					     %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+%	Theorem environments (these need the amsthm package)
+%
+%% \theoremstyle{plain} %% This is the default
+
+\newtheorem{thm}{Theorem}[section]
+\newtheorem{cor}[thm]{Corollary}
+\newtheorem{lem}[thm]{Lemma}
+\newtheorem{prop}[thm]{Proposition}
+\newtheorem{ax}{Axiom}
+
+\theoremstyle{definition}
+\newtheorem{defn}{Definition}[section]
+
+\theoremstyle{remark}
+\newtheorem{rem}{Remark}[section]
+\newtheorem*{notation}{Notation}
+\newtheorem*{exrcs}{Exercise}
+\newtheorem*{exmple}{Example}
+
+%\numberwithin{equation}{section}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%	Macros.							     %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+%	Here some macros that are needed in this document:
+
+\newcommand{\motion}{\mathbf{\varphi}}
+\newcommand{\hmotion}{\mbox{\boldmath $\hat{\varphi}$}}
+\newcommand{\cauchy}{\mbox{\boldmath $\sigma$}}
+\newcommand{\eqn}[1]{(\ref{#1})}
+\newcommand{\hOmega}{\hat{\Omega}}
+\newcommand{\homega}{\hat{\omega}}
+\newcommand{\nphalf}{n+\frac{1}{2}}
+\newcommand{\nmhalf}{n-\frac{1}{2}}
+\newcommand{\kmhalf}{k-\frac{1}{2}}
+\newcommand{\kphalf}{k+\frac{1}{2}}
+\newcommand{\picdir}{Figures}
+
+\title{Advanced Appliations of Synthetic MR and MAGiC}
+\author{}
+\begin{document}                % The start of the document
+\maketitle
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Physics Model}\label{PhysicsModel}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\[
+  \vec{z}  =  ?
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Mathematical Framework}\label{GeneralMathFramework}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The underlying philosophy and assumptions within our approach is that the physics 
+models are 1st order accurate or within 70-80\% of the needed accuracy and the error is
+adequate within the assumed Gaussian noise.
+Gaussian distributions provide analytical representations of the random
+variables of interest (ie T1, T2) within the Bayesian setting and 
+provide a crux for understanding. In particular, we say that a random
+variable $\eta$ belongs to a multi-variate normal distribution 
+of mean $\mu \in \mathbb{R}^n $ and covariance $\Sigma \in \mathbb{R}^{n \times n}$
+\[
+     \eta \sim \mathcal{N}(\mu,\Sigma)  
+    \Rightarrow
+      p(\eta)  = \frac{1}{2 \; \pi \; \det{\Sigma}} \exp\left( - \frac{1}{2} \| \mu - \eta\|^2_{\Sigma}\right)
+\]
+
+
+\begin{enumerate}
+  \item Our data acquistion model, $\mathcal{G}(\vec{k},\theta): \mathbb{R}^a
+\times \mathbb{R}^m \rightarrow \mathbb{R}^n $,
+maps deterministic acquisition
+parameters, $\vec{k} \in \mathbb{R}^a$, and uncertain parameters, $\theta \in \mathbb{R}^m$
+to observables, $\vec{z} \in \mathbb{R}^n$ ( or $\vec{z} \in \mathbb{C}^n$).
+Explicitly, we will assume that the
+measurement models are corrupted by zero mean white noise noise of a
+\textbf{known} covariance matrix, $\Sigma_z \in \mathbb{R}^{n \times n}$ 
+\begin{equation}
+\label{sensormodelstructure}
+\begin{split}
+  \vec{z} & = \mathcal{G}(\vec{k};\theta) + \eta   \qquad   \eta \sim \mathcal{N}(0,\Sigma_z)
+      \\
+  \vec{k} & =  \text{(TE, TR, etc)}
+      \\
+  \theta &  =  \text{(T1, T2, etc)}
+     \end{split}
+\end{equation}
+$\eta$ may be interpreted as the measurement noise or the acquisition noise
+in the sensor model. For a deterministic measurement model $\mathcal{G}$,
+the conditional probablity distribution has an explicit analytical form
+and may be written as a  \textbf{known} Gaussian
+distribution. 
+  \[ 
+      p(\vec{z}|\theta)   =  \mathcal{N}(\mathcal{G}(\vec{k};\theta),\Sigma_z)  
+  \]
+  \item Additional \textbf{known} information is the prior probability
+distributions for the model parameters, $p(\theta)$.  For simplicity,
+    assume that Prior parameters are Gaussian distributed of 
+   \textbf{known} mean, $\hat{\theta}$ and covariance, $\Sigma_\theta$
+   \[
+      \theta \sim \mathcal{N} (\hat{\theta}, \Sigma_\theta)
+   \]
+  \item Bayes theorem is fundamental to the approach.
+The probability of the measurements $p(z)$ must be interprited in terms of the
+known information. The probability of the measurements may be derived from
+the marginalization of the joint probability and has the interpretation as
+the projection of the joint probability onto the measurement axis.
+\[
+  p(z) = \int_\theta p(\theta,z)  \; d\theta 
+       = \int_\theta p(z|\theta) \; p(\theta)\; d\theta 
+\]
+  \item  The concept of informational entropy~\cite{Madankan15}, $H(Z)$,
+provides a mathematically rigorous framework to look for measurement acquisition
+parameters, $\vec{k}$, with the high information content of the reconstruction.
+Given a probability space 
+$(\Omega, \mathcal{F},p)$ (probability maps from the
+sigma-algebra of possible events $p:\mathcal{F}\rightarrow [0,1]$
+sigma-algebra, $\mathcal{F}$, defined on set of `outcomes' $\Omega$
+\cite{durrett2010probability}),
+we will define information of an event  as
+proportional to the inverse probability.
+\[
+\text{information} \equiv  \frac{1}{p(z)}
+\]
+Intuitively, when a low probability event occurs this provides high
+information.
+The informational entropy is an \textit{average}
+of the information content for a sigma algebra of events $\mathcal{F}$
+\[
+H(Z) = \int_Z  p(z) \ln\frac{1}{p(z)} \; dz
+\qquad
+  p(z) = \int_\theta p(z|\theta) \; p(\theta)\; d\theta 
+\]
+Hence this entropy measure is an average of the information content
+for a given set of events, $\mathcal{F}$, and is proportional to the
+variance or uncertainty in which the set of events occur.
+This agrees with thermodynamic entropy;
+if the information containing events are completely spread out such as in a
+uniform distribution, the entropy is maxmized.
+The entropy
+is zero for a probability distribution in which
+only one event occurs. Zero information is gained when the same event
+always occurs ($0 \ln\frac{1}{0} = 0$). 
+Intuitively, we want to find acquisition parameters,
+$\vec{k}$, for which the measurements are most uncertain
+\[
+\max_k H(Z)
+  \quad \Leftrightarrow \quad
+\min_k 
+    \int_Z   dz \underbrace{\int_\theta  d\theta \; p(z|\theta) \; p(\theta)}_{p(z)}
+                \underbrace{ln \left(\int_\theta  d\theta \; p(z|\theta) \; p(\theta)\right)}_{ln \; p(z)}
+\]
+Alternatively we may consider this entropy maximization problem as a
+sensitivity analysis for the variance of the measurement $Z$, ie . 
+$ \max_k H(Z) \approx  \max_k \text{Var}(Z) $
+\[ \begin{split}
+   \bar{Z} = \mathbb{E}[Z]  & = \int_Z   dz \; z
+   \underbrace{\int_\theta  d\theta \; p(z|\theta) \; p(\theta)}_{p(z)}
+  \\
+   \mathbb{E}[ ( Z - \bar{Z} )^2 ]  & = \int_Z   dz \;(z - \bar{Z})^2 
+   \underbrace{\int_\theta  d\theta \; p(z|\theta) \; p(\theta)}_{p(z)}
+  \\
+   &  \propto
+    \int_Z   dz \;(z - \bar{z})^2 \int_\theta  d\theta 
+ \exp\left( - \frac{1}{2} \|  z- \mathcal{G}(\vec{k},\theta)  \|^2_{\Sigma_z}\right)
+ \exp\left( - \frac{1}{2} \|  \theta - \hat{\theta}  \|^2_{\Sigma_\theta}\right)
+ \end{split}
+\]
+Probilistic integrals may be
+computed from uncertainty quantification
+techniques~\cite{fahrenholtz2013generalised}.
+
+ 
+
+\end{enumerate}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\nocite{*}
+\bibliographystyle{apalike}
+\bibliography{references}
+
+
+\end{document}
