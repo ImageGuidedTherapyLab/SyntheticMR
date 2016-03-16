@@ -66,11 +66,11 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Physics Model}\label{PhysicsModel}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
+The steady-state magnetization $M_{TD}$ at a specific delay time $T_D$ can be found as a function of flip angle $\theta$, repetition time $T_R$, excitation pulse $\alpha$, and relaxation time  $T_1$:
 \[
-  \vec{z}  =  ?
+  M_{TD}  =  M_0\frac{1-(1-\cos(\theta))e^{-\frac{T_D}{T_1}}-\cos(\theta)e^{-\frac{T_R}{T_1}}}{1-\cos(\theta)e^{-\frac{T_R}{T_1}}\cos(\alpha)}
 \]
-
+where, $M_0$ is the unsatuarated magnetization.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Mathematical Framework}\label{GeneralMathFramework}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
