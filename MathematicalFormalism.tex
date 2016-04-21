@@ -55,7 +55,7 @@
 \newcommand{\nmhalf}{n-\frac{1}{2}}
 \newcommand{\kmhalf}{k-\frac{1}{2}}
 \newcommand{\kphalf}{k+\frac{1}{2}}
-\newcommand{\picdir}{Figures}
+\newcommand{\picdir}{pdffig/}
 
 \title{Advanced Appliations of Synthetic MR and MAGiC}
 \author{}
@@ -198,6 +198,67 @@ techniques~\cite{fahrenholtz2013generalised}.
 
 \end{enumerate}
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{WIP - Echo train length }\label{ModelFidelity}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+% http://mriquestions.com/fse-parameters.html
+% http://mriquestions.com/what-is-fsetse.html
+
+In conventional spin-echo imaging, two basic timing parameters are
+required, repetition time (TR) and echo time (TE), Figure~\ref{fig:echotrain}(a).
+Similar to
+fast spin echo (FSE) imaging, 
+the acquistion is setup to acquire multiple lines of k-space in a single TR.
+In this situation,
+TE is replaced by effective echo
+time  and addition parameters are needed: 
+
+\begin{itemize}
+\item TE$_\text{eff} \equiv$ the time at which the central lines of k-space are being filled.
+\item Number of echoes $\equiv$ called echo train length (ETL)
+\item Time between echoes $\equiv$ called echo spacing (ESP) 
+\end{itemize}
+
+
+
+\begin{figure}[h] 
+\begin{tabular}{ccc}
+\includegraphics[width=.3\textwidth]{\picdir/7162303.png}
+&
+\includegraphics[width=.3\textwidth]{\picdir/5013564.png}
+&
+\includegraphics[width=.3\textwidth]{\picdir/3316708_orig.png}
+\\
+(a) & (b) & (c) \\
+\end{tabular}
+\caption{ 
+(a)
+}\label{fig:echotrain}
+\end{figure}
+
+
+{\color{red}
+   TODO - need to update signal model for multiple read out lines
+}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{WIP - Inverse Problem Framework}\label{InverseProbFramework}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\[
+  \vec{z}  = \mathcal{G}(\theta) + \eta   \qquad   \eta \sim \mathcal{N}(0,\Sigma_z)
+\]
+\[
+  p(z|\theta ) = \exp \left( \|\vec{z} -  \mathcal{G}(\theta)\|^2_{\Sigma_z} \right)
+\]
+\[
+               d\left(\vec{z}, \mathcal{G}(\theta^*)\right) = 
+   \min_{\theta \in \Omega} d\left(\vec{z}, \mathcal{G}(\theta)\right)
+\qquad
+\theta = \left(\mu_\text{CSF}, \mu_\text{GM}, \mu_\text{WM}, \mu_\text{Tumor} \right)
+\]
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \nocite{*}
