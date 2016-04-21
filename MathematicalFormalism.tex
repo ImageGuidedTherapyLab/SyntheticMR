@@ -265,5 +265,113 @@ time  and addition parameters are needed:
 \bibliographystyle{apalike}
 \bibliography{references}
 
+\appendix
+\section{Bayes - An intuitive example}
+Bayes theorem is fundamental to the approach and is immediately
+follows from the definition of conditional probability
+\[
+\left.
+\begin{split}
+p(y|x)  \equiv  \frac{p(x,y)}{p(x)}  \\
+p(x|y)  \equiv  \frac{p(x,y)}{p(y)} 
+\end{split}
+\right\}
+\Rightarrow
+p(y|x) p(x) = p(x,y) = p(x|y) p(y)
+\Rightarrow
+\hspace{-1in}
+\begin{split}
+p(y|x)  =\frac{ p(x|y) p(y) }{p(x) } \\
+p(x|y)  =\frac{ p(y|x) p(x) }{p(y) } \\
+\end{split}
+\]
+
+As a concrete example, consider the explicit two dimensional joint Gaussian
+distribution as a medium for understanding. Here we have two random
+variables $\mathbf{x}_1$ and $\mathbf{x}_2$ defined on the same probability
+space, $\Omega$.
+\[
+\mathbf{x}_i: \Omega \rightarrow \mathbb{R}
+\qquad
+P\left( \left\{ \omega: 
+\mathbf{x}_i (\omega) \in A
+ \right\}\right)
+=
+\int_A p(\eta_i) d\eta_i
+\]
+Intuitively, if we are \textbf{given} the joint distribution,
+$p(\eta_1,\eta_2)$, knowledge of the realization of one particular random
+variable provides information on the realization of the second random
+variable.
+\[
+      p(\eta_1,\eta_2)  = \frac{1}{2 \; \pi \; \sqrt{\det{\Sigma}}}
+\exp\left( \frac{1}{2}
+\begin{bmatrix}
+\eta_1 - \mu_1 \\
+\eta_2 - \mu_2 \\
+\end{bmatrix}^\top
+\underbrace{
+\begin{bmatrix}
+       \sigma_1^2        & r_{12} \sigma_1 \sigma_2 \\
+r_{12} \sigma_1 \sigma_2 &          \sigma_2^2 \\
+\end{bmatrix}
+}_{\equiv \Sigma}
+\begin{bmatrix}
+\eta_1 - \mu_1 \\
+\eta_2 - \mu_2 \\
+\end{bmatrix}
+\right)
+\]
+
+See \cite{maybeck1979stochastic} (Sec 3.10), characteristic functions 
+are used to show that individual marginal
+densities of joint  Gaussian random variable is also Gaussian.
+\[
+p(\eta_1) = 
+\int_{\eta_2}
+      p(\eta_1,\eta_2)
+\;d\eta_2
+ = \frac{1}{ \sqrt{2 \; \pi \; \sigma_2^2}} \exp\left( - \frac{(\eta_1 -
+\mu_1)^2}{2 \sigma_1^2} \right)
+\]
+
+\[
+p(\eta_2) = 
+\int_{\eta_1}
+      p(\eta_2,\eta_1)
+\;d\eta_1
+ = \frac{1}{ \sqrt{2 \; \pi \; \sigma_1^2}} \exp\left( - \frac{(\eta_2 -
+\mu_2)^2}{2 \sigma_2^2} \right)
+\]
+
+Conditional probablity is \textit{defined} through the algegraic
+reduction of the ratio of the joint and the marginal densities
+\[
+p(\eta_1|\eta_2) =  \frac{p(\eta_1,\eta_2)  }{p(\eta_2) }
+ = \frac{1}{ \sqrt{2 \; \pi \; \sigma_{1|2}^2}}
+    \exp\left( - \frac{(\eta_1 - \mu_{1|2})^2}{2 \sigma_{1|2}^2} \right)
+ = 
+\frac{p(\eta_1)}{p(\eta_2)}
+   \frac{1}{ \sqrt{2 \; \pi \; \sigma_{2|1}^2}}
+    \exp\left( - \frac{(\eta_2 - \mu_{2|1})^2}{2 \sigma_{2|1}^2} \right)
+\]
+\[
+\mu_{1|2} =  \mu_1 - 
+       \frac{r_{12} \sigma_1 \sigma_2 }{\sigma_2^2}
+       (\eta_2 - \mu_2)
+\qquad
+\sigma_{1|2} = 
+\sigma_1^2  - 
+       \frac{(r_{12} \sigma_1 \sigma_2 )^2}{\sigma_2^2}
+\]
+\[
+\mu_{2|1} =  \mu_2 - 
+       \frac{r_{12} \sigma_1 \sigma_2 }{\sigma_1^2}
+       (\eta_1 - \mu_1)
+\qquad
+\sigma_{2|1} = 
+\sigma_2^2  - 
+       \frac{(r_{12} \sigma_1 \sigma_2 )^2}{\sigma_1^2}
+\]
 
 \end{document}
