@@ -65,35 +65,109 @@
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\section*{Introduction-
-Synthetic MR : Optimal Experimental Design }
+\section{Problem Statement}\label{sec:prob_statement}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-
-\section*{Problem Statement}\label{sec:prob_statement}
 Consider a magnetization signal $M_{TD}$ that is defined as
+as function of 
+\textbf{acquisition parameters} $\kk=\{T_R,T_D,\theta,T_E,\alpha\}$ 
+{\color{red}(@kenphwang are we considering $\alpha$ a control parameter?)}
+and \textbf{tissue properties} $\p \equiv \{T_1,T_2,M_0\}$. 
+
+\begin{figure}[h] 
+\centering
+\begin{tabular}{ccc}
+\includegraphics[width=.7\textwidth]{\picdir/PulseSequence.png} & 
+\includegraphics[width=.29\textwidth]{\picdir/NeuroBasis.png} \\
+(a) & (b) \\
+\end{tabular}
+\caption{ 
+(a) Synthetic MR Pulse sequence. (b) Neuroimaging basis.
+}\label{fig:Pulsesequence}
+\end{figure}
 
 \begin{equation}\label{mtd}
 M_{TD}(\kk,\p,\x)=\left(M_0(\x)\frac{1-(1-\cos \theta)e^{-\frac{T_D}{T_1(\x)}}-\cos \theta e^{-\frac{T_D}{T_1(\x)}}}{1-\cos \theta e^{-\frac{T_R}{T_1(\x)}}cos \alpha}\right) e^{-\frac{T_E}{T_2(\x)}}
 \end{equation}
-where, $M_0$ is the unsaturated magnetization, $\theta$ represents the flip angle, and $T_R$ and $T_E$ denote repetition time and echo time, respectively. Parameters $T_1$ and $T_2$ represents relaxation times, and $\alpha$ is the excitation pulse. Note that the unsaturated magnetization $M_0$, along with relaxation times $T_1$ and $T_2$, are a function of spatial coordination $\x$. As well, excitation pulse $\alpha$ is a function of flip angle in general, i.e. $\alpha=\alpha(\theta)$.
+Here, $M_0$ is the unsaturated magnetization, $\theta$ represents the \textit{saturation} flip
+angle, and $T_R$ and $T_E$ denote repetition time and echo time, respectively.
+Parameters $T_1$ and $T_2$ represents relaxation times, and $\alpha$ is the
+\textit{local} excitation flip angle. 
+In general, excitation pulse $\alpha$ is a function of flip angle, i.e.
+$\alpha=\alpha(\theta)$
+{\color{red}(@kenphwang why is this?)}.
+Note that the unsaturated magnetization $M_0$, along with
+relaxation times $T_1$ and $T_2$, are a function of spatial coordination $\x$.
+Basis functions $\phi_i$ represent the neuro anatomy. For completeness,
+consider
+$\phi_1 = \phi_\text{gm}$,
+$\phi_2 = \phi_\text{wm}$,
+$\phi_3 = \phi_\text{csf}$,
+$\phi_4 = \phi_\text{tumor}$ as a simplified set 
+of the regions illustrated in Figure~\ref{fig:Pulsesequence}(b).
+\[
+T_1(\xbf)=\sum_{i=1}^{N=4} T1_i \phi_i(\xbf)
+\qquad
+T_2(\xbf)=\sum_{i=1}^{N=4} T2_i \phi_i(\xbf)
+\qquad
+M_0(\xbf)=\sum_{i=1}^{N=4} M0_i \phi_i(\xbf)
+\]
+	
+	
+\[
+\bigcup_{i=1}^{N=4}\Omega_i=\Omega  \qquad  \Omega_n\cap\Omega_m=\varnothing
+\qquad 
+\phi_i(\xbf)=\left\{ \begin{split}
+			1 & \quad x\in\Omega_i \\
+			0 & \quad \text{otherwise}
+                     \end{split} \right. 
+\]
 
-In practice, the MRI observations are Fourier transform of $M_{TD}$, usually polluted with a white noise $\nu$ (with mean zero and variance $\R$). Hence, \eq{mtd} can be written as:
+
+Assume that the signal model  for $M_{TD}$ \eqn{mtd} is our measurment model in \textbf{image space}
+and is polluted with a white noise $\nu$ (with mean zero and variance $\R$). Hence, \eq{mtd} can be written as:
 \begin{equation}\label{mtdobs}
-%z(\kk,\p)=\underbrace{\mathcal{F}^{-1}\left[\int_{\Omega} M_{TD}(\kk,\p,\x)e^{-\frac{T_E}{T_2^*(\x)}-jT_E\Delta\omega_0(\x)}e^{-2\pi \vec{k}.\x}d\x\right]}_{h(\kk,\p)}+\nu
-z(\kk,\p)=\underbrace{M_{TD}(\kk,\p,\x)e^{-j\Delta\omega_0(\x)}}_{h(\kk,\p)}+\nu\textbf{}
+z(\kk,\p)=\underbrace{M_{TD}(\kk,\p,\x)}_{h(\kk,\p)}+\nu
 \end{equation}
 
-Note that the observation $z$ is a function of control parameters $\kk=\{T_R,T_D,\theta,T_E\}$ and parameters of interest $\p$. %, and \textit{k-}space coordination parameter $\vec{k}$.
-The ultimate goal is to provide accurate estimate of the parameters $\p\equiv \{T_1,T_2,M_0\}$, given some measurements $z$. 
 
-Precise estimation of parameters $\p$ crucially depends on the values of control parameters $\kk=\{T_R,T_D,\theta,T_E\}$.  In other words, to ensure performance of the estimation algorithm, one needs to select the control parameters $\kk=\{T_R,T_D,\theta,T_E\}$ such that the observation $z$ provides useful information about the parameters $\p$. This is achieved my maximizing the mutual information between the control parameters $\kk$ and parameters of interest $\p$. 
+Note that the observation $z$ is a function of control parameters $\kk$ and
+parameters of interest $\p$.  The ultimate goal is to provide accurate estimate
+of the parameters $\p$, given some measurements $z$. 
+Precise estimation of parameters $\p$ crucially depends on the values of
+control parameters $\kk=\{T_R,T_D,\theta,T_E\}$.  In other words, to ensure
+performance of the estimation algorithm, one needs to select the control
+parameters $\kk=\{T_R,T_D,\theta,T_E\}$ such that the observation $z$ provides
+useful information about the parameters $\p$. This is achieved my maximizing
+the mutual information between the control parameters $\kk$ and parameters of
+interest $\p$. 
+Within this framework we will consider the tissue properties to be normally distributed
+Gaussian parameters.
+\[
+  \text{T1}_\text{WM}    =  \mathcal{N}(100ms, 20ms)  \qquad
+  \text{T1}_\text{GM}    =  \mathcal{N}(120ms, 20ms)  \qquad
+  \text{T1}_\text{CSF}   =  \mathcal{N}(320ms, 20ms)  \qquad
+  \text{T1}_\text{Tumor} =  \mathcal{N}(300ms, 20ms)
+\]
+\[
+  \text{T2}_\text{WM}    =  \mathcal{N}(100ms, 20ms)  \qquad
+  \text{T2}_\text{GM}    =  \mathcal{N}(120ms, 20ms)  \qquad
+  \text{T2}_\text{CSF}   =  \mathcal{N}(320ms, 20ms)  \qquad
+  \text{T2}_\text{Tumor} =  \mathcal{N}(300ms, 20ms)
+\]
+\[
+  \text{M0}_\text{WM}    =  \mathcal{N}(100??, 20??)  \qquad
+  \text{M0}_\text{GM}    =  \mathcal{N}(120??, 20??)  \qquad
+  \text{M0}_\text{CSF}   =  \mathcal{N}(320??, 20??)  \qquad
+  \text{M0}_\text{Tumor} =  \mathcal{N}(300??, 20??)
+\]
 
-%This manuscript concentrates on the idea of finding the values of control parameters $\k$ such that they provide the most information about the parameters $\p$. In the following, we first briefly describe the idea of model-data fusion to estimate the parameters $\p$. Then, the idea of optimal experimental design for control parameters $\k$ is explained.
 
-
-\section*{Optimal Experimental Design}\label{oed}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{WIP - Optimal Experimental Design}\label{oed}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 As discussed before, performance of estimation process crucially depends on the value of control parameters $\kk$. Hence, it is important to develop mathematical tools to identify the control parameters $\kk$ such that they provide the best observation data for accurate estimation of parameter $\p$. This is equivalent with maximizing the mutual information between the observation data and parameters $\p$. Based on information theory, mutual information is defined as the reduction of uncertainty in one parameter due to knowledge of the other parameter.
 
 \begin{equation} \label{mi}
@@ -125,7 +199,11 @@ We emphasize here that the mutual information will be the same on different pixe
 On the other hand, in a case that the tissue properties for each pixel are different from the other, then the mutual information needs to be evaluated for each and every pixel of interest.
 
 
-\section*{Model - Data Fusion}\label{da}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{WIP - Model Data Fusion}\label{da}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 After finding the optimal values of the control parameter $\kk$, we can proceed and perform the model-data fusion to get a better understanding about the uncertainties involved in parameters $\p$.
 The fusion of observational data with mathematical model predictions promises to provide greater understanding of physical phenomenon than either approach alone can achieve. In here, a minimum variance framework is being used for model - data fusion. Based on minimum variance technique, posterior statistics of parameter $\p$ can be written as:
 
@@ -161,13 +239,27 @@ The matrices $\Sigma_{\p z}$ amd $\Sigma_{hh}$ are defined as:
 \eq{minvarmean} along with \eq{minvarvar} provide posterior mean and covariance of parameter $\p$ given observation data $\tilde{z}$ and model predictions $h(\kk,\p)$.
 We emphasize here that the optimal values of $\kk$, obtained from \eq{mimax}, are used in \eq{minvarmean}.
 
-\section*{Overall Picture}
+\section{WIP - Overall Picture}
 The following diagram illustrates the general work-flow of the process:
 \begin{figure}[h!!]
 \center
 \includegraphics[trim = 1.5cm 3cm 8cm 0.5cm, clip,width=5in,height=4.5in]{\picdir/flowchart.pdf}
 \caption{Schematic view of the estimation process}
 \end{figure}
+
+\section{WIP - T1, T2, M0 Reconstruction}
+\paragraph{Given}
+the image space date for  multiple  acquistion parameters 
+$\{ M_{TD}(\kk_1),M_{TD}(\kk_2), M_{TD}(\kk_2),... \}$,  \\
+ $\kk_i=\{T_{R_i},T_{D_i},\theta_i,T_{E_i},\alpha_i\}$ 
+{\color{red}(@kenphwang 2 delay times and 4 echoes correct?)},
+
+The reconstruction algorithms for T1, T2, M0 is as follows:
+\begin{itemize}
+\item {\color{red}(@kenphwang can we get the current code for this recon.)}
+\item {\color{red}(@kenphwang Can  you provide an example data set ? is this real/imaginary data? or magnitude only? is $\alpha$, $\theta$ fixed?)}
+\item 
+\end{itemize}
 
 
 %\begin{figure}[htb!]
@@ -181,18 +273,9 @@ The following diagram illustrates the general work-flow of the process:
 % % t2 Fig
  
 
-%\section*{Conclusion}
-%In this manuscript, we provided new mathematical formulations to address the problem of parameter estimation in presence of large number of data observations. The key point of these formulations is to make use of Bayesian Central Limit Theorem, which approximates posterior distribution of parameter of interest with a Gaussian distribution, whose mean and covariance are provided using maximum likelihood estimate of the parameter and Fisher information, respectively. 
-%
-%It should be noted here that the only possible challenge in using these formulations is to evaluate the Fisher information. As we discussed before, finding Fisher information can be challenging in general, depending on the nonlinearities involved in observation operator $\mathcal{U}(\Teta)$.
-
-%\bibliographystyle{IEEEtran}
-%%\bibliographystyle{plain}
-%\bibliography{refs}
-
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\section{Physics Model}\label{PhysicsModel}
+\section{ WIP - Physics Model}\label{PhysicsModel}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 The steady-state magnetization $M_{TD}$ at a specific delay time $T_D$ can be found as a function of flip angle $\theta$, repetition time $T_R$, excitation pulse $\alpha$, and relaxation time  $T_1$:
 \[
@@ -200,7 +283,7 @@ The steady-state magnetization $M_{TD}$ at a specific delay time $T_D$ can be fo
 \]
 where, $M_0$ is the unsatuarated magnetization.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\section{Mathematical Framework}\label{GeneralMathFramework}
+\section{ WIP - Mathematical Framework}\label{GeneralMathFramework}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 The underlying philosophy and assumptions within our approach is that the physics 
