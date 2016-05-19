@@ -248,6 +248,142 @@ Information content as function of $(T_D, T_E)$
  MI = H(z) \approx \Sigma_z = 
 \]
 
+As mentioned earlier, one of the main challenges in MRI technique is to effectively determine the optimal locations on $k-$space such that they provide the best estimate for the image. In other words, we are looking for the measurement data such that they provide the most confident estimates of uncertain parameters. This is equivalent with finding the measurement data that result in most reduction of uncertainty in parameter estimates. Based on the Information Theory \cite{cover2012elements}, the reduction of uncertainty in one parameter due to the knowledge of the other variable is known as \textit{Mutual Information}. Hence, a good measurement data is the one that provides us the maximum amount of mutual information. Information theoretic approaches and the concept of mutual information has been used in numerous works for optimal sensor placement and sensor management \cite{bourgault2002information,martinez2006optimal,tharmarasa2007large,williams2007approximate,krause2008,choi2010continuous,julian2012distributed,madankan_jae,Madankan_dydess}. The concept of mutual information is also recently being used for optimal measurement design in functional MRI (fMRI) \cite{yan2014linear}. In the following, we first describe the concept of mutual information. Then the mathematical details for finding the optimal locations on $k-$space are presented.
+
+\subsubsection*{Mutual Information as a Measure of Sensor Performance}
+According to information theory, the mutual information \cite{cover2012elements} between the model forecast $\mathcal{U}$ and measurement $z$ can be written as
+
+\begin{equation}\label{mutual_info_u}
+I(\mathcal{U}(\mu,\bar{k});z) = \int_{z}\int_{\mathcal{U}} p(\mathcal{U},z)\ln\left(\frac{p(\mathcal{U},z)}{p(\mathcal{U})p(z)}\right)d\mathcal{U} dz
+\end{equation}
+
+Since the uncertain parameter $\mu$ is the only source of uncertainty in model forecast $\mathcal{U}$, one can evaluate the mutual information between the uncertain parameter $\mu$ and measurement $z$, instead of \eq{mutual_info_u}:
+
+\begin{equation}\label{mutual_info}
+%I(k^\mu;z^k) \equiv 
+I(\mu;z) = \int_{z}\int_{\mu} p(\mu,z)\ln\left(\frac{p(\mu,z)}{p(\mu)p(z)}\right)d\mu dz
+\end{equation}
+Using Bayes' rule, $p(\mu,z)$ can be written as
+
+\[p(\mu,z)=p(\mu|z)p(z)\]
+Hence $I(\mu;z)$ will be equal to:
+\begin{eqnarray}\label{info}
+I(\mu;z) = \int_{z} \underbrace{\int_{\mu} p(\mu|z)ln\left(\frac{p(\mu|z)p(z)}{p(\mu)p(z)}\right)d\mu}_{D_{KL}(p(\mu|z))||p(\mu)} p(z) dz
+\end{eqnarray}
+or,
+\begin{equation}
+I(\mu;z)=\mathcal{E}_z[D_{KL}\left(p(\mu|z))||p(\mu)\right)]
+\end{equation}
+  
+where, $D_{KL}\left(p(a)||p(b)\right)$ denotes the KL distance between two probability density functions $p(a)$  and $p(b)$. Hence, mutual information can be interpreted as the average Kullback-Leiber distance between the prior pdf $p(\mu)$ and the posterior pdf $p(\mu|z)$. By maximizing the mutual information, one inherently maximizes the difference between the prior and posterior distributions of the parameter $\mu$, thus leading to a better measurement and estimate.
+
+
+\subsection{Optimal Locations on k-space}\label{subsec:kspace}
+Note that due to dependence of observation data $z$ on $k-$space parameters, the mutual information $I(\mu;z)$ is also a function of $(k_x,k_y,k_z)$ parameters. Hence, our goal is to look for a set of optimal locations $(k_x^j,k_y^j,k_z^j),\ j=1,2,\cdots,N$ such that they maximize the mutual information. This can be mathematically described as the following optimization problem:
+
+\begin{equation}\label{cost1}
+\max_K J(K) = \max_{K} I(\mu;\mathbf{z})
+\end{equation}
+where, $K=\{(k_x^1,k_y^1,k_z^1),\cdots,(k_x^N,k_y^N,k_z^N)\}$ denotes the coordinates of $N$ observations on $k-$space and $\mathbf{z}=\{z_1,z_2,\cdots,z_N\}$ is the set of all $N$ observations in hand. 
+
+Note that obtained $k$-space points are completely independent from \textit{noise realizations}, while \textit{statistics of the noise} will affect the location of k-space points. For instance, if the standard deviation of noise increases, it will result in a less confident estimate of parameter $\mu$, and vice versa. In extreme case, when standard deviation of noise goes to infinity, i.e. when SNR approaches to zero, there would not be any useful information in k-space measurements and proposed algorithm returns the same prior estimates of $\mu$. On the other hand, when SNR goes to infinity (i.e. standard deviation of noise goes to zero), the proposed algorithm will be much more confident about the parameter estimate $\mu$ and correspondingly temperature estimate. 
+%Unfortunately, solving the above optimization problem is computationally intractable for most of the practical applications. Hence, one needs to simplify the original optimization problem and find the approximate solution for optimal location of each observation. \textit{Assuming} measurement data to be statistically independent from each other, one can use heuristic problem solving techniques like greedy algorithm \cite{bertsekas_book} to simplify the aforementioned optimization. Using the greedy algorithm, original optimization problem can be simplified to:
+%Note that due to independence of measurement data, one can rewrite \eq{cost1} as:
+
+%\begin{equation}\label{cost2}
+%\max_K J(K)=\max_{K} \sum\limits_{j=1}^{N} I(\mu;z_j)
+%\end{equation}
+%and since the mutual information $I(\mu;z_j)$ is a scalar positive quantity, \eq{cost2} can be written as the following:
+%
+%\begin{align}
+%\max_K J(K)=& \sum\limits_{j=1}^{N}\max_{(k_x^j,k_y^j,k_z^j)} I(\mu;z_j)\label{cost3}\\
+%\text{subject to: } & \nonumber\\
+%&(k_x^i,k_y^i,k_z^i) \neq (k_x^j,k_y^j,k_z^j) \label{cons}
+%\end{align}
+%where, \eq{cons} is considered to avoid the redundancy in observations. Intuitively, \eq{cost3} tries to find the optimal locations for each observation on $k-$space such that it maximizes the mutual information between the measurement and uncertain parameter $\mu$.
+
+
+\subsection{A Simpler Alternative: Maximizing the Variance}\label{susec:variance}
+Unfortunately, evaluation of mutual information and solving the above optimization problem is computationally intractable for most of the practical applications. Hence, one needs to simplify the original optimization problem and find the approximate solution for optimal location of each observation. A simpler alternative in finding useful $k-$space locations is to maximize the entropy (uncertainty) in model outputs $\mathcal{U}$, instead of maximizing the mutual information $I(\mu;z)$ \cite{krause2008}. Based on information theory, the entropy of $\mathcal{U}$, denoted by $h(\mathcal{U})$ is defined as:
+%As we discussed in section \ref{sec:dyn_data}, mutual information can be expressed as the reduction of uncertainty (entropy), i.e. $I(\mathcal{U},z)$ can be expressed as
+%
+%\begin{equation}\label{mutualinfo_entropy}
+%I(\mathcal{U},z)=h(\mathcal{U})-h(\mathcal{U}|z)
+%\end{equation}
+%where, $h(\mathcal{U})$ denotes the entropy of $\mathcal{U}$, and is defined as
+
+\begin{equation}\label{entropy}
+h(\mathcal{U})=-\int_{\mathcal{U}} ln\left(p(\mathcal{U})\right)p(\mathcal{U})d\mathcal{U}
+\end{equation}
+where, $p(\mathcal{U})$ is the probability density function of $\mathcal{U}$. % As well, $h(\mathcal{U}|z)$ represents the entropy of $\mathcal{U}$, given the measurement $z$.
+%Now, according to \eq{mutualinfo_entropy}, one can write
+%\begin{equation}\label{info_entro_max}
+%\max I(\mathcal{U},z)=\max \left\lbrace h(\mathcal{U})-h(\mathcal{U}|z)\right\rbrace
+%\end{equation}
+%or
+%\begin{equation}\label{info_entro_max}
+%\max I(\mathcal{U},z) \geq \max h(\mathcal{U}) - \max h(\mathcal{U}|z)
+%\end{equation}
+%Looking at \eq{info_entro_max}, one can see that maximizing the entropy $h(\mathcal{U})$ maximizes the lower bound of $I(\mathcal{U},z)$. 
+One can simplify the problem by just maximizing the entropy of model outputs, instead of maximizing the mutual information. We emphasize here that this simplification may have its drawback in not giving the \textit{globally} optimal locations on $k-$space, but as we will show in the following, it will result in great simplification of the problem. 
+
+To proceed with maximizing the entropy $h(\mathcal{U})$, we first note that based on Maximum Entropy Principle \cite{cover2012elements}, probability density function $p(\mathcal{U})$ can be parametrized in terms of its central moments as
+
+\begin{equation}\label{pu_entropy}
+p(\mathcal{U})=\lim_{N\rightarrow \infty} \left(e^{\sum\limits_{n=0}^N \lambda_n (\mathcal{U}-\hat{\mathcal{U}})^n}\right),\quad \lambda_n \in \re
+\end{equation}
+
+where, $\hat{\mathcal{U}}$ is provided by \eqref{expx1U}. By substituting \eq{pu_entropy} in \eq{entropy}, we will have:
+$  $
+\begin{align}
+h(\mathcal{U})=-\int_{\mathcal{U}} \lim_{N\rightarrow \infty} \left(\sum\limits_{n=0}^\infty \lambda_n (\mathcal{U}-\hat{\mathcal{U}})^n\right) p(\mathcal{U})d(\mathcal{U})\nonumber\\
+= \lim_{N \rightarrow \infty} (-\lambda_0 - \sum\limits_{n=2}^{N} \lambda_n m_n) \label{entropy_moments}
+\end{align}
+where, $m_n$s are the central moments of $\mathcal{U}$, defined by \eq{expx1_ctrU}. Hence, entropy of $p(\mathcal{U})$ can be described in terms of its central moments, as shown in \eq{entropy_moments}. Now, by approximating $p(\mathcal{U})$ with its first two moments and truncating the above expansion (i.e. letting $N=2$), we have 
+
+\begin{equation}\label{entropy_var}
+h(\mathcal{U})\simeq -\lambda_0-\lambda_2 m_2,\quad \lambda_0,\lambda_2 \in \re
+\end{equation}
+Therefore, to maximize the entropy one can only maximize the variance, i.e.
+\begin{eqnarray}\label{entropy_var_max}
+\max_{K} h(\mathcal{U})= -\lambda_0 -\lambda_2 \max_{K}(m_2), \quad \lambda_0,\lambda_2 \in \re
+\end{eqnarray}
+\textcolor{black}{subject to:
+\begin{equation}\label{sparsity_con}
+|K^i-K^j|\geq N_d,\quad \forall\ i,j\in 1,2,\cdots,N,\quad i\neq j 
+\end{equation}}
+where, $|K^i-K^j|=|(k_x^i,k_y^i,k_z^i)-(k_x^j,k_y^j,k_z^j)|$ denotes the distance between the $i^{th}$ and $j^{th}$ locations on $k-$space and $m_2=Var(\mathcal{U})$ is defined from \eq{expx1_ctrU}. Hence, the locations on $k-$space with the highest value of variance for $\mathcal{U}$ are a good approximation of optimal locations for data observations. 
+
+\textcolor{black}{\eq{sparsity_con} is considered to ensure that every distinct pair of $k-$space observations are at least by a distance $N_d$ apart from each other. This constraint is used in order to compensate possible dependencies that can be introduced due to approximation of the original problem. We assumed $N_d=1$ through this manuscript.}
+
+\textcolor{black}{One should note that different order of truncation (i.e. different values of $N$) can be used to approximate the entropy in \eq{entropy_moments}. Clearly, higher order approximation (greater values of $N$) leads to more accurate approximation of entropy. However, the downside of using higher order terms is that one needs to find the corresponding $\lambda_n$ coefficients for each term. Finding corresponding $\lambda_n$ coefficients requires solving an optimization problem which could increase computational cost of the whole procedure. Hence, lower order approximation of entropy is of more interest due to real time applications of the proposed technique.}
+
+%As explained in section \ref{subsec:kspace}, solution of associated optimization problem with maximizing mutual information can be computationally intractable in presence of large number of measurements. In addition, evaluation of mutual information $I(\mu;z)$ can be computationally expensive due to associated integrations in \eq{mutual_info}. A simpler alternative to avoid these complexities is to find the locations on $k-$space which posses the highest variability in model predictions. To achieve this, one first needs to perform non-uniform Fourier transform on the Pennes bioheat model outputs using \eq{ymodel} and then, variance of model predictions can be  calculated as given in \eq{expx1_ctrU}, i.e.
+%
+%\begin{equation}\label{varkspace}
+%Var(\mathcal{U})=\sum_{q=1}^{M} w_q(\mathcal{U}(\x,\mu(\xii^q),t)-\hat{\mathcal{U}})^2
+%\end{equation}
+%where, $\hat{\mathcal{U}}$ is the expected value of $\mathcal{U}$, calculated using \eq{expx1U}. Now, the locations on $k-$space with highest value of the variance are the \textit{most useful} locations for data observations. 
+The intuition behind the idea of maximizing the variance is that the points on $k-$space with lower value of variance are less sensitive to model perturbations (resulted from parameter uncertainties) and vice versa. Hence, it is better to select the points on $k-$space with highest sensitivity with respect to model uncertainties. For instance, a point with zero variance on $k-$space will not be a good candidate for data observation since no matter what the values of uncertain parameters are, model output will always be the same at that specific point. On the other hand, a point on $k-$space with large value of variance means that the model output at that location is \textit{highly sensitive} to model uncertainties. Hence, a measurement at that $k-$space location would be of more interest. Therefore, the points with highest values of variance of $\mathcal{U}$ are \textit{better candidates} for data observations. 
+
+%Note that against the mutual information, calcuation of variance of model outputs is very simple and computationally affordable. In addition, solving the optimization problem associated with finding the points with highest values of variance is a much simpler task, comparing with solution of \eq{cost3}.
+
+
+\subsection{Adaptation to Practical $k-$space Sampling}\label{susec:var_kspace}
+It is well known that practically, $k-$space sampling occurs along readout lines, rather than just sparse points on $k-$space. Hence, one needs to modify the idea of variance maximization in order to make it applicable to practical $k-$space sampling. To do so, we propose to perform the $k-$space sampling along the readout lines which their points posses the higher value of variance, i.e.
+
+\begin{equation}\label{var2d}
+\max_{K_y} \sum_{k_x=1}^{N_x} m_2(k_x,k_y)
+\end{equation}
+where, $K_y=\{k_y^1,\cdots,k_y^N\}$ and $N_x$ denotes the total number of points along the $k_x$ axis on $k-$space. Similarly, in $3-$dimensional $k-$space sampling, one can write
+\begin{equation}\label{var3d}
+\max_{K_{xy}} \sum_{k_z=1}^{N_z} m_2(k_x,k_y,k_z)
+\end{equation}
+where, $K_{xy}=\{(k_x^1,k_y^1),\cdots,(k_x^N,k_y^N)\}$ and $N_z$ denotes the total number of points along the $k_z$ axis on $k-$space. 
+
+The major benefit of using \eq{var2d} and \eq{var3d} instead of maximizing \eq{entropy_var_max} is that it provides a more practical scheme for optimal $k-$space undersampling by providing the most informative readout lines, rather than the most informative points. In addition, less computational effort is required to solve  \eq{var2d} and \eq{var3d} comparing to \eq{entropy_var_max}. Note that after finding the optimal readout lines through maximizing \eq{var2d} and \eq{var3d} all the points along those readout lines are used for model - data fusion.
+
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{MI Calculations}
