@@ -71,8 +71,11 @@
 Consider a magnetization signal $M_{TD}$ that is defined as
 as function of 
 \textbf{acquisition parameters} $\kk=\{T_R,T_D,\theta,T_E,\alpha\}$ 
-{\color{red}(@kenphwang are we considering $\alpha$ a control parameter?)}
 and \textbf{tissue properties} $\p \equiv \{T_1,T_2,M_0\}$. 
+Within the scope of this project, $T_R$=4sec, $\theta$=120\textsuperscript{o}, 
+and $\alpha$=90\textsuperscript{o} are \textbf{fixed}. Delay time, $T_D$, and echo time $T_E$
+are parameters under consideration for acquisition optimization. 
+
 
 \begin{figure}[h] 
 \centering
@@ -87,9 +90,14 @@ and \textbf{tissue properties} $\p \equiv \{T_1,T_2,M_0\}$.
 \end{figure}
 
 \begin{equation}\label{mtd}
-M_{TD}(\kk,\p,\x)=\left(M_0(\x)\frac{1-(1-\cos \theta)e^{-\frac{T_D}{T_1(\x)}}-\cos \theta e^{-\frac{T_D}{T_1(\x)}}}{1-\cos \theta e^{-\frac{T_R}{T_1(\x)}}cos \alpha}\right) e^{-\frac{T_E}{T_2(\x)}}
+M_{TD}(\kk,\p,\x)=
+   M_0 e^{i\psi(\x)}
+\left(
+ (\x)\frac{1-(1-\cos \theta)e^{-\frac{T_D}{T_1(\x)}}-\cos \theta e^{-\frac{T_D}{T_1(\x)}}}{1-\cos \theta e^{-\frac{T_R}{T_1(\x)}}cos \alpha}
+ \right) e^{-\frac{T_E}{T_2(\x)}}
 \end{equation}
-Here, $M_0$ is the unsaturated magnetization, $\theta$ represents the \textit{saturation} flip
+Here, $M_0$ is the unsaturated magnetization, $\psi(\x)$ is the measured phase offset,
+$\theta$ represents the \textit{saturation} flip
 angle, and $T_R$ and $T_E$ denote repetition time and echo time, respectively.
 Parameters $T_1$ and $T_2$ represents relaxation times, and $\alpha$ is the
 \textit{local} excitation flip angle. 
@@ -98,8 +106,7 @@ $\alpha=\alpha(\theta)$
 {\color{red}(@kenphwang why is this?)}.
 Note that the unsaturated magnetization $M_0$, along with
 relaxation times $T_1$ and $T_2$, are a function of spatial coordination $\x$.
-Basis functions $\phi_i$ represent the neuro anatomy. For completeness,
-consider
+Basis functions $\phi_i$ represent the neuroanatomy. For completeness, consider
 $\phi_1 = \phi_\text{gm}$,
 $\phi_2 = \phi_\text{wm}$,
 $\phi_3 = \phi_\text{csf}$,
@@ -135,14 +142,14 @@ Note that the observation $z$ is a function of control parameters $\kk$ and
 parameters of interest $\p$.  The ultimate goal is to provide accurate estimate
 of the parameters $\p$, given some measurements $z$. 
 Precise estimation of parameters $\p$ crucially depends on the values of
-control parameters $\kk=\{T_R,T_D,\theta,T_E\}$.  In other words, to ensure
+control parameters $\kk=\{T_D,T_E\}$ ( $\{T_R,\theta,\alpha\}$ \textbf{fixed}).  
+In other words, to ensure
 performance of the estimation algorithm, one needs to select the control
-parameters $\kk=\{T_R,T_D,\theta,T_E\}$ such that the observation $z$ provides
+parameters $\kk=\{T_D,T_E\}$ such that the observation $z$ provides
 useful information about the parameters $\p$. This is achieved my maximizing
-the mutual information between the control parameters $\kk$ and parameters of
-interest $\p$. 
-Within this framework we will consider the tissue properties to be normally distributed
-Gaussian parameters.
+the mutual information between the measurements $z$ and parameters of interest
+$\p$.  Within this framework we will consider the tissue properties to be
+normally distributed Gaussian parameters.
 \[
   \text{T1}_\text{WM}    =  \mathcal{N}(100ms, 20ms)  \qquad
   \text{T1}_\text{GM}    =  \mathcal{N}(120ms, 20ms)  \qquad
@@ -161,11 +168,12 @@ Gaussian parameters.
   \text{M0}_\text{CSF}   =  \mathcal{N}(320??, 20??)  \qquad
   \text{M0}_\text{Tumor} =  \mathcal{N}(300??, 20??)
 \]
+{\color{red}(@kenphwang need exact numbers)}
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\section{WIP - Optimal Experimental Design}\label{oed}
+\section{Optimal ($T_D$,$T_E$) Design}\label{oed}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 As discussed before, performance of estimation process crucially depends on the value of control parameters $\kk$. Hence, it is important to develop mathematical tools to identify the control parameters $\kk$ such that they provide the best observation data for accurate estimation of parameter $\p$. This is equivalent with maximizing the mutual information between the observation data and parameters $\p$. Based on information theory, mutual information is defined as the reduction of uncertainty in one parameter due to knowledge of the other parameter.
@@ -198,8 +206,73 @@ We emphasize here that the mutual information will be the same on different pixe
 
 On the other hand, in a case that the tissue properties for each pixel are different from the other, then the mutual information needs to be evaluated for each and every pixel of interest.
 
+The final plot over delay time and echo time is shown in Figure~\ref{fig:MIMapTDTE}.
+The current acquistion utilizes 8 total combinations of (effective) echo times 
+and delay times, 2 echo times and 4 delay times.
+
+The information content of this acquisition scheme is calculated as the superposition
+\[
+ I^\text{current} = \sum_{i=1}^8 I((T_D, T_E)_i)
+\qquad \text{\color{red}(@kenphwang need exact numbers)}
+\]
+\[
+   \left(T_D, T_E\right) = 
+   \left\{
+   \text{(20ms, 15ms),(40ms, 15ms),(70ms, 15ms),(90ms, 15ms),
+         (20ms, 35ms),(40ms, 35ms),(70ms, 35ms),(90ms, 35ms)}
+   \right\}
+\]
+An optimal acquisition strategy either maintains or improves this information content with
+less samples to (1) improve time and (2) accuracy.
+\[
+  I^\text{current} < I^\text{optimal} = \sum_{i=1}^{M \leq 8} I((T^*_D, T^*_E)_i)
+\]
+
+\begin{figure}[h] 
+\centering
+\includegraphics[width=.7\textwidth]{\picdir/MIMapTDTE.png} 
+\caption{ 
+Information content as function of $(T_D, T_E)$
+}\label{fig:MIMapTDTE}
+\end{figure}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{MI Approximations}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+{\color{red}(@dmitchell412 need Variance calculation algorithm compiled here with Quadrature)}
+
+(Copy approximation from @madankan paper)
+
+\[
+ MI = H(z) \approx \Sigma_z = 
+\]
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{MI Calculations}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+{\color{red}(@dmitchell412 need Entropy calculation algorithm compiled here using
+linearization about quadrature points)}
+
+A more direct calculation of the entropy is given as
+\[
+ MI = H(z) \approx 
+\]
+
+\begin{figure}[h] 
+\centering
+\begin{tabular}{ccc}
+\includegraphics[width=.5\textwidth]{\picdir/20160519_115937.jpg} & 
+\includegraphics[width=.49\textwidth]{\picdir/20160519_115947.jpg} \\
+\end{tabular}
+\caption{ 
+\color{red}
+WIP - @dmitchell412 Need higher order entropy approximation
+}\label{fig:Pulsesequence}
+\end{figure}
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{WIP - Model Data Fusion}\label{da}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
