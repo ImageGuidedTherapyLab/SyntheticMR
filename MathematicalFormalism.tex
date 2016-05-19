@@ -64,6 +64,16 @@
 \maketitle
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Pending Tasks}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{itemize}
+\item {\color{red} @kenphwang can we get the current code for this recon.}
+\item {\color{red} @kenphwang Can  you provide an example data set ? is this real/imaginary data? }
+\item @fuentesdt Code Eq. \eqn{mimax}
+\item @fuentesdt generate Figure~\ref{fig:MIMapTDTE}
+\end{itemize}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Problem Statement}\label{sec:prob_statement}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -71,8 +81,11 @@
 Consider a magnetization signal $M_{TD}$ that is defined as
 as function of 
 \textbf{acquisition parameters} $\kk=\{T_R,T_D,\theta,T_E,\alpha\}$ 
-{\color{red}(@kenphwang are we considering $\alpha$ a control parameter?)}
 and \textbf{tissue properties} $\p \equiv \{T_1,T_2,M_0\}$. 
+Within the scope of this project, $T_R$=4sec, $\theta$=120\textsuperscript{o}, 
+and $\alpha$=90\textsuperscript{o} are \textbf{fixed}. Delay time, $T_D$, and echo time $T_E$
+are parameters under consideration for acquisition optimization. 
+
 
 \begin{figure}[h] 
 \centering
@@ -87,9 +100,14 @@ and \textbf{tissue properties} $\p \equiv \{T_1,T_2,M_0\}$.
 \end{figure}
 
 \begin{equation}\label{mtd}
-M_{TD}(\kk,\p,\x)=\left(M_0(\x)\frac{1-(1-\cos \theta)e^{-\frac{T_D}{T_1(\x)}}-\cos \theta e^{-\frac{T_D}{T_1(\x)}}}{1-\cos \theta e^{-\frac{T_R}{T_1(\x)}}cos \alpha}\right) e^{-\frac{T_E}{T_2(\x)}}
+M_{TD}(\kk,\p,\x)=
+   M_0 e^{i\psi(\x)}
+\left(
+ (\x)\frac{1-(1-\cos \theta)e^{-\frac{T_D}{T_1(\x)}}-\cos \theta e^{-\frac{T_D}{T_1(\x)}}}{1-\cos \theta e^{-\frac{T_R}{T_1(\x)}}cos \alpha}
+ \right) e^{-\frac{T_E}{T_2(\x)}}
 \end{equation}
-Here, $M_0$ is the unsaturated magnetization, $\theta$ represents the \textit{saturation} flip
+Here, $M_0$ is the unsaturated magnetization, $\psi(\x)$ is the measured phase offset,
+$\theta$ represents the \textit{saturation} flip
 angle, and $T_R$ and $T_E$ denote repetition time and echo time, respectively.
 Parameters $T_1$ and $T_2$ represents relaxation times, and $\alpha$ is the
 \textit{local} excitation flip angle. 
@@ -98,8 +116,7 @@ $\alpha=\alpha(\theta)$
 {\color{red}(@kenphwang why is this?)}.
 Note that the unsaturated magnetization $M_0$, along with
 relaxation times $T_1$ and $T_2$, are a function of spatial coordination $\x$.
-Basis functions $\phi_i$ represent the neuro anatomy. For completeness,
-consider
+Basis functions $\phi_i$ represent the neuroanatomy. For completeness, consider
 $\phi_1 = \phi_\text{gm}$,
 $\phi_2 = \phi_\text{wm}$,
 $\phi_3 = \phi_\text{csf}$,
@@ -128,6 +145,14 @@ Assume that the signal model  for $M_{TD}$ \eqn{mtd} is our measurment model in 
 and is polluted with a white noise $\nu$ (with mean zero and variance $\R$). Hence, \eq{mtd} can be written as:
 \begin{equation}\label{mtdobs}
 z(\kk,\p)=\underbrace{M_{TD}(\kk,\p,\x)}_{h(\kk,\p)}+\nu
+\qquad
+\nu \in \mathbb{R}^2
+\quad 
+\R = 
+\begin{bmatrix}
+\sigma_r &      0    \\
+    0    & \sigma_i  \\
+\end{bmatrix}
 \end{equation}
 
 
@@ -135,14 +160,14 @@ Note that the observation $z$ is a function of control parameters $\kk$ and
 parameters of interest $\p$.  The ultimate goal is to provide accurate estimate
 of the parameters $\p$, given some measurements $z$. 
 Precise estimation of parameters $\p$ crucially depends on the values of
-control parameters $\kk=\{T_R,T_D,\theta,T_E\}$.  In other words, to ensure
+control parameters $\kk=\{T_D,T_E\}$ ( $\{T_R,\theta,\alpha\}$ \textbf{fixed}).  
+In other words, to ensure
 performance of the estimation algorithm, one needs to select the control
-parameters $\kk=\{T_R,T_D,\theta,T_E\}$ such that the observation $z$ provides
+parameters $\kk=\{T_D,T_E\}$ such that the observation $z$ provides
 useful information about the parameters $\p$. This is achieved my maximizing
-the mutual information between the control parameters $\kk$ and parameters of
-interest $\p$. 
-Within this framework we will consider the tissue properties to be normally distributed
-Gaussian parameters.
+the mutual information between the measurements $z$ and parameters of interest
+$\p$.  Within this framework we will consider the tissue properties to be
+normally distributed Gaussian parameters.
 \[
   \text{T1}_\text{WM}    =  \mathcal{N}(100ms, 20ms)  \qquad
   \text{T1}_\text{GM}    =  \mathcal{N}(120ms, 20ms)  \qquad
@@ -161,14 +186,22 @@ Gaussian parameters.
   \text{M0}_\text{CSF}   =  \mathcal{N}(320??, 20??)  \qquad
   \text{M0}_\text{Tumor} =  \mathcal{N}(300??, 20??)
 \]
+{\color{red}(@kenphwang need exact numbers)}
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\section{WIP - Optimal Experimental Design}\label{oed}
+\section{Optimal ($T_D$,$T_E$) Design}\label{oed}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-As discussed before, performance of estimation process crucially depends on the value of control parameters $\kk$. Hence, it is important to develop mathematical tools to identify the control parameters $\kk$ such that they provide the best observation data for accurate estimation of parameter $\p$. This is equivalent with maximizing the mutual information between the observation data and parameters $\p$. Based on information theory, mutual information is defined as the reduction of uncertainty in one parameter due to knowledge of the other parameter.
+As discussed before, performance of estimation process crucially depends on the
+value of control parameters $\kk$. Hence, it is important to develop
+mathematical tools to identify the control parameters $\kk$ such that they
+provide the best observation data for accurate estimation of parameter $\p$.
+This is equivalent with maximizing the mutual information between the
+observation data and parameters $\p$. Based on information theory, mutual
+information is defined as the reduction of uncertainty in one parameter due to
+knowledge of the other parameter.
 
 \begin{equation} \label{mi}
 I(\p;z)=\int_z\int_p p(\p,z)\ln\left(\frac{p(\p,z)}{p(\p)p(z)}\right)d\p dz
@@ -189,20 +222,466 @@ I(\p;z)=\int_z\int_p p(z|\p)p(\p)\ln\left[p(z|\p)\right]d\p dz - \int_z p(z) \ln
 Note that due to dependence of observation data $z$ on control parameters, the mutual information $I(\p;z)$ is a function of control parameter $\kk$. In order to maximize the reduction of uncertainty in parameter estimate (i.e. to have the most confident estimates of the parameter $\p$), one can simply maximize the mutual information between the observation data and parameters of interest:
 
 \begin{equation}\label{mimax}
-\max_{\kk} I(\p;z)
+\max_{\kk \in \mathcal{F}} I(\p;z)
+\qquad
+\kk=\{T_D,T_E\} \in \mathcal{F} = (0,4sec] \times (0,140ms] \subset \mathbb{R}^2 
 \end{equation}
 
-The above maximization results in \textit{optimal} values of control parameter $\kk$ for accurate estimation of parameter $\p$. Note that in \eq{mi3}, $p(z|\p)$ is defined as a Gaussian distribution with mean $h(\kk,\p)$ and variance $\R$. As well, $p(\p)$ denotes the prior distribution of parameter $\p$, which for the ease of calculations, is considered to be a Gaussian distribution with some prior mean $\hat{\p}^-$ and prior covariance $\Sigma^-$, i.e. $p(\p)\sim \mathcal{N}(\hat{p}^-,\Sigma^-)$. Method of quadrature points can be used to evaluate \eq{mi3}. 
+The above maximization results in \textit{optimal} values of control parameter
+$\kk$ for accurate estimation of parameter $\p$. 
+The feasible set, $\mathcal{F}$, is determined by the pulse sequence acquisition physics.
+Note that in \eq{mi3},
+$p(z|\p)$ is defined as a Gaussian distribution with mean $h(\kk,\p)$ and
+variance $\R$. As well, $p(\p)$ denotes the prior distribution of parameter
+$\p$, which for the ease of calculations, is considered to be a Gaussian
+distribution with some prior mean $\hat{\p}^-$ and prior covariance $\Sigma^-$,
+i.e. $p(\p)\sim \mathcal{N}(\hat{p}^-,\Sigma^-)$. Method of quadrature points
+can be used to evaluate \eq{mi3}. 
 
 We emphasize here that the mutual information will be the same on different pixels with the same tissue types. This is due to the similarities in statistics of $\p$ between the two different pixels with the same tissue properties. In other words, whenever two different pixels have the same tissue properties, then the distribution of parameter $\p$, denoted by $p(\p)$, is the same and so is the value of mutual information. Hence, there is no need to evaluate the mutual information for each pixel in a region with the same tissue type. 
-
 On the other hand, in a case that the tissue properties for each pixel are different from the other, then the mutual information needs to be evaluated for each and every pixel of interest.
 
+The final plot over delay time and echo time is shown in Figure~\ref{fig:MIMapTDTE}.
+The current acquistion utilizes 8 total combinations of (effective) echo times 
+and delay times, 2 echo times and 4 delay times.
+
+The information content of this acquisition scheme is calculated as the superposition
+\[
+ I^\text{current} = \sum_{i=1}^8 I((T_D, T_E)_i)
+\qquad \text{\color{red}(@kenphwang need exact numbers)}
+\]
+\[
+   \left(T_D, T_E\right) = 
+   \left\{
+   \text{(20ms, 15ms),(40ms, 15ms),(70ms, 15ms),(90ms, 15ms),
+         (20ms, 35ms),(40ms, 35ms),(70ms, 35ms),(90ms, 35ms)}
+   \right\}
+\]
+An optimal acquisition strategy either maintains or improves this information content with
+less samples to (1) improve time and (2) accuracy.
+\[
+  I^\text{current} < I^\text{optimal} = \sum_{i=1}^{M \leq 8} I((T^*_D, T^*_E)_i)
+\]
+
+\begin{figure}[h] 
+\centering
+\includegraphics[width=.7\textwidth]{\picdir/MIMapTDTE.png} 
+\caption{ 
+Information content as function of $(T_D, T_E) \in \mathcal{F} = (0,4sec] \times (0,140ms] \subset \mathbb{R}^2 $.
+The feasible set, $\mathcal{F} $, 
+is determined by the pulse sequence acquisition physics.
+}\label{fig:MIMapTDTE}
+\end{figure}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{MI Approximations: Maximizing the Variance}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+Unfortunately, evaluation of mutual information and solving the above
+optimization problem is computationally intractable for most of the practical
+applications. Hence, one needs to simplify the original optimization problem
+and find the approximate solution for optimal location of each observation. A
+simpler alternative in finding useful $k-$space locations is to maximize the
+entropy (uncertainty) in model outputs $\mathcal{U}$, instead of maximizing the
+mutual information $I(\mu;z)$ \cite{krause2008}. Based on information theory,
+the entropy of $\mathcal{U}$, denoted by $h(\mathcal{U})$ is defined as:
+%
+
+\begin{equation}\label{entropy}
+h(\mathcal{U})=-\int_{\mathcal{U}} ln\left(p(\mathcal{U})\right)p(\mathcal{U})d\mathcal{U}
+\end{equation}
+where, $p(\mathcal{U})$ is the probability density function of $\mathcal{U}$. % As well, $h(\mathcal{U}|z)$ represents the entropy of $\mathcal{U}$, given the measurement $z$.
+One can simplify the problem by just maximizing the entropy of model outputs,
+instead of maximizing the mutual information. We emphasize here that this
+simplification may have its drawback in not giving the \textit{globally}
+optimal locations on $k-$space, but as we will show in the following, it will
+result in great simplification of the problem. 
+
+To proceed with maximizing the entropy $h(\mathcal{U})$, we first note that
+based on Maximum Entropy Principle \cite{cover2012elements}, probability
+density function $p(\mathcal{U})$ can be parametrized in terms of its central
+moments as
+
+\begin{equation}\label{pu_entropy}
+p(\mathcal{U})=\lim_{N\rightarrow \infty} \left(e^{\sum\limits_{n=0}^N \lambda_n (\mathcal{U}-\hat{\mathcal{U}})^n}\right),\quad \lambda_n \in \re
+\end{equation}
+
+where, $\hat{\mathcal{U}}$ is provided by \eqref{expx1U}. By substituting
+\eq{pu_entropy} in \eq{entropy}, we will have: $  $
+\begin{align}
+h(\mathcal{U})=-\int_{\mathcal{U}} \lim_{N\rightarrow \infty} \left(\sum\limits_{n=0}^\infty \lambda_n (\mathcal{U}-\hat{\mathcal{U}})^n\right) p(\mathcal{U})d(\mathcal{U})\nonumber\\
+= \lim_{N \rightarrow \infty} (-\lambda_0 - \sum\limits_{n=2}^{N} \lambda_n m_n) \label{entropy_moments}
+\end{align}
+where, $m_n$s are the central moments of $\mathcal{U}$, defined by \eq{expx1_ctrU}. Hence, entropy of $p(\mathcal{U})$ can be described in terms of its central moments, as shown in \eq{entropy_moments}. Now, by approximating $p(\mathcal{U})$ with its first two moments and truncating the above expansion (i.e. letting $N=2$), we have 
+
+\begin{equation}\label{entropy_var}
+h(\mathcal{U})\simeq -\lambda_0-\lambda_2 m_2,\quad \lambda_0,\lambda_2 \in \re
+\end{equation}
+Therefore, to maximize the entropy one can only maximize the variance, i.e.
+\begin{eqnarray}\label{entropy_var_max}
+\max_{K} h(\mathcal{U})= -\lambda_0 -\lambda_2 \max_{K}(m_2), \quad \lambda_0,\lambda_2 \in \re
+\end{eqnarray}
+\textcolor{black}{subject to:
+\begin{equation}\label{sparsity_con}
+|K^i-K^j|\geq N_d,\quad \forall\ i,j\in 1,2,\cdots,N,\quad i\neq j 
+\end{equation}}
+where, $|K^i-K^j|=|(k_x^i,k_y^i,k_z^i)-(k_x^j,k_y^j,k_z^j)|$ denotes the
+distance between the $i^{th}$ and $j^{th}$ locations on $k-$space and
+$m_2=Var(\mathcal{U})$ is defined from \eq{expx1_ctrU}. Hence, the locations on
+$k-$space with the highest value of variance for $\mathcal{U}$ are a good
+approximation of optimal locations for data observations. 
+
+\textcolor{black}{\eq{sparsity_con} is considered to ensure that every distinct
+pair of $k-$space observations are at least by a distance $N_d$ apart from each
+other. This constraint is used in order to compensate possible dependencies
+that can be introduced due to approximation of the original problem. We assumed
+$N_d=1$ through this manuscript.}
+
+\textcolor{black}{One should note that different order of truncation (i.e.
+different values of $N$) can be used to approximate the entropy in
+\eq{entropy_moments}. Clearly, higher order approximation (greater values of
+$N$) leads to more accurate approximation of entropy. However, the downside of
+using higher order terms is that one needs to find the corresponding
+$\lambda_n$ coefficients for each term. Finding corresponding $\lambda_n$
+coefficients requires solving an optimization problem which could increase
+computational cost of the whole procedure. Hence, lower order approximation of
+entropy is of more interest due to real time applications of the proposed
+technique.}
+
+%As explained in section \ref{subsec:kspace}, solution of associated optimization problem with maximizing mutual information can be computationally intractable in presence of large number of measurements. In addition, evaluation of mutual information $I(\mu;z)$ can be computationally expensive due to associated integrations in \eq{mutual_info}. A simpler alternative to avoid these complexities is to find the locations on $k-$space which posses the highest variability in model predictions. To achieve this, one first needs to perform non-uniform Fourier transform on the Pennes bioheat model outputs using \eq{ymodel} and then, variance of model predictions can be  calculated as given in \eq{expx1_ctrU}, i.e.
+%
+%\begin{equation}\label{varkspace}
+%Var(\mathcal{U})=\sum_{q=1}^{M} w_q(\mathcal{U}(\x,\mu(\xii^q),t)-\hat{\mathcal{U}})^2
+%\end{equation}
+%where, $\hat{\mathcal{U}}$ is the expected value of $\mathcal{U}$, calculated using \eq{expx1U}. Now, the locations on $k-$space with highest value of the variance are the \textit{most useful} locations for data observations. 
+The intuition behind the idea of maximizing the variance is that the points on
+$k-$space with lower value of variance are less sensitive to model
+perturbations (resulted from parameter uncertainties) and vice versa. Hence, it
+is better to select the points on $k-$space with highest sensitivity with
+respect to model uncertainties. For instance, a point with zero variance on
+$k-$space will not be a good candidate for data observation since no matter
+what the values of uncertain parameters are, model output will always be the
+same at that specific point. On the other hand, a point on $k-$space with large
+value of variance means that the model output at that location is
+\textit{highly sensitive} to model uncertainties. Hence, a measurement at that
+$k-$space location would be of more interest. Therefore, the points with
+highest values of variance of $\mathcal{U}$ are \textit{better candidates} for
+data observations. 
+
+%Note that against the mutual information, calcuation of variance of model outputs is very simple and computationally affordable. In addition, solving the optimization problem associated with finding the points with highest values of variance is a much simpler task, comparing with solution of \eq{cost3}.
+
+
+{\color{red}(@dmitchell412 need Variance calculation algorithm compiled here with Quadrature)}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{MI Calculations}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+{\color{red}(@dmitchell412 need Entropy calculation algorithm compiled here using
+linearization about quadrature points)}
+
+A more direct calculation of the entropy is given as
+\[
+ MI = H(z) \approx 
+\]
+
+\begin{figure}[h] 
+\centering
+\begin{tabular}{ccc}
+\includegraphics[width=.5\textwidth]{\picdir/20160519_115937.jpg} & 
+\includegraphics[width=.49\textwidth]{\picdir/20160519_115947.jpg} \\
+\end{tabular}
+\caption{ 
+\color{red}
+WIP - @dmitchell412 Need higher order entropy approximation
+}\label{fig:Pulsesequence}
+\end{figure}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Overall Picture}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+The following diagram illustrates the general work-flow of the process:
+\begin{figure}[h!!]
+\center
+\includegraphics[trim = 1.5cm 3cm 8cm 0.5cm, clip,width=5in,height=4.5in]{\picdir/flowchart.pdf}
+\caption{Schematic view of the estimation process}
+\end{figure}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{WIP - Inverse Problem Framework}\label{InverseProbFramework}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\[
+  \vec{z}  = \mathcal{G}(\theta) + \eta   \qquad   \eta \sim \mathcal{N}(0,\Sigma_z)
+\]
+\[
+  p(z|\theta ) = \exp \left( \|\vec{z} -  \mathcal{G}(\theta)\|^2_{\Sigma_z} \right)
+\]
+\[
+               d\left(\vec{z}, \mathcal{G}(\theta^*)\right) = 
+   \min_{\theta \in \Omega} d\left(\vec{z}, \mathcal{G}(\theta)\right)
+\qquad
+\theta = \left(\mu_\text{CSF}, \mu_\text{GM}, \mu_\text{WM}, \mu_\text{Tumor} \right)
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{WIP - T1, T2, M0 Reconstruction}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\paragraph{Given}
+the image space date for  multiple  acquistion parameters 
+$\{ M_{TD}(\kk_1),M_{TD}(\kk_2), M_{TD}(\kk_2),... \}$,  \\
+ $\kk_i=\{T_{R_i},T_{D_i},\theta_i,T_{E_i},\alpha_i\}$ 
+{\color{red}(@kenphwang 2 delay times and 4 echoes correct?)},
+
+The reconstruction algorithms for T1, T2, M0 is as follows:
+\begin{itemize}
+\item 
+\item 
+\item 
+\end{itemize}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{WIP - k-space signal model}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+{\color{red} @wstefan @kenphwang need to develop full k-space model of echo train trajectories for subsampling.}
+
+Consider the schematic of the pulse sequence for the  acquistion provided in
+Figure~\ref{fig:Pulsesequencemfgre}(a).
+For a  given tissue, $\Omega \subset \mathbb{R}^3$,
+with heterogenious intrinistic relaxation properties $T1(r)$ and $T2^*(r)$
+we will assume a multi-echo signal, $s_l(t,n)\in\mathbb{C}$ ,
+from the l-th coil at the n-th echo 
+of the form of a linear combination of damped exponentials. 
+The signal strength is dependent on the coil sensitivity $c_l(r)$.
+\begin{equation}
+\label{multiechosignalmodel}
+\begin{split}
+ s_l(t,n) = \int_\Omega c_l(r)  w[n] e^{-i \int_0^t \gamma \vec{G}(\tau)\cdot r d \tau} \; dr
+\qquad
+ w[n]  = \sum_j^{N_\text{species}} 
+ C_j \Lambda_j^n 
+  \qquad  \qquad n = 0,1,2,\dots,N_\text{echo}-1
+\\
+\Lambda_j^n  = e^{-\left( 
+\underbrace{i\; \Delta B_{0_j}(r) }_\text{off-resonance} 
++
+\frac{1}{T2^*_j} \right) \left( \text{TE} + n \; \text{ESP}\right) } 
+\quad  \quad
+C_j = \frac{M_{0_j} \sin \left(\gamma \theta_N \right)\left( 1- e^{-TR/T1_j}\right)}{\left( 1- \cos \left(\gamma \theta_N \right) e^{-TR/T1_j}\right)}
+e^{-i  \phi_j} 
+\in  \mathbb{C} 
+\end{split}
+\end{equation}
+
+Each weighted exponential, $C_j \Lambda_j$, represents a distinct chemical species,
+ie water, fat, sodium hydroxide, etc. 
+The complex amplitude,
+$C_j \in \mathbb{C}$, 
+depends on (1) acquisition parameters - repetition time, TR,
+and flip angle, $\theta_N$, as well as (2) tissue dependent properties -
+ spin lattice relaxation,  $T1_j$,
+ proton density $M_{0_j}$, and
+ initial phase offset, $\phi_j$.
+Similarly, the complex exponential, $\Lambda_j$,
+depends on (1) acquisition parameters - echo time, TE,
+echo spacing , ESP, as well as (2) tissue dependent properties -
+ spin spin relaxation,  $T2^*_j$, and tissue depending off-resonsance
+arising from temperature change, motion, and/or susceptibility, 
+$\Delta B_{0_j}(r)$.
+\[
+ \Delta B_{0_j}(r) = 
+\left\{ 
+\begin{split}
+                2\pi f_j = 2\pi \underbrace{\alpha B_0 \Delta T_j(r)}_{f_j} & \qquad \text{temperature}   
+\\
+                ... =      & \qquad \text{susceptibility}   
+\\
+                ... =      & \qquad \text{motion}   
+\end{split}
+\right.
+\]
+
+
+\textbf{We will assume:} 
+\begin{itemize} 
+ \item off-resonance, $\Delta B_{0_j}$ does not depend on readout time
+ \item constant gradients 
+        \[ \left\{
+             \begin{split}
+           k_x & = \gamma G (t - TE) \\
+           k_y & = \gamma  G_y T_{pe} \\
+           k_z & = \gamma  G_z T_{pe} \\
+           \end{split}
+           \right. \qquad
+          |t-TE| < T_{acq}/2
+          \qquad \qquad
+          \vec{k} \equiv \frac{\gamma \; \vec{G} \; t}{2 \pi}
+        \]
+The time in this signal model, $t$, represents the measurements during
+the readout and is less the the repetition time $t < TR \approx 500ms$.
+\[
+  t =  iii \cdot \Delta t \quad iii = 0, ..., 255
+\qquad 
+  \Delta t = \frac{T_{acq}}{256} 
+\]
+Note that the acquisition time for a single echo/single slice under this model may be
+estimated as the number of phase encodes times the repetition time.
+\[
+   \text{acquisition time} = \# \text{phase encodes } \cdot TR 
+                           \leq 256 \cdot 500ms \approx 2 \text{min}
+\]
+
+ \item the phase induced temperature change is measured at the echo time
+  \[
+    \int_0^\text{TE} f(\tau) d\tau \approx f(TE) TE
+  \]
+\end{itemize} 
+
+Under these assumptions, the measurements at the n-th echo $s(t_i,n)$, 
+have the intuitive interpretation
+as the Fourier coefficient of the complex image, 
+$c_l(r) \sum_j C_j \Lambda_j^n : \mathbb{R}^3 \rightarrow \mathbb{C}$.
+ 
+\begin{equation}
+\label{FFTmultiecho}
+ s_l(t,n) = \text{Fourier transform} \left\{ \underbrace{c_l(r) \sum_j C_j \Lambda_j^n }_{\equiv f(r):\mathbb{R}^3 \rightarrow \mathbb{C} } \right\}
+          = \mathcal{F}(f(r))
+          = \int_\Omega \left(c_l(r) \sum_j C_j \Lambda_j^n \right)
+          e^{-2  \pi i \vec{k}  \cdot r } \; dr
+          = s_l(k_x,k_y,k_z,n)
+\end{equation}
+        {\color{red} TODO - @dmitchell412 - derive this model and verify  }
+
+Within the context/notation of Eqn \eqn{sensormodelstructure},
+\[
+           s_l(k_x,k_y,k_z,n) =
+\mathcal{G}\left(\underbrace{\vec{k},TE,TR,ESP, N_{echo}, N_{species},
+\theta_N}_{k}
+,\underbrace{T1,T2,\Delta B_0}_\theta\right)
+\]
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\section{WIP - Model Data Fusion}\label{da}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\nocite{*}
+\bibliographystyle{apalike}
+\bibliography{references}
+
+\appendix
+\section{Bayes - An intuitive example}
+Bayes theorem is fundamental to the approach and is immediately
+follows from the definition of conditional probability
+\[
+\left.
+\begin{split}
+p(y|x)  \equiv  \frac{p(x,y)}{p(x)}  \\
+p(x|y)  \equiv  \frac{p(x,y)}{p(y)} 
+\end{split}
+\right\}
+\Rightarrow
+p(y|x) p(x) = p(x,y) = p(x|y) p(y)
+\Rightarrow
+\hspace{-1in}
+\begin{split}
+p(y|x)  =\frac{ p(x|y) p(y) }{p(x) } \\
+p(x|y)  =\frac{ p(y|x) p(x) }{p(y) } \\
+\end{split}
+\]
+
+As a concrete example, consider the explicit two dimensional joint Gaussian
+distribution as a medium for understanding. Here we have two random
+variables $\mathbf{x}_1$ and $\mathbf{x}_2$ defined on the same probability
+space, $\Omega$.
+\[
+\mathbf{x}_i: \Omega \rightarrow \mathbb{R}
+\qquad
+P\left( \left\{ \omega: 
+\mathbf{x}_i (\omega) \in A
+ \right\}\right)
+=
+\int_A p(\eta_i) d\eta_i
+\]
+Intuitively, if we are \textbf{given} the joint distribution,
+$p(\eta_1,\eta_2)$, knowledge of the realization of one particular random
+variable provides information on the realization of the second random
+variable.
+\[
+      p(\eta_1,\eta_2)  = \frac{1}{2 \; \pi \; \sqrt{\det{\Sigma}}}
+\exp\left( \frac{1}{2}
+\begin{bmatrix}
+\eta_1 - \mu_1 \\
+\eta_2 - \mu_2 \\
+\end{bmatrix}^\top
+\underbrace{
+\begin{bmatrix}
+       \sigma_1^2        & r_{12} \sigma_1 \sigma_2 \\
+r_{12} \sigma_1 \sigma_2 &          \sigma_2^2 \\
+\end{bmatrix}
+}_{\equiv \Sigma}
+\begin{bmatrix}
+\eta_1 - \mu_1 \\
+\eta_2 - \mu_2 \\
+\end{bmatrix}
+\right)
+\]
+
+See \cite{maybeck1979stochastic} (Sec 3.10), characteristic functions 
+are used to show that individual marginal
+densities of joint  Gaussian random variable is also Gaussian.
+\[
+p(\eta_1) = 
+\int_{\eta_2}
+      p(\eta_1,\eta_2)
+\;d\eta_2
+ = \frac{1}{ \sqrt{2 \; \pi \; \sigma_2^2}} \exp\left( - \frac{(\eta_1 -
+\mu_1)^2}{2 \sigma_1^2} \right)
+\]
+
+\[
+p(\eta_2) = 
+\int_{\eta_1}
+      p(\eta_2,\eta_1)
+\;d\eta_1
+ = \frac{1}{ \sqrt{2 \; \pi \; \sigma_1^2}} \exp\left( - \frac{(\eta_2 -
+\mu_2)^2}{2 \sigma_2^2} \right)
+\]
+
+Conditional probablity is \textit{defined} through the algegraic
+reduction of the ratio of the joint and the marginal densities
+\[
+p(\eta_1|\eta_2) =  \frac{p(\eta_1,\eta_2)  }{p(\eta_2) }
+ = \frac{1}{ \sqrt{2 \; \pi \; \sigma_{1|2}^2}}
+    \exp\left( - \frac{(\eta_1 - \mu_{1|2})^2}{2 \sigma_{1|2}^2} \right)
+ = 
+\frac{p(\eta_1)}{p(\eta_2)}
+   \frac{1}{ \sqrt{2 \; \pi \; \sigma_{2|1}^2}}
+    \exp\left( - \frac{(\eta_2 - \mu_{2|1})^2}{2 \sigma_{2|1}^2} \right)
+\]
+\[
+\mu_{1|2} =  \mu_1 - 
+       \frac{r_{12} \sigma_1 \sigma_2 }{\sigma_2^2}
+       (\eta_2 - \mu_2)
+\qquad
+\sigma_{1|2} = 
+\sigma_1^2  - 
+       \frac{(r_{12} \sigma_1 \sigma_2 )^2}{\sigma_2^2}
+\]
+\[
+\mu_{2|1} =  \mu_2 - 
+       \frac{r_{12} \sigma_1 \sigma_2 }{\sigma_1^2}
+       (\eta_1 - \mu_1)
+\qquad
+\sigma_{2|1} = 
+\sigma_2^2  - 
+       \frac{(r_{12} \sigma_1 \sigma_2 )^2}{\sigma_1^2}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{WIP - Model Data Fusion}\label{da}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 After finding the optimal values of the control parameter $\kk$, we can proceed and perform the model-data fusion to get a better understanding about the uncertainties involved in parameters $\p$.
 The fusion of observational data with mathematical model predictions promises to provide greater understanding of physical phenomenon than either approach alone can achieve. In here, a minimum variance framework is being used for model - data fusion. Based on minimum variance technique, posterior statistics of parameter $\p$ can be written as:
@@ -239,49 +718,8 @@ The matrices $\Sigma_{\p z}$ amd $\Sigma_{hh}$ are defined as:
 \eq{minvarmean} along with \eq{minvarvar} provide posterior mean and covariance of parameter $\p$ given observation data $\tilde{z}$ and model predictions $h(\kk,\p)$.
 We emphasize here that the optimal values of $\kk$, obtained from \eq{mimax}, are used in \eq{minvarmean}.
 
-\section{WIP - Overall Picture}
-The following diagram illustrates the general work-flow of the process:
-\begin{figure}[h!!]
-\center
-\includegraphics[trim = 1.5cm 3cm 8cm 0.5cm, clip,width=5in,height=4.5in]{\picdir/flowchart.pdf}
-\caption{Schematic view of the estimation process}
-\end{figure}
-
-\section{WIP - T1, T2, M0 Reconstruction}
-\paragraph{Given}
-the image space date for  multiple  acquistion parameters 
-$\{ M_{TD}(\kk_1),M_{TD}(\kk_2), M_{TD}(\kk_2),... \}$,  \\
- $\kk_i=\{T_{R_i},T_{D_i},\theta_i,T_{E_i},\alpha_i\}$ 
-{\color{red}(@kenphwang 2 delay times and 4 echoes correct?)},
-
-The reconstruction algorithms for T1, T2, M0 is as follows:
-\begin{itemize}
-\item {\color{red}(@kenphwang can we get the current code for this recon.)}
-\item {\color{red}(@kenphwang Can  you provide an example data set ? is this real/imaginary data? or magnitude only? is $\alpha$, $\theta$ fixed?)}
-\item 
-\end{itemize}
-
-
-%\begin{figure}[htb!]
-%\begin{tabular}{ccc}
-%\hspace{-0.25in}\subfigure{\includegraphics[width=2.5in]{pics/t2.eps}}&
-%\hspace{-0.25in}\subfigure{\includegraphics[width=2.5in]{pics/t2meas.eps}}&
-%\hspace{-0.25in}\subfigure{\includegraphics[width=2.5in]{pics/err2.eps}}
-%\end{tabular}
-%\caption{Temperature map over slice 2 a) Reconstructed temperature, b) observed temperature, c) the error between the reconstruction and measurement.}\label{t2}
-%\end{figure}
-% % t2 Fig
  
 
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\section{ WIP - Physics Model}\label{PhysicsModel}
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-The steady-state magnetization $M_{TD}$ at a specific delay time $T_D$ can be found as a function of flip angle $\theta$, repetition time $T_R$, excitation pulse $\alpha$, and relaxation time  $T_1$:
-\[
-  M_{TD}  =  M_0\frac{1-(1-\cos(\theta))e^{-\frac{T_D}{T_1}}-\cos(\theta)e^{-\frac{T_R}{T_1}}}{1-\cos(\theta)e^{-\frac{T_R}{T_1}}\cos(\alpha)}
-\]
-where, $M_0$ is the unsatuarated magnetization.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{ WIP - Mathematical Framework}\label{GeneralMathFramework}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -453,136 +891,4 @@ time  and addition parameters are needed:
 {\color{red}
    TODO - need to update signal model for multiple read out lines
 }
-
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\section{WIP - Inverse Problem Framework}\label{InverseProbFramework}
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\[
-  \vec{z}  = \mathcal{G}(\theta) + \eta   \qquad   \eta \sim \mathcal{N}(0,\Sigma_z)
-\]
-\[
-  p(z|\theta ) = \exp \left( \|\vec{z} -  \mathcal{G}(\theta)\|^2_{\Sigma_z} \right)
-\]
-\[
-               d\left(\vec{z}, \mathcal{G}(\theta^*)\right) = 
-   \min_{\theta \in \Omega} d\left(\vec{z}, \mathcal{G}(\theta)\right)
-\qquad
-\theta = \left(\mu_\text{CSF}, \mu_\text{GM}, \mu_\text{WM}, \mu_\text{Tumor} \right)
-\]
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\nocite{*}
-\bibliographystyle{apalike}
-\bibliography{references}
-
-\appendix
-\section{Bayes - An intuitive example}
-Bayes theorem is fundamental to the approach and is immediately
-follows from the definition of conditional probability
-\[
-\left.
-\begin{split}
-p(y|x)  \equiv  \frac{p(x,y)}{p(x)}  \\
-p(x|y)  \equiv  \frac{p(x,y)}{p(y)} 
-\end{split}
-\right\}
-\Rightarrow
-p(y|x) p(x) = p(x,y) = p(x|y) p(y)
-\Rightarrow
-\hspace{-1in}
-\begin{split}
-p(y|x)  =\frac{ p(x|y) p(y) }{p(x) } \\
-p(x|y)  =\frac{ p(y|x) p(x) }{p(y) } \\
-\end{split}
-\]
-
-As a concrete example, consider the explicit two dimensional joint Gaussian
-distribution as a medium for understanding. Here we have two random
-variables $\mathbf{x}_1$ and $\mathbf{x}_2$ defined on the same probability
-space, $\Omega$.
-\[
-\mathbf{x}_i: \Omega \rightarrow \mathbb{R}
-\qquad
-P\left( \left\{ \omega: 
-\mathbf{x}_i (\omega) \in A
- \right\}\right)
-=
-\int_A p(\eta_i) d\eta_i
-\]
-Intuitively, if we are \textbf{given} the joint distribution,
-$p(\eta_1,\eta_2)$, knowledge of the realization of one particular random
-variable provides information on the realization of the second random
-variable.
-\[
-      p(\eta_1,\eta_2)  = \frac{1}{2 \; \pi \; \sqrt{\det{\Sigma}}}
-\exp\left( \frac{1}{2}
-\begin{bmatrix}
-\eta_1 - \mu_1 \\
-\eta_2 - \mu_2 \\
-\end{bmatrix}^\top
-\underbrace{
-\begin{bmatrix}
-       \sigma_1^2        & r_{12} \sigma_1 \sigma_2 \\
-r_{12} \sigma_1 \sigma_2 &          \sigma_2^2 \\
-\end{bmatrix}
-}_{\equiv \Sigma}
-\begin{bmatrix}
-\eta_1 - \mu_1 \\
-\eta_2 - \mu_2 \\
-\end{bmatrix}
-\right)
-\]
-
-See \cite{maybeck1979stochastic} (Sec 3.10), characteristic functions 
-are used to show that individual marginal
-densities of joint  Gaussian random variable is also Gaussian.
-\[
-p(\eta_1) = 
-\int_{\eta_2}
-      p(\eta_1,\eta_2)
-\;d\eta_2
- = \frac{1}{ \sqrt{2 \; \pi \; \sigma_2^2}} \exp\left( - \frac{(\eta_1 -
-\mu_1)^2}{2 \sigma_1^2} \right)
-\]
-
-\[
-p(\eta_2) = 
-\int_{\eta_1}
-      p(\eta_2,\eta_1)
-\;d\eta_1
- = \frac{1}{ \sqrt{2 \; \pi \; \sigma_1^2}} \exp\left( - \frac{(\eta_2 -
-\mu_2)^2}{2 \sigma_2^2} \right)
-\]
-
-Conditional probablity is \textit{defined} through the algegraic
-reduction of the ratio of the joint and the marginal densities
-\[
-p(\eta_1|\eta_2) =  \frac{p(\eta_1,\eta_2)  }{p(\eta_2) }
- = \frac{1}{ \sqrt{2 \; \pi \; \sigma_{1|2}^2}}
-    \exp\left( - \frac{(\eta_1 - \mu_{1|2})^2}{2 \sigma_{1|2}^2} \right)
- = 
-\frac{p(\eta_1)}{p(\eta_2)}
-   \frac{1}{ \sqrt{2 \; \pi \; \sigma_{2|1}^2}}
-    \exp\left( - \frac{(\eta_2 - \mu_{2|1})^2}{2 \sigma_{2|1}^2} \right)
-\]
-\[
-\mu_{1|2} =  \mu_1 - 
-       \frac{r_{12} \sigma_1 \sigma_2 }{\sigma_2^2}
-       (\eta_2 - \mu_2)
-\qquad
-\sigma_{1|2} = 
-\sigma_1^2  - 
-       \frac{(r_{12} \sigma_1 \sigma_2 )^2}{\sigma_2^2}
-\]
-\[
-\mu_{2|1} =  \mu_2 - 
-       \frac{r_{12} \sigma_1 \sigma_2 }{\sigma_1^2}
-       (\eta_1 - \mu_1)
-\qquad
-\sigma_{2|1} = 
-\sigma_2^2  - 
-       \frac{(r_{12} \sigma_1 \sigma_2 )^2}{\sigma_1^2}
-\]
-
 \end{document}

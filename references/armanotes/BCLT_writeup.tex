@@ -1,0 +1,339 @@
+
+
+
+\documentclass[]{article}
+%
+% If IEEEtran.cls has not been installed into the LaTeX system files,
+% manually specify the path to it like:
+% \documentclass[journal]{../sty/IEEEtran}
+
+\usepackage{amsmath, amsthm, amssymb,bm,datetime}
+\usepackage{graphicx,color,subfigure}
+%\usepackage{hyperref}
+\usepackage{epstopdf}
+\usepackage{booktabs}
+\usepackage{cases}
+\usepackage{cite}
+\usepackage[margin=0.75in]{geometry}
+\usepackage{authblk}
+
+
+
+
+\include{symbols}
+
+
+\begin{document}
+\title{Bayesian Central Theorem: Bayesian Inference in the Presence of Large Number of Observational Data
+%{\color{red}
+% - other titles
+% - Accelerated MR Thermometry Reconstruction in the Presence of Signal Model Uncertainties
+% - Model-based Acceleration of MR Thermal Imaging Reconstruction in the Presence of Uncertainties
+%}
+}
+%
+%
+% author names and IEEE memberships
+% note positions of commas and nonbreaking spaces ( ~ ) LaTeX will not break
+% a structure at a ~ so this keeps an author's name from being broken across
+% two lines.
+% use \thanks{} to gain access to the first footnote area
+% a separate \thanks must be used for each paragraph as LaTeX2e's \thanks
+% was not built to handle multiple paragraphs
+%
+
+\author[1]{Reza~Madankan*}
+%\author[1]{Wolfgang~Stefan}
+%\author[1]{Samuel Fahrenholtz}
+%\author[1]{Christopher MacLellan}
+%\author[1]{John~Hazle}
+%\author[1]{Jason Stafford}
+%\author[2]{Jeffrey S.~Weinberg, Ganesh~Rao}
+%\author[1]{David~Fuentes}
+
+\affil[1]{Department of Imaging Physics, University of Texas MD Anderson Cancer Center, Houston,
+TX, 77015 USA e-mail: rmadankan@mdanderson.org}
+%\affil[2]{Department of Neurosurgery, University of Texas MD Anderson Cancer Center}
+
+
+% make the title area
+\date{}
+\maketitle{}
+
+% As a general rule, do not put math, special symbols or citations
+% in the abstract or keywords.
+%\begin{abstract}
+%TBD ...
+%\end{abstract}
+%\subsection*{keywords}
+%MRI, thermal ablation, Arrhenius dose, inverse problems, mutual information, sensor management, quantification and estimation, Pennes bioheat model.
+
+
+
+
+
+
+% For peer review papers, you can put extra information on the cover
+% page as needed:
+% \ifCLASSOPTIONpeerreview
+% \begin{center} \bfseries EDICS Category: 3-BBND \end{center}
+% \fi
+%
+% For peerreview papers, this IEEEtran command inserts a page break and
+% creates the second title. It will be ignored for other modes.
+
+
+\section*{Introduction}
+With increasing number of patient data, there is a crucial need to develop and apply more robust and computationally affordable algorithms for statistical analysis of these data sets. This manuscript concentrates  on applying Bayesian Central Theorem for efficient statistical analysis and inference in presence of large data sets. Proposed technique in here, would have many applications in improving patient care through improving accuracy of applied statistical algorithms for data processing.
+
+
+\section*{Problem Statement}\label{sec:prob_statement}
+Consider a physical process $\x \in \re^{n}$, which can be described in terms of a parameter $\Teta\in\re^{p}$, using a mathematical model $\mathcal{M}$:
+
+\begin{equation}\label{model}
+\x=\mathcal{M}(\Teta)
+\end{equation}
+
+For instance, in case of a heat diffusion process, $\x$ and $\Teta$ represent the temperature map and conductivity, respectively; and the operator $\mathcal{M}$ denotes the heat diffusion process.
+
+In clinical applications, it often happens that the mathematical model for each patient is different from the others. For instance in thermal ablation procedure, depending on the present tissue types in region of interest, different mathematical formulation is needed to describe the distribution of temperature over the tissue. Hence, given $N$ number of patients, one can extend above equations to accurately describe the physical process of interest for each case, i.e. we will have:
+
+\begin{equation}\label{modelN}
+\x_i=\mathcal{M}_i(\Teta),\quad i=1,2,\cdots, N
+\end{equation}
+
+On the other hand, assume that for each patient there exist some observations from a quantity of interest, denoted by $\z_i \in \re^m$, that can be acquired based on the following observation model:
+
+\begin{equation}\label{obsmodelN}
+\z_i=\mathcal{U}_i(\Teta)+\nu_i, \quad i=1,2,\cdots,N
+\end{equation}
+
+Note that observation data $\z_i$ is polluted with a white noise $\nu_i$ with covariance $\Sigma_i\in\re^{m\times m}$.
+
+Given all these mathematical model predictions $\x_i$ and observations $\z_i$, our goal is to accurately estimate parameter $\Teta$. As one can see, the major challenge over here, is the computational complexities raised due to presence of large data sets. In the following, we will discuss our technique to tackle this problem in more detail.
+
+
+\section*{Bayesian Inference}\label{sec:bayes}
+To proceed with Bayesian inference framework, let's first concatenate model prediction and observation vectors as the following:
+\vspace{0.2in}
+
+\begin{center}
+$\mathcal{X}=\left[\x_1,\x_2,\cdots,\x_N\right]^T$, $\quad \mathcal{Z}=\left[\z_1,\z_2,\cdots,\z_N\right]^T$
+\end{center}
+\vspace{0.2in}
+
+
+Note that $\mathcal{X}\in \re^{nN}$ and $\mathcal{Z}\in \re^{mN}$. In other words, all the models $\mathcal{M}_i$ can be concatenated into an augmented model as the following:
+
+\begin{equation}\label{model_aug}
+\mathcal{X}=\mathcal{M}_t(\Teta)
+\end{equation}
+and 
+\begin{equation}\label{obsmodel_aug}
+\mathcal{Z}=\mathcal{U}(\Teta)+\Nu
+\end{equation}
+where, $\mathcal{M}_t(\Teta)$, $\mathcal{U}(\Teta)$, $\mathcal{Z}$, and $\Nu$ are defined as:
+\vspace{0.2in}
+
+\begin{center}
+$\mathcal{M}_t=\left[\mathcal{M}_1,\mathcal{M}_2,\cdots,\mathcal{M}_N\right]^T$, $\quad \mathcal{U}=\left[
+\mathcal{U}_1,\mathcal{U}_2,\cdots,\mathcal{U}_N\right]^T$, $\quad \mathcal{Z}=\left[\z_1,\z_2,\cdots,\z_N\right]^T$, $\quad
+\Nu=\left[\nu_1,\nu_2,\cdots,\nu_N\right]^T$
+\end{center}
+\vspace{0.2in}
+
+
+Now, given these observations, one can use Bayesian inference to find posterior statistics of the parameter $\Teta$, as the following:
+
+\begin{equation}\label{bayes}
+p(\Teta|\mathcal{Z})=\frac{p(\Teta)p(\mathcal{Z}|\Teta)}{p(\mathcal{Z})}
+\end{equation}
+
+However, there is a major computational challenge in using the above formula for cases with large number of data observations. In detail, $p(\mathcal{Z})$ and $p(\mathcal{Z}|\Teta)$ go to zero whenever the dimension of observational data $\mathcal{Z}$ increases. 
+
+To avoid the computational complexities involved in \eq{bayes}, one can make use of Bayesian Central Limit Theorem (BCLT). Based on BCLT, for large number of data observations, posterior distribution of parameter $\Teta$ can be approximated using the following normal distribution:
+
+\begin{eqnarray}\label{bct}
+p(\Teta|\mathcal{Z})\simeq \mathcal{N}(\hat{\Teta},I_t^{-1}(\hat{\Teta})), \quad I_t(\hat{\Teta})=mN.I(\hat{\Teta})
+\end{eqnarray}
+where, $\hat{\Teta}$ is the \textit{Maximum Likelihood Estimate} (MLE) of parameter $\Teta$ and $I(\hat{\Teta})$ denotes the Fisher information, as defined later on in \eq{fisher0}. Note that $mN$ in \eq{bct} corresponds with the number of available measurement data.
+
+\vspace{0.2in}
+\subsection*{\textit{Derivation of Bayesian Central Limit Theorem:}}
+\vspace{0.1in}
+To prove BCLT, we first rewrite logarithm of posterior pdf $p(\Teta|\mathcal{Z})$ as:
+
+\begin{equation}
+\log p(\Teta|\mathcal{Z}) = \log p(\Teta)  - \log p(\mathcal{Z}) + \sum_{i=1}^{mN} \log p(\mathcal{Z}_i|\Teta)
+\end{equation}
+
+Note that in presence of large samples (i.e. large $mN$), the last term dominates the above equation. Hence, $\log p(\Teta|\mathcal{Z})$ can be  approximated as:
+
+\begin{equation}
+\log p(\Teta|\mathcal{Z}) \simeq \sum_{i=1}^{mN} \log p(\mathcal{Z}_i|\Teta) \equiv l(\Teta)
+\end{equation}
+
+Now, by using Taylor series expansion of $l(\Teta)$ around maximum likelihood estimate of $\Teta$, we will have:
+
+\begin{equation}\label{proof2}
+l(\Teta) \simeq l(\hat{\Teta})+(\Teta-\hat{\Teta})\frac{\partial}{\partial \Teta} l(\Teta)|_{\hat{\Teta}} + \frac{1}{2}(\Teta-\hat{\Teta})^T(\Teta-\hat{\Teta})\frac{\partial^2 l(\Teta)}{\partial \Teta\Teta^T}|_{\hat{\Teta}}
+\end{equation}
+Note that $\frac{\partial l(\Teta)}{\partial \Teta}|_{\hat{\Teta}} = 0$ in above equation. Hence, \eq{proof2} can be written as:
+\textbf{\begin{equation}\label{proof3}
+l(\Teta) = \log p(\Teta|\mathcal{Z}) \simeq l(\hat{\Teta}) + \frac{1}{2}(\Teta-\hat{\Teta})^T(\Teta-\hat{\Teta})\frac{\partial^2 l(\Teta)}{\partial \Teta\Teta^T}|_{\hat{\Teta}}
+\end{equation}}
+Or,
+
+\begin{eqnarray}\label{exponential}
+p(\Teta|\mathcal{Z})\simeq p(\hat{\Teta}|\mathcal{Z})e^{\left(\frac{1}{2}(\Teta-\hat{\Teta})^Tl''(\hat{\Teta})(\Teta-\hat{\Teta})\right)}
+\end{eqnarray}
+where, $l''(\Teta)= \frac{\partial^2 l(\Teta)}{\partial \Teta\Teta^T}|_{\hat{\Teta}}$. On the other hand, for large value of $mN$, we have:
+
+\begin{eqnarray}
+l''(\Teta)= \sum_{i=1}^{mN} \frac{\partial^2 \log p(\mathcal{Z}_i|\Teta)}{\partial \Teta\Teta^T}|_{\hat{\Teta}}=\frac{mN}{mN}\sum_{i=1}^{mN} \frac{\partial^2 \log p(\mathcal{Z}_i|\Teta)}{\partial \Teta\Teta^T}|_{\hat{\Teta}}\nonumber \\
+ \simeq mN.\Ex{\frac{\partial^2 \log p(\mathcal{Z}|\Teta)}{\partial \Teta\Teta^T}}{} = -mN.I(\hat{\Teta})=-I_t(\hat{\Teta})
+\end{eqnarray}
+
+Hence, one can rewrite \eq{exponential} as the following:
+
+\begin{equation}
+p(\Teta|\mathcal{Z})\simeq p(\hat{\Teta}|\mathcal{Z})e^{\left(-\frac{1}{2}(\Teta-\hat{\Teta})^TI_t(\hat{\Teta})(\Teta-\hat{\Teta})\right)}
+\end{equation}
+
+Note that $p(\hat{\teta}|\mathcal{Z})$ behaves as a normalization factor in above equation.
+\qed
+
+\vspace{0.1in}
+
+To make use of \eq{bct}, one needs to evaluate MLE of $\Teta$ and Fisher information $I(\hat{\Teta})$. In the following, the mathematical formulation for finding each of these quantities is explained.
+
+\subsection*{Calculation of MLE of $\Teta$}\label{sec:mle}
+%From \eq{bayes}, one can write down posterior distribution of $\Teta$ as:
+%
+%\begin{equation}
+%p(\Teta|\mmathcal{Z}) \propto p(\Teta)p(\mathcal{Z}|\Teta)
+%\end{equation}
+From \eq{obsmodelN}, we know that likelihood distribution $p(\mathcal{Z}|\Teta)$ can be written as:
+\begin{eqnarray}\label{likhood}
+p(\mathcal{Z}|\Teta) = \mathcal{N}({\mathcal{U}}(\Teta),\Sigma)
+\end{eqnarray}
+where, $\Sigma$ is the covariance matrix of white noise $\Nu$.
+
+%Also, for the ease of formulation, we consider the prior distribution $p(\Teta)$ to be a normal distribution with mean $\bar{\Teta}$ and covariance $\Sigma_{\Teta}$, i.e.
+%
+%\begin{equation}\label{prior}
+%p(\Teta)=\mathcal{N}(\bar{\Teta},\Sigma_{\Teta})
+%\end{equation}
+
+For the ease of computation, instead of maximizing the likelihood function, one can maximize the logarithm of the likelihood function. Hence, MLE can be formulated as:
+
+\begin{equation}\label{mle}
+\max_{\Teta}\quad  \log \left( p(\mathcal{Z}|\Teta)\right) = \min_{\Teta} \quad \frac{1}{2} \left(\mathcal{Z}-{\mathcal{U}}(\Teta)\right)^T\Sigma^{-1}\left(\mathcal{Z}-{\mathcal{U}}(\Teta)\right)
+\end{equation}
+
+Maximizing \eq{mle} results in maximum likelihood estimate of parameter $\Teta$, denoted by $\hat{\Teta}$. Note that in presence of a linear observation operator $\mathcal{U}$, the above cost function reduces to a quadratic function of $\Teta$ that can be easily solved for $\hat{\Teta}$. On the other hand, nonlinear observation operator results in a nonlinear optimization. However, since the dimension of $\Teta$ is usually small, above optimization can be handled even in the presence of nonlinearities.
+
+
+\subsection*{Evaluation of Fisher Information}\label{sec:fisher}
+Once we found the MLE estimate of $\Teta$, we can proceed to calculate the Fisher information $I(\hat{\Teta})$ using the following formula:
+
+\begin{equation}\label{fisher0}
+I(\hat{\Teta}) = \Ex{\left(\frac{\partial}{\partial \Teta}\log p(\mathcal{Z}|\Teta)\right)^2|\hat{\Teta}}{}
+= -\Ex{\left(\frac{\partial^2}{\partial \Teta\Teta^T}\log p(\mathcal{Z}|\Teta)\right)|\hat{\Teta}}{}
+\end{equation}
+where, $\hat{\Teta}$ denotes the MLE of $\Teta$, obtained from \eq{mle}. Given the likelihood to be a normal distribution, one can simplify above equation as the following:
+
+\begin{eqnarray}\label{fisher}
+I(\hat{\Teta}) = \frac{1}{4}\Ex{\left(\frac{\partial}{\partial \Teta}\left\{ \left(\mathcal{Z}-{\mathcal{U}}_t(\Teta)\right)^T\Sigma^{-1}\left(\mathcal{Z}-{\mathcal{U}}_t(\Teta)\right)\right\} \right)^2|\hat{\Teta}}{}\nonumber\\
+= \int_{\mathcal{Z}} \left(\frac{\partial}{\partial \Teta}\left\{ \left(\mathcal{Z}-{\mathcal{U}}_t(\Teta)\right)^T\Sigma^{-1}\left(\mathcal{Z}-{\mathcal{U}}_t(\Teta)\right)\right\} \right)^2 p(\mathcal{Z}|\Teta)d\mathcal{Z}\bigg|_{\Teta=\hat{\Teta}}
+\end{eqnarray}
+
+Hence, using MLE of $\Teta$, one can evaluate Fisher information $I(\hat{\Teta})$ using \eq{fisher}. However, the integration involved in \eq{fisher} can be computationally expensive to evaluate, depending on the nonlinearities involved in observation operator $\mathcal{U}$.
+
+Note that in presence of a general $p-$dimensional parameter $\Teta$, Fisher information $I(\hat{\Teta})$ will be a $p\times p$ matrix, where each of its elements can be calculated as follows:
+
+
+\begin{eqnarray}\label{fisher_matrix}
+I_{i,j}(\hat{\Teta})=\int_{\mathcal{Z}} \left(\frac{\partial}{\partial \Teta_i}\left\{ \left(\mathcal{Z}-{\mathcal{U}}(\Teta)\right)^T\Sigma^{-1}\left(\mathcal{Z}-{\mathcal{U}}(\Teta)\right)\right\}\right)
+\left(\frac{\partial}{\partial \Teta_j}\left\{ \left(\mathcal{Z}-{\mathcal{U}}(\Teta)\right)^T\Sigma^{-1}\left(\mathcal{Z}-{\mathcal{U}}(\Teta)\right)\right\}\right) p(\mathcal{Z}|\Teta)d\mathcal{Z}\bigg|_{\Teta=\hat{\Teta}}
+\end{eqnarray}
+
+Now, using matrix algebra one can rewrite $I_{ij}(\hat{\Teta})$ as follows:
+
+\begin{eqnarray}\label{fisher_expand}
+I_{ij}(\hat{\Teta})=\mathcal{U}^T_{\Teta_i}\Sigma^{-1}(M+mm^T)
++Tr(\Sigma^{-1}\mathcal{U}_{\Teta_i}\mathcal{U}^T_{\Teta_j}\Sigma^{-1}M)
++m^T(\Sigma^{-1}\mathcal{U}_{\Teta_i}\mathcal{U}^T_{\Teta_j}\Sigma^{-1})m\nonumber\\
++m^T\Sigma^{-1}\mathcal{U}_{\Teta_i}\frac{\partial}{\partial \Teta_j}(\mathcal{U}^T\Sigma^{-1}\mathcal{U})
++\mathcal{U}^T_{\Teta_i}\Sigma^{-1}(M+mm^T)\Sigma^{-1}\mathcal{U}_{\Teta_j}\nonumber\\
++\mathcal{U}^T_{\Teta_i}\Sigma^{-1}(M+mm^T)\Sigma^{-1}\mathcal{U}_{\Teta_j}
++\mathcal{U}^T_{\Teta_i}\Sigma^{-1}m\frac{\partial}{\partial \Teta_j}(\mathcal{U}^T\Sigma^{-1}\mathcal{U})\nonumber\\
++\frac{\partial}{\partial\Teta_i}(\mathcal{U}^T\Sigma^{-1}\mathcal{U})m^T\Sigma^{-1}\mathcal{U}_{\Teta_j}
++\frac{\partial}{\partial \Teta_i}(\mathcal{U}^T\Sigma^{-1}\mathcal{U})\mathcal{U}^T_{\Teta_j}\Sigma^{-1}m
+\nonumber \\
++\frac{\partial}{\partial \Teta_i}(\mathcal{U}^T\Sigma^{-1}\mathcal{U})\frac{\partial}{\partial \Teta_j}(\mathcal{U}^T\Sigma^{-1}\mathcal{U})&
+\end{eqnarray}
+
+
+where, $m$ and $M=\Sigma$ denote conditional mean and conditional covariance of observation $\mathcal{Z}$ in above equation, respectively. Note that \eq{fisher_expand} needs to be evaluated at $\Teta=\hat{\Teta}$.
+
+
+
+\section*{A Simple Example}
+The effect of MrgLITT operation on human brain is simulated retrospectively. \Fig{mrglitt} illustrates the position of the tumor in the brain.
+
+
+\begin{figure}[htb]
+\centering
+\includegraphics*[width=5in]{pics/mrglitt.png}
+\caption{Position of the tumor in human brain.}\label{mrglitt}
+\end{figure}
+% % mrglitt Fig
+
+As described before, Bayesian central limit theorem is used to find the optimal values of optical attenuation coefficients by comparing the temperature predictions and temperature measurements. Optimal values of optical attenuation coefficients are then utilized in Pennes bioheat equation to reconstruct the temperature map.
+
+\Fig{t1} represents the temperature map at a particular slice, given by direct measurement and temperature reconstruction through the Pennes bioheat equation. Similarly, reconstructed temperature map at another slice is being compared with direct temperature measurements in \Fig{t2}. 
+
+\begin{figure}[htb!]
+\begin{tabular}{ccc}
+\hspace{-0.25in}\subfigure{\includegraphics[width=2.5in]{pics/t1.eps}}&
+\hspace{-0.25in}\subfigure{\includegraphics[width=2.5in]{pics/t1meas.eps}}&
+\hspace{-0.25in}\subfigure{\includegraphics[width=2.5in]{pics/err1.eps}}
+\end{tabular}
+\caption{Temperature map over slice 1 a) Reconstructed temperature, b) observed temperature, c) the error between the reconstruction and measurement.}\label{t1}
+\end{figure}
+% % t1 Fig
+\begin{figure}[htb!]
+\begin{tabular}{ccc}
+\hspace{-0.25in}\subfigure{\includegraphics[width=2.5in]{pics/t2.eps}}&
+\hspace{-0.25in}\subfigure{\includegraphics[width=2.5in]{pics/t2meas.eps}}&
+\hspace{-0.25in}\subfigure{\includegraphics[width=2.5in]{pics/err2.eps}}
+\end{tabular}
+\caption{Temperature map over slice 2 a) Reconstructed temperature, b) observed temperature, c) the error between the reconstruction and measurement.}\label{t2}
+\end{figure}
+% % t2 Fig
+ 
+\pagebreak
+\section*{Treatment Planning and Connection with Tissue Segmentation}
+Clearly, accuracy of reconstructed temperature map crucially depends on precision of tissue segmentation in hand. Hence, to assess reliable temperature reconstruction, one needs to have accurate tissue segmentation. This can be achieved by using the optimal tissue segmentation algorithm. \Fig{treatment} illustrates the treatment planning for MRgLITT implementation that combines both BCLT and Optimal Tissue Segmentation to achieve a reliable estimation of temperature map over the tissue.
+
+% % Treatment Planning Fig
+\begin{figure}[htb!]
+\centering
+\includegraphics*[trim=5cm 5cm 6cm 2cm, clip=true, width=5.5in]{pics/flowchart.pdf}
+\caption{Implementation of MRgLITT by combining BCLT and Optimal Tissue Segmentation Algorithm.}\label{treatment}
+\end{figure}
+
+\section*{Conclusion}
+In this manuscript, we provided new mathematical formulations to address the problem of parameter estimation in presence of large number of data observations. The key point of these formulations is to make use of Bayesian Central Limit Theorem, which approximates posterior distribution of parameter of interest with a Gaussian distribution, whose mean and covariance are provided using maximum likelihood estimate of the parameter and Fisher information, respectively. 
+
+It should be noted here that the only possible challenge in using these formulations is to evaluate the Fisher information. As we discussed before, finding Fisher information can be challenging in general, depending on the nonlinearities involved in observation operator $\mathcal{U}(\Teta)$.
+
+%\bibliographystyle{IEEEtran}
+%%\bibliographystyle{plain}
+%\bibliography{refs}
+
+
+\end{document}
+
+
