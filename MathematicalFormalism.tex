@@ -379,12 +379,22 @@ data observations.
 \subsection{MI Calculations}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-{\color{red}(@dmitchell412 need Entropy calculation algorithm compiled here using
-linearization about quadrature points)}
+{\color{red}
+(@dmitchell412 need Entropy calculation algorithm compiled here using
+kernel density methods (KDM) about quadrature points~\cite{walters2009estimation,tobin2013kernel,terejanu2012bayesian})
+}
 
+
+\[
+   p(z) = \int_\theta p(z|\theta) p (\theta) d \theta
+        = \sum_q \omega_q p(z|\theta_q)
+\]
 A more direct calculation of the entropy is given as
 \[
- MI = H(z) \approx 
+ MI = H(z)  = \int_z p(z) ln \; p(z) \; dz 
+       \approx \int_z  \sum_q \omega_q p(z|\theta_q)  ln \; p(z) \; dz 
+       \approx         \sum_{qr} \omega_{qr} \; ln \; p(z_r) 
+       \approx         \sum_{qr} \omega_{qr} \; ln \; \sum_l \omega_l \; p(z_r|\theta_l)
 \]
 
 \begin{figure}[h] 
