@@ -402,6 +402,15 @@ A more direct calculation of the entropy is given as
 \end{split}
 \]
 
+Derivatives for optimization with respect to control parameters $\kappa_i$ are computed with chain rule and sensitivities:
+\[
+\frac{\partial \; MI}{\partial \kappa_i} = 
+      \sum_q \omega_q \sum_r \omega_{r} ln \left( \sum_l \omega_l e^\frac{ x_r + g(\theta_q) - g(\theta_l)}{\sigma} 
+       \left( \frac{\partial g(\theta_q)}{\partial u}\frac{\partial u}{\partial \kappa_i} 
+           -  \frac{\partial g(\theta_l)}{\partial u}\frac{\partial u}{\partial \kappa_i} 
+      \right) \right) 
+\]
+
 %\begin{figure}[h] 
 %\centering
 %\begin{tabular}{ccc}
