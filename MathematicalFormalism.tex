@@ -64,13 +64,14 @@
 \maketitle
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\section{Pending Tasks}
+\section{Paper Outline Tasks}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{itemize}
-\item {\color{red} @kenphwang can we get the current code for this recon.}
-\item {\color{red} @kenphwang Can  you provide an example data set ? is this real/imaginary data? }
 \item @fuentesdt Code Eq. \eqn{mimax}
-\item @fuentesdt generate Figure~\ref{fig:MIMapTDTE}
+\item @fuentesdt generate MI map of high information content regions, Figure~\ref{fig:MIMapTDTE}
+\item {\color{red} @kenphwang Need 2 data sets. (1) phantom with known T1/T2 and (2) example data set  in human. is this real/imaginary data? }
+\item {\color{red} Recon all data sets with current $TE$ and $TD$ and optimal $TE$ and $TD$.  @kenphwang can we get the current code for this recon? }
+\item @fuentesdt compare and report accuracy in the optimal vs current recon technique
 \end{itemize}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -378,25 +379,40 @@ data observations.
 \subsection{MI Calculations}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-{\color{red}(@dmitchell412 need Entropy calculation algorithm compiled here using
-linearization about quadrature points)}
+{\color{red}
+(@dmitchell412 need Entropy calculation algorithm compiled here using
+kernel density methods (KDM) about quadrature points~\cite{walters2009estimation,tobin2013kernel,terejanu2012bayesian})
+}
+
 
 A more direct calculation of the entropy is given as
 \[
- MI = H(z) \approx 
+   p(z) = \int_\theta p(z|\theta) p (\theta) d \theta = \sum_q \omega_q p(z|\theta_q)
+\]
+\[ \begin{split}
+ MI = H(z) &  = \int_z p(z) ln \; p(z) \; dz 
+          = \int_z ln \; p(z) \; \int_\theta p(z|\theta) p (\theta) d \theta   \; dz  
+    \approx \int_z ln \; p(z)  \sum_q \omega_q p(z|\theta_q)  \; dz 
+      \\ &  
+          =  \sum_q \omega_q \int_z ln \; p(z)  p(z|\theta_q)  \; dz 
+      \underbrace{ \approx }_{?}\sum_q \omega_q \sum_r \omega_{r} ln \; p(x_r + g(\theta_q) )
+      \underbrace{ \approx }_{?}\sum_q \omega_q \sum_r \omega_{r} ln \left( \sum_l \omega_l p( x_r + g(\theta_q) |\theta_l) \right) 
+      \\ &  
+      \underbrace{ \propto }_{?}\sum_q \omega_q \sum_r \omega_{r} ln \left( \sum_l \omega_l e^\frac{ x_r + g(\theta_q) - g(\theta_l)}{\sigma} \right) 
+\end{split}
 \]
 
-\begin{figure}[h] 
-\centering
-\begin{tabular}{ccc}
-\includegraphics[width=.5\textwidth]{\picdir/20160519_115937.jpg} & 
-\includegraphics[width=.49\textwidth]{\picdir/20160519_115947.jpg} \\
-\end{tabular}
-\caption{ 
-\color{red}
-WIP - @dmitchell412 Need higher order entropy approximation
-}\label{fig:Pulsesequence}
-\end{figure}
+%\begin{figure}[h] 
+%\centering
+%\begin{tabular}{ccc}
+%\includegraphics[width=.5\textwidth]{\picdir/20160519_115937.jpg} & 
+%\includegraphics[width=.49\textwidth]{\picdir/20160519_115947.jpg} \\
+%\end{tabular}
+%\caption{ 
+%\color{red}
+%WIP - @dmitchell412 Need higher order entropy approximation
+%}\label{fig:Pulsesequence}
+%\end{figure}
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
