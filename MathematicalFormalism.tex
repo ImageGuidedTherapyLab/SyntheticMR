@@ -385,29 +385,34 @@ kernel density methods (KDM) about quadrature points~\cite{walters2009estimation
 }
 
 
-\[
-   p(z) = \int_\theta p(z|\theta) p (\theta) d \theta
-        = \sum_q \omega_q p(z|\theta_q)
-\]
 A more direct calculation of the entropy is given as
 \[
- MI = H(z)  = \int_z p(z) ln \; p(z) \; dz 
-       \approx \int_z  \sum_q \omega_q p(z|\theta_q)  ln \; p(z) \; dz 
-       \approx         \sum_{qr} \omega_{qr} \; ln \; p(z_r) 
-       \approx         \sum_{qr} \omega_{qr} \; ln \; \sum_l \omega_l \; p(z_r|\theta_l)
+   p(z) = \int_\theta p(z|\theta) p (\theta) d \theta = \sum_q \omega_q p(z|\theta_q)
+\]
+\[ \begin{split}
+ MI = H(z) &  = \int_z p(z) ln \; p(z) \; dz 
+          = \int_z ln \; p(z) \; \int_\theta p(z|\theta) p (\theta) d \theta   \; dz  
+    \approx \int_z ln \; p(z)  \sum_q \omega_q p(z|\theta_q)  \; dz 
+      \\ &  
+          =  \sum_q \omega_q \int_z ln \; p(z)  p(z|\theta_q)  \; dz 
+      \underbrace{ \approx }_{?}\sum_q \omega_q \sum_r \omega_{r} ln \; p(x_r + g(\theta_q) )
+      \underbrace{ \approx }_{?}\sum_q \omega_q \sum_r \omega_{r} ln \left( \sum_l \omega_l p( x_r + g(\theta_q) |\theta_l) \right) 
+      \\ &  
+      \underbrace{ \propto }_{?}\sum_q \omega_q \sum_r \omega_{r} ln \left( \sum_l \omega_l e^\frac{ x_r + g(\theta_q) - g(\theta_l)}{\sigma} \right) 
+\end{split}
 \]
 
-\begin{figure}[h] 
-\centering
-\begin{tabular}{ccc}
-\includegraphics[width=.5\textwidth]{\picdir/20160519_115937.jpg} & 
-\includegraphics[width=.49\textwidth]{\picdir/20160519_115947.jpg} \\
-\end{tabular}
-\caption{ 
-\color{red}
-WIP - @dmitchell412 Need higher order entropy approximation
-}\label{fig:Pulsesequence}
-\end{figure}
+%\begin{figure}[h] 
+%\centering
+%\begin{tabular}{ccc}
+%\includegraphics[width=.5\textwidth]{\picdir/20160519_115937.jpg} & 
+%\includegraphics[width=.49\textwidth]{\picdir/20160519_115947.jpg} \\
+%\end{tabular}
+%\caption{ 
+%\color{red}
+%WIP - @dmitchell412 Need higher order entropy approximation
+%}\label{fig:Pulsesequence}
+%\end{figure}
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
