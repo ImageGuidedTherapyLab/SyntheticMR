@@ -275,6 +275,26 @@ is determined by the pulse sequence acquisition physics.
 \end{figure}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Bayesian Learning}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Score function~\cite{seeger2010optimization}
+\[
+ S = \mathcal{H}( P (u|z)) - E_{P(\tilde{z}|z)} \left[ \mathcal{H}(P(u|z,\tilde{z}))\right]
+\]
+ \[
+  \mathcal{H}( P (u|z)) = \mathcal{H}( P (u,z)) - \mathcal{H}( P (z)) 
+ \]
+
+\[
+  H(X,Y,Z) = H(X|Y,Z)  + H(Y,Z) = H(X|Y,Z)  + H(Y|Z) + H(Z)
+\]
+
+\[
+\mathcal{H}(P(u|z,\tilde{z}))  = 
+\mathcal{H}(P(u,z,\tilde{z}))  - \mathcal{H}(P(z,\tilde{z}))  
+\]
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{MI Approximations: Maximizing the Variance}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
