@@ -275,36 +275,10 @@ is determined by the pulse sequence acquisition physics.
 \end{figure}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\subsection{Bayesian Learning}
+\section{Bayesian Learning}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-Key ideas of active Bayesian learning follows from the  definition of conditional 
-mutual information~\cite{cover2012elements} and \textit{repeeated} application of
- the definition of conditional probability and conditional entropy.
-\[
- p(x,y|z) \equiv \frac{p(x,y,z)}{p(z)} 
-               = \frac{p(x|y,z)p(y,z)}{p(z)}
-               =       p(x|y,z)p(y|z)
-\]
-\[
- H(Y|X  ) \equiv E_x \left[ H(Y|X=x) \right] =  \sum_x p(x) H(Y|X=x) =  -\sum_{x} p(x) \sum_{y} p(y|x) \log p(y|x) 
-\]
-\[ 
-\begin{split}
-I(X;Y|Z) &\equiv \sum_x \sum_y \sum_z p(x,y,z) \log  \frac{  p(x,y|z)       }{p(x|z)p(y|z)} 
-             =   \sum_x \sum_y \sum_z p(x,y,z) \log  \frac{  p(x|y,z)p(y|z) }{p(x|z)p(y|z)} 
-             =   \sum_x \sum_y \sum_z p(x,y,z) \log  \frac{  p(x|y,z)       }{p(x|z)      } \\
-         &   =  -\sum_x \sum_y \sum_z p(x,y,z) \log                           p(x|z)       
-             +   \sum_x \sum_y \sum_z p(x,y,z) \log          p(x|y,z)                       \\
-         &   =  -\sum_x \sum_z        p(x,  z) \log                           p(x|z)       
-             +   \sum_x \sum_y \sum_z p(x|y,z) p(y,z)  \log  p(x|y,z)                       \\
-         &   =  -\sum_z p(z) \sum_x p(x|z) \log p(x|z) 
-             +   \sum_y \sum_z  p(y,z) \sum_x p(x|y,z) \log p(x|y,z)                      
-             =   H(X|Z) - H(X|Y,Z) 
-\end{split}
-\]
-
-These definitions and identities show that the `score' function from 
+The `score' function from 
 \cite{seeger2010optimization} is the mutual information between the desired measurement $\tilde{y}$
 and the image $u$ conditioned on existing measurements $y$.
 \[ 
@@ -400,6 +374,36 @@ The final information gain may be computed as:
               +  \int_{\tilde{y}}  \; d\tilde{y} \; p(\tilde{y}|y) \int_u  \; du \;p(u|\tilde{y},y) \log p(u|\tilde{y},y) \right) \\
 \end{split}
 \]
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Information theory identities}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+Key ideas of active Bayesian learning follows from the  definition of conditional 
+mutual information~\cite{cover2012elements} and \textit{repeeated} application of
+ the definition of conditional probability and conditional entropy.
+\[
+ p(x,y|z) \equiv \frac{p(x,y,z)}{p(z)} 
+               = \frac{p(x|y,z)p(y,z)}{p(z)}
+               =       p(x|y,z)p(y|z)
+\]
+\[
+ H(Y|X  ) \equiv E_x \left[ H(Y|X=x) \right] =  \sum_x p(x) H(Y|X=x) =  -\sum_{x} p(x) \sum_{y} p(y|x) \log p(y|x) 
+\]
+\[ 
+\begin{split}
+I(X;Y|Z) &\equiv \sum_x \sum_y \sum_z p(x,y,z) \log  \frac{  p(x,y|z)       }{p(x|z)p(y|z)} 
+             =   \sum_x \sum_y \sum_z p(x,y,z) \log  \frac{  p(x|y,z)p(y|z) }{p(x|z)p(y|z)} 
+             =   \sum_x \sum_y \sum_z p(x,y,z) \log  \frac{  p(x|y,z)       }{p(x|z)      } \\
+         &   =  -\sum_x \sum_y \sum_z p(x,y,z) \log                           p(x|z)       
+             +   \sum_x \sum_y \sum_z p(x,y,z) \log          p(x|y,z)                       \\
+         &   =  -\sum_x \sum_z        p(x,  z) \log                           p(x|z)       
+             +   \sum_x \sum_y \sum_z p(x|y,z) p(y,z)  \log  p(x|y,z)                       \\
+         &   =  -\sum_z p(z) \sum_x p(x|z) \log p(x|z) 
+             +   \sum_y \sum_z  p(y,z) \sum_x p(x|y,z) \log p(x|y,z)                      
+             =   H(X|Z) - H(X|Y,Z) 
+\end{split}
+\]
+
+\pagebreak
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{MI Approximations: Maximizing the Variance}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
