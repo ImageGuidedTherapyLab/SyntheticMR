@@ -299,8 +299,8 @@ I(X;Y|Z) &\equiv \sum_x \sum_y \sum_z p(x,y,z) \log  \frac{  p(x,y|z)       }{p(
          &   =  -\sum_x \sum_z        p(x,  z) \log                           p(x|z)       
              +   \sum_x \sum_y \sum_z p(x|y,z) p(y,z)  \log  p(x|y,z)                       \\
          &   =  -\sum_z p(z) \sum_x p(x|z) \log p(x|z) 
-             +   \sum_y \sum_z  p(y,z) \sum_x p(x|y,z) \log p(x|y,z)                      \\
-         &   =   H(X|Z) - H(X|Y,Z) 
+             +   \sum_y \sum_z  p(y,z) \sum_x p(x|y,z) \log p(x|y,z)                      
+             =   H(X|Z) - H(X|Y,Z) 
 \end{split}
 \]
 
@@ -308,27 +308,21 @@ These definitions and identities show that the `score' function from
 \cite{seeger2010optimization} is the mutual information between the desired measurement $\tilde{y}$
 and the image $u$ conditioned on existing measurements $y$.
 \[ 
-\begin{split}
-\mathcal{S}   =  I(U;\tilde{Y}|Y) 
-            & = -\sum_y p(y) \sum_u p(u|y) \log p(u|y) 
-              +  \sum_{\tilde{y}} \sum_y  p(\tilde{y},y) \sum_u p(u|\tilde{y},y) \log p(u|\tilde{y},y) \\
-            & = -\sum_y p(y) \sum_u p(u|y) \log p(u|y) 
-              +  \sum_{\tilde{y}} \sum_y  p(\tilde{y}|y) p(y)\sum_u p(u|\tilde{y},y) \log p(u|\tilde{y},y) \\
-            & =  H(U|Y) - H(U|\tilde{Y},Y) 
-\end{split}
+\mathcal{S}   =  I(U;\tilde{Y}|Y) =  H(U|Y) - H(U|\tilde{Y},Y)   
 \]
+This has a very intuitive interpretation.  The current measure of uncertainty
+in the parameter recovery (reconstruction) is $H(U|Y)$ for the given data, $Y$. 
+The measure of uncertainty in the parameter recovery (reconstruction) for
+ a new measurement, $\tilde{Y}$, is $H(U|Y,\tilde{Y})$.
+The measurement, $\tilde{Y}$, is `optimal' when is reduction
+in uncertainty in the parameter recovery (reconstruction) is maximized.
+
 We will assume that the joint probability between (measurement, acquisition) pairs is  jointly normal.
 The joint probability of signal measurements as a function of design parameters is assumed to be indepdent. 
-\[
- p(y_i)  =  \int_U p(y_i|u)  p(u) du 
-  \qquad
- p(u|y_i) = \frac{ p(u,y_i)}{ p(y_i)}
-        = \frac{ p(y_i|u) p(u)}{ p(y_i)}
-\]
 % TODO work out
 \[
  \begin{split}
-   p(y_1,y_2|u,k_1,k_2)  = &
+   p(y_1,y_2|u,k_1,k_2)  & =
       C      \exp{
                 \begin{bmatrix}
                  y_1 - \mu_1 \\
@@ -343,38 +337,32 @@ The joint probability of signal measurements as a function of design parameters 
                  y_2 - \mu_2 \\
                 \end{bmatrix}
                  }
-  \\
-   & =  
+    =  
       \underbrace{
          C_1    \exp{
-                \begin{bmatrix}
-                 y_1(u,k_1) - \mu_1 \\
-                \end{bmatrix}^\top
-                 P^{-1}_{11} 
-                \begin{bmatrix}
-                 y_1(u,k_1) - \mu_1 \\
-                \end{bmatrix}
-                 } }_{p(y_1|u,k_1)} 
-         \underbrace{
+                \|
+                 y_1(u,k_1) - \mu_1
+                \|_{P_{11}}
+                  }}_{p(y_1|u,k_1)} 
+      \underbrace{
          C_2    \exp{
-                \begin{bmatrix}
-                 y_2(u,k_2) - \mu_2 \\
-                \end{bmatrix}^\top
-                 P^{-1}_{22} 
-                \begin{bmatrix}
-                 y_2(u,k_2) - \mu_2 \\
-                \end{bmatrix}
-                 } }_{p(y_2|u,k_2)} 
+                \|
+                 y_2(u,k_2) - \mu_2
+                \|_{P_{22}}
+                  }}_{p(y_2|u,k_2)} 
  \end{split}
 \]
-For simplicity of notation, assume that two measures arise from two distinct acquisition parameters such that the dependence  on $k$ is assumed.
-\[
+For simplicity of notation, assume that two measures arise from two distinct acquisition parameters such that the dependence  on $k$ is assumed:
+$
    p(y_1,y_2|u)  = p(y_1|u) p(y_2|u) 
-\]
+$.
 The joint distribution for the measurements is generally correlated through the model.
 \[
    p(y_1,y_2)  = \int_U p(y_1,y_2,u) du = \int_U p(y_1,y_2|u)  p(u) du 
                = \int_U p(y_1|u) p(y_2|u) p(u) du 
+  \qquad
+ p(u|y_i) = \frac{ p(u,y_i)}{ p(y_i)}
+        = \frac{ p(y_i|u) p(u)}{ p(y_i)}
 \]
 \[
    p(y_2|y_1)  = \frac{p(y_1,y_2)}{p(y_1)}
@@ -383,15 +371,34 @@ The joint distribution for the measurements is generally correlated through the 
                = \int_U \frac{p(y_1|u)}{p(y_1)} p(y_2|u) p(u) du 
                = \int_U p(u|y_1) p(y_2|u)  du 
 \]
-
- The model for probability of parameters condition on the joint probability of the data is approximated similar to \cite{seeger2010optimization}.
 \[
+ p(y_i)  =  \int_U p(y_i|u)  p(u) du  
+\]
+
+Under these assumptions,
+ the model for probability of parameters condition on the joint probability of
+the data reduces to the probabulity of the parametery recovery (reconstruction) with respect
+to the data multiplied by the probability of the new measurements given the 
+parametery recovery (reconstruction) \cite{seeger2010optimization}. 
+ \[
  p(u|\tilde{y},y) = \frac{ p(u,\tilde{y},y)}{ p(\tilde{y},y)}
                   = \frac{ p(\tilde{y},y|u) p(u) }{ p(\tilde{y},y)}
                   = \frac{ p(\tilde{y}|u) p(y|u) p(u) }{ p(\tilde{y},y)}
                   = \frac{ p(\tilde{y}|u) p(y|u) p(u) }{ p(\tilde{y},y)}
                   = p(\tilde{y}|u) p(u|y) \frac{ p(y) }{ p(\tilde{y},y)}
                   \propto p(u|y) p(\tilde{y}|u) 
+\]
+The final information gain may be computed as:
+\[ 
+\begin{split}
+\mathcal{S}   =  I(U;\tilde{Y}|Y) &=  H(U|Y) - H(U|\tilde{Y},Y)   \\
+            & = -\int_y \; dy \; p(y) \int_u \; du \;  p(u|y) \log p(u|y) 
+              +  \int_{\tilde{y}}  \; d\tilde{y} \;\int_y  \; dy \; p(\tilde{y},y) \int_u  \; du \;p(u|\tilde{y},y) \log p(u|\tilde{y},y) \\
+            & = -\int_y  \; dy \;p(y) \int_u  \; du \;p(u|y) \log p(u|y) 
+              +  \int_{\tilde{y}}  \; d\tilde{y} \;\int_y  \; dy \; p(\tilde{y}|y) p(y)\int_u  \; du \;p(u|\tilde{y},y) \log p(u|\tilde{y},y) \\
+            & =  \int_y  \; dy \;p(y)  \left(-\int_u  \; du \;p(u|y) \log p(u|y) 
+              +  \int_{\tilde{y}}  \; d\tilde{y} \; p(\tilde{y}|y) \int_u  \; du \;p(u|\tilde{y},y) \log p(u|\tilde{y},y) \right) \\
+\end{split}
 \]
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{MI Approximations: Maximizing the Variance}
