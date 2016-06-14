@@ -292,8 +292,8 @@ mutual information~\cite{cover2012elements} and \textit{repeeated} application o
 \[ 
 \begin{split}
 I(X;Y|Z) &\equiv \sum_x \sum_y \sum_z p(x,y,z) \log  \frac{  p(x,y|z)       }{p(x|z)p(y|z)} 
-             =   \sum_x \sum_y \sum_z p(x,y,z) \log  \frac{  p(x|y,z)p(y|z) }{p(x|z)p(y|z)} \\
-         &   =   \sum_x \sum_y \sum_z p(x,y,z) \log  \frac{  p(x|y,z)       }{p(x|z)      } \\
+             =   \sum_x \sum_y \sum_z p(x,y,z) \log  \frac{  p(x|y,z)p(y|z) }{p(x|z)p(y|z)} 
+             =   \sum_x \sum_y \sum_z p(x,y,z) \log  \frac{  p(x|y,z)       }{p(x|z)      } \\
          &   =  -\sum_x \sum_y \sum_z p(x,y,z) \log                           p(x|z)       
              +   \sum_x \sum_y \sum_z p(x,y,z) \log          p(x|y,z)                       \\
          &   =  -\sum_x \sum_z        p(x,  z) \log                           p(x|z)       
@@ -317,17 +317,81 @@ and the image $u$ conditioned on existing measurements $y$.
             & =  H(U|Y) - H(U|\tilde{Y},Y) 
 \end{split}
 \]
- The model for probability of parameters condition on the joint probability of the data is approximated similar to \cite{seeger2010optimization}.
+We will assume that the joint probability between (measurement, acquisition) pairs is  jointly normal.
+The joint probability of signal measurements as a function of design parameters is assumed to be indepdent. 
 \[
- p(u|\tilde{y},y) \propto p(u|y) p(\tilde{y}|u) 
+ p(y_i)  =  \int_U p(y_i|u)  p(u) du 
+  \qquad
+ p(u|y_i) = \frac{ p(u,y_i)}{ p(y_i)}
+        = \frac{ p(y_i|u) p(u)}{ p(y_i)}
+\]
+% TODO work out
+\[
+ \begin{split}
+   p(y_1,y_2|u,k_1,k_2)  = &
+      C      \exp{
+                \begin{bmatrix}
+                 y_1 - \mu_1 \\
+                 y_2 - \mu_2 \\
+                \end{bmatrix}^\top
+                \begin{bmatrix}
+                 P^{-1}_{11} & 0      \\
+                   0    & P^{-1}_{22} \\
+                \end{bmatrix}
+                \begin{bmatrix}
+                 y_1 - \mu_1 \\
+                 y_2 - \mu_2 \\
+                \end{bmatrix}
+                 }
+  \\
+   & =  
+      \underbrace{
+         C_1    \exp{
+                \begin{bmatrix}
+                 y_1(u,k_1) - \mu_1 \\
+                \end{bmatrix}^\top
+                 P^{-1}_{11} 
+                \begin{bmatrix}
+                 y_1(u,k_1) - \mu_1 \\
+                \end{bmatrix}
+                 } }_{p(y_1|u,k_1)} 
+         \underbrace{
+         C_2    \exp{
+                \begin{bmatrix}
+                 y_2(u,k_2) - \mu_2 \\
+                \end{bmatrix}^\top
+                 P^{-1}_{22} 
+                \begin{bmatrix}
+                 y_2(u,k_2) - \mu_2 \\
+                \end{bmatrix}
+                 } }_{p(y_2|u,k_2)} 
+ \end{split}
+\]
+For simplicity of notation, assume that two measures arise from two distinct acquisition parameters such that the dependence  on $k$ is assumed.
+\[
+   p(y_1,y_2|u)  = p(y_1|u) p(y_2|u) 
+\]
+The joint distribution for the measurements is generally correlated through the model.
+\[
+   p(y_1,y_2)  = \int_U p(y_1,y_2,u) du = \int_U p(y_1,y_2|u)  p(u) du 
+               = \int_U p(y_1|u) p(y_2|u) p(u) du 
 \]
 \[
+   p(y_2|y_1)  = \frac{p(y_1,y_2)}{p(y_1)}
+               = \frac{1}{p(y_1)}
+                 \int_U p(y_1|u) p(y_2|u) p(u) du 
+               = \int_U \frac{p(y_1|u)}{p(y_1)} p(y_2|u) p(u) du 
+               = \int_U p(u|y_1) p(y_2|u)  du 
+\]
+
+ The model for probability of parameters condition on the joint probability of the data is approximated similar to \cite{seeger2010optimization}.
+\[
  p(u|\tilde{y},y) = \frac{ p(u,\tilde{y},y)}{ p(\tilde{y},y)}
-                  = \frac{ p(u,\tilde{y},y)}{ p(\tilde{y},y)}
-\qquad
- p(u|y) = \frac{ p(u,y)}{ p(y)}
-\qquad
- p(\tilde{y}|u) = \frac{ p(u,\tilde{y})}{ p(u)}
+                  = \frac{ p(\tilde{y},y|u) p(u) }{ p(\tilde{y},y)}
+                  = \frac{ p(\tilde{y}|u) p(y|u) p(u) }{ p(\tilde{y},y)}
+                  = \frac{ p(\tilde{y}|u) p(y|u) p(u) }{ p(\tilde{y},y)}
+                  = p(\tilde{y}|u) p(u|y) \frac{ p(y) }{ p(\tilde{y},y)}
+                  \propto p(u|y) p(\tilde{y}|u) 
 \]
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{MI Approximations: Maximizing the Variance}
