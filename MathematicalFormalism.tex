@@ -317,21 +317,17 @@ and the image $u$ conditioned on existing measurements $y$.
             & =  H(U|Y) - H(U|\tilde{Y},Y) 
 \end{split}
 \]
-Score function~\cite{seeger2010optimization}
+ The model for probability of parameters condition on the joint probability of the data is approximated similar to \cite{seeger2010optimization}.
 \[
- S = \mathcal{H}( P (u|z)) - E_{P(\tilde{z}|z)} \left[ \mathcal{H}(P(u|z,\tilde{z}))\right]
+ p(u|\tilde{y},y) \propto p(u|y) p(\tilde{y}|u) 
 \]
- \[
-  \mathcal{H}( P (u|z)) = \mathcal{H}( P (u,z)) - \mathcal{H}( P (z)) 
- \]
-
 \[
-  H(X,Y,Z) = H(X|Y,Z)  + H(Y,Z) = H(X|Y,Z)  + H(Y|Z) + H(Z)
-\]
-
-\[
-\mathcal{H}(P(u|z,\tilde{z}))  = 
-\mathcal{H}(P(u,z,\tilde{z}))  - \mathcal{H}(P(z,\tilde{z}))  
+ p(u|\tilde{y},y) = \frac{ p(u,\tilde{y},y)}{ p(\tilde{y},y)}
+                  = \frac{ p(u,\tilde{y},y)}{ p(\tilde{y},y)}
+\qquad
+ p(u|y) = \frac{ p(u,y)}{ p(y)}
+\qquad
+ p(\tilde{y}|u) = \frac{ p(u,\tilde{y})}{ p(u)}
 \]
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{MI Approximations: Maximizing the Variance}
