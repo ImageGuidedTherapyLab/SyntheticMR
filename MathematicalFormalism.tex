@@ -374,6 +374,25 @@ The final information gain may be computed as:
               +  \int_{\tilde{y}}  \; d\tilde{y} \; p(\tilde{y}|y) \int_u  \; du \;p(u|\tilde{y},y) \log p(u|\tilde{y},y) \right) \\
 \end{split}
 \]
+We have two options to compute the information gain $I(U;\tilde{Y}|Y)$  or scoring function $\mathcal{S}$ at this point:
+\begin{enumerate}
+  \item  Assume that the measurements are completely predicted by the model. ie
+    \[
+       p(y) =  \int_U p(y|u)  p(u) du  
+    \]
+  \item  Use Gaussian distribution around actual signal measurements $y^*$ and ignore the model predicted measurements
+    \[
+       p(y) =  \mathcal{N}(y^*,\sigma) = \exp\left(\frac{y - y^*}{\sigma} \right) \neq \int_U p(y|u)  p(u) du  
+    \]
+\end{enumerate}
+{\color{red} @dmitchell412 how do we interpret this ? how does modeling errors affect this choice ? which is `better' ?
+should we further separate into predicted measurement vs actual measurement ? ie Kalman Filter~\cite{maybeck1979stochastic}.
+\[
+  z = H y + \nu 
+\qquad \Rightarrow \qquad
+ I(U;\tilde{Y}|Z) 
+\]
+}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Information theory identities}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
