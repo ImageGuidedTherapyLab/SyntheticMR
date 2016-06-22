@@ -40,6 +40,8 @@ tags:
 doc:
 	pdflatex MathematicalFormalism.tex
 
+wip:
+	pdflatex wip.tex
 bib:
 	bibtex MathematicalFormalism
 # build pdf file first to ensure all aux files are available
