@@ -103,9 +103,9 @@ acquisition optimization.
 
 \begin{equation}\label{mtd}
 M_{TD}(T_R,T_D,\theta,T_E,\alpha,\p,\x)=
-   M_0 e^{i\psi(\x)}
+   M_0(\x) e^{i\psi(\x)}
 \left(
- (\x)\frac{1-(1-\cos \theta)e^{-\frac{T_D}{T_1(\x)}}-\cos \theta e^{-\frac{T_D}{T_1(\x)}}}{1-\cos \theta e^{-\frac{T_R}{T_1(\x)}}cos \alpha}
+ \frac{1-(1-\cos \theta)e^{-\frac{T_D}{T_1(\x)}}-\cos \theta e^{-\frac{T_D}{T_1(\x)}}}{1-\cos \theta e^{-\frac{T_R}{T_1(\x)}}cos \alpha}
  \right) e^{-\frac{T_E}{T_2(\x)}}
 \end{equation}
 Here, $M_0$ is the unsaturated magnetization, $\psi(\x)$ is the measured phase offset,
@@ -570,6 +570,28 @@ Resulting in
      \right)^2
 \]
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Analytic Geometry}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+{\color{red} @dmitchell412 need regression test}
+
+Suppose for example that the magnetization function was of the form of a complex Gaussian.
+\[
+   M_{TD} = T1 \left( e^{i \pi x^2}
+                    + e^{i \pi y^2}
+                    + e^{i \pi z^2}
+               \right)
+  \qquad
+  \Rightarrow
+  \qquad
+  \mathcal{F} M_{TD} =
+            T1 \left(  e^{i \pi (1/4 - f_x^2)}
+                     + e^{i \pi (1/4 - f_y^2)}
+                     + e^{i \pi (1/4 - f_z^2)}
+               \right)
+\]
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
