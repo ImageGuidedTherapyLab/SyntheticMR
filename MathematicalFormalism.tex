@@ -79,9 +79,9 @@
 \section{Problem Statement}\label{sec:prob_statement}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-Consider a magnetization signal $M_{TD}$ that is defined as
-as function of 
-\textbf{acquisition parameters} $\kk=\{T_R,T_D,\theta,T_E,\alpha\}$ 
+Consider a \textbf{complex} magnetization signal $M_{TD} \in \mathbb{C}$ that
+is defined as as function of \textbf{acquisition parameters} 
+$\kk=\{T_R,T_D,\theta,T_E,\alpha\}$ 
 and \textbf{tissue properties} $\p \equiv \{T_1,T_2,M_0\}$. 
 Within the scope of this project, $T_R$=4sec, $\theta$=120\textsuperscript{o}, 
 and $\alpha$=90\textsuperscript{o} are \textbf{fixed}. Delay time, $T_D$, and echo time $T_E$
@@ -141,121 +141,11 @@ M_0(\xbf)=\sum_{i=1}^{N=4} M0_i \phi_i(\xbf)
                      \end{split} \right. 
 \]
 
-
-Assume that the signal model  for $M_{TD}$ \eqn{mtd} is our measurment model in \textbf{image space}
-and is polluted with a white noise $\nu$ (with mean zero and variance $\R$). Hence, \eq{mtd} can be written as:
-\begin{equation}\label{mtdobs}
-z(\kk,\p)=\underbrace{M_{TD}(\kk,\p,\x)}_{h(\kk,\p)}+\nu
-\qquad
-\nu \in \mathbb{R}^2
-\quad 
-\R = 
-\begin{bmatrix}
-\sigma_r &      0    \\
-    0    & \sigma_i  \\
-\end{bmatrix}
-\end{equation}
-
-
-Note that the observation $z$ is a function of control parameters $\kk$ and
-parameters of interest $\p$.  The ultimate goal is to provide accurate estimate
-of the parameters $\p$, given some measurements $z$. 
-Precise estimation of parameters $\p$ crucially depends on the values of
-control parameters $\kk=\{T_D,T_E\}$ ( $\{T_R,\theta,\alpha\}$ \textbf{fixed}).  
-In other words, to ensure
-performance of the estimation algorithm, one needs to select the control
-parameters $\kk=\{T_D,T_E\}$ such that the observation $z$ provides
-useful information about the parameters $\p$. This is achieved my maximizing
-the mutual information between the measurements $z$ and parameters of interest
-$\p$.  Within this framework we will consider the tissue properties to be
-normally distributed Gaussian parameters.
-\[
-  \text{T1}_\text{WM}    =  \mathcal{N}(100ms, 20ms)  \qquad
-  \text{T1}_\text{GM}    =  \mathcal{N}(120ms, 20ms)  \qquad
-  \text{T1}_\text{CSF}   =  \mathcal{N}(320ms, 20ms)  \qquad
-  \text{T1}_\text{Tumor} =  \mathcal{N}(300ms, 20ms)
-\]
-\[
-  \text{T2}_\text{WM}    =  \mathcal{N}(100ms, 20ms)  \qquad
-  \text{T2}_\text{GM}    =  \mathcal{N}(120ms, 20ms)  \qquad
-  \text{T2}_\text{CSF}   =  \mathcal{N}(320ms, 20ms)  \qquad
-  \text{T2}_\text{Tumor} =  \mathcal{N}(300ms, 20ms)
-\]
-\[
-  \text{M0}_\text{WM}    =  \mathcal{N}(100??, 20??)  \qquad
-  \text{M0}_\text{GM}    =  \mathcal{N}(120??, 20??)  \qquad
-  \text{M0}_\text{CSF}   =  \mathcal{N}(320??, 20??)  \qquad
-  \text{M0}_\text{Tumor} =  \mathcal{N}(300??, 20??)
-\]
-{\color{red}(@kenphwang need exact numbers)}
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\section{WIP - k-space signal model}
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-
-{\color{red} @wstefan @kenphwang need to develop full k-space model of echo train trajectories for subsampling.}
-
-Consider the schematic of the pulse sequence for the  acquistion provided in
-Figure~\ref{fig:Pulsesequencemfgre}(a).
-For a  given tissue, $\Omega \subset \mathbb{R}^3$,
-with heterogenious intrinistic relaxation properties $T1(r)$ and $T2^*(r)$
-we will assume a multi-echo signal, $s_l(t,n)\in\mathbb{C}$ ,
-from the l-th coil at the n-th echo 
-of the form of a linear combination of damped exponentials. 
-The signal strength is dependent on the coil sensitivity $c_l(r)$.
-\begin{equation}
-\label{multiechosignalmodel}
-\begin{split}
- s_l(t,n) = \int_\Omega c_l(r)  w[n] e^{-i \int_0^t \gamma \vec{G}(\tau)\cdot r d \tau} \; dr
-\qquad
- w[n]  = \sum_j^{N_\text{species}} 
- C_j \Lambda_j^n 
-  \qquad  \qquad n = 0,1,2,\dots,N_\text{echo}-1
-\\
-\Lambda_j^n  = e^{-\left( 
-\underbrace{i\; \Delta B_{0_j}(r) }_\text{off-resonance} 
-+
-\frac{1}{T2^*_j} \right) \left( \text{TE} + n \; \text{ESP}\right) } 
-\quad  \quad
-C_j = \frac{M_{0_j} \sin \left(\gamma \theta_N \right)\left( 1- e^{-TR/T1_j}\right)}{\left( 1- \cos \left(\gamma \theta_N \right) e^{-TR/T1_j}\right)}
-e^{-i  \phi_j} 
-\in  \mathbb{C} 
-\end{split}
-\end{equation}
-
-Each weighted exponential, $C_j \Lambda_j$, represents a distinct chemical species,
-ie water, fat, sodium hydroxide, etc. 
-The complex amplitude,
-$C_j \in \mathbb{C}$, 
-depends on (1) acquisition parameters - repetition time, TR,
-and flip angle, $\theta_N$, as well as (2) tissue dependent properties -
- spin lattice relaxation,  $T1_j$,
- proton density $M_{0_j}$, and
- initial phase offset, $\phi_j$.
-Similarly, the complex exponential, $\Lambda_j$,
-depends on (1) acquisition parameters - echo time, TE,
-echo spacing , ESP, as well as (2) tissue dependent properties -
- spin spin relaxation,  $T2^*_j$, and tissue depending off-resonsance
-arising from temperature change, motion, and/or susceptibility, 
-$\Delta B_{0_j}(r)$.
-\[
- \Delta B_{0_j}(r) = 
-\left\{ 
-\begin{split}
-                2\pi f_j = 2\pi \underbrace{\alpha B_0 \Delta T_j(r)}_{f_j} & \qquad \text{temperature}   
-\\
-                ... =      & \qquad \text{susceptibility}   
-\\
-                ... =      & \qquad \text{motion}   
-\end{split}
-\right.
-\]
-
-
-\textbf{We will assume:} 
+Under the assumptions:
 \begin{itemize} 
- \item off-resonance, $\Delta B_{0_j}$ does not depend on readout time
+ \item phase offset, $\psi(\x)$, constant over acquisition time 
+ \item TE = effective echo time when readout crosses $k-$space center, i.e.  ignore additional
+       T2$^*$ decay of echo train
  \item constant gradients 
         \[ \left\{
              \begin{split}
@@ -282,34 +172,84 @@ estimated as the number of phase encodes times the repetition time.
                            \leq 256 \cdot 500ms \approx 2 \text{min}
 \]
 
- \item the phase induced temperature change is measured at the echo time
-  \[
-    \int_0^\text{TE} f(\tau) d\tau \approx f(TE) TE
-  \]
 \end{itemize} 
 
-Under these assumptions, the measurements at the n-th echo $s(t_i,n)$, 
-have the intuitive interpretation
-as the Fourier coefficient of the complex image, 
-$c_l(r) \sum_j C_j \Lambda_j^n : \mathbb{R}^3 \rightarrow \mathbb{C}$.
+The $k-$space measurements, $\mathcal{G} \in \mathbb{C}$, have the intuitive interpretation
+as the Fourier coefficients of the complex image weight by the
+coil sensitivities, $c(r):  \mathbb{R}^3 \rightarrow \mathbb{R}$.
  
 \begin{equation}
 \label{FFTmultiecho}
- s_l(t,n) = \text{Fourier transform} \left\{ \underbrace{c_l(r) \sum_j C_j \Lambda_j^n }_{\equiv f(r):\mathbb{R}^3 \rightarrow \mathbb{C} } \right\}
+\mathcal{G}(k_x,k_y,k_z,\kk,\p) = \text{Fourier transform} \left\{ \underbrace{c_l(r) M_{TD}(\kk,\p,r) }_{\equiv f(r):\mathbb{R}^3 \rightarrow \mathbb{C} } \right\}
           = \mathcal{F}(f(r))
-          = \int_\Omega \left(c_l(r) \sum_j C_j \Lambda_j^n \right)
+          = \int_\Omega \left(M_{TD}(\kk,\p,r)c_l(r)  \right)
           e^{-2  \pi i \vec{k}  \cdot r } \; dr
-          = s_l(k_x,k_y,k_z,n)
 \end{equation}
-        {\color{red} TODO - @dmitchell412 - derive this model and verify  }
 
-Within the context/notation of Eqn \eqn{sensormodelstructure},
+Assuming the real and imaginary components of the signal are independent Gaussian noise our 
+signal model may equivalently be understood in $\mathbb{R}^2$ in terms of the real
+and imaginary components.
 \[
-           s_l(k_x,k_y,k_z,n) =
-\mathcal{G}\left(\underbrace{\vec{k},TE,TR,ESP, N_{echo}, N_{species},
-\theta_N}_{k}
-,\underbrace{T1,T2,\Delta B_0}_\theta\right)
+\begin{bmatrix}
+z_r(k_x,k_y,k_z,\kk,\p) \\
+z_i(k_x,k_y,k_z,\kk,\p) \\
+\end{bmatrix}
+= 
+\begin{bmatrix}
+\Re \left\{ \mathcal{G}(k_x,k_y,k_z,\kk,\p)  \right\} \\
+\Im \left\{ \mathcal{G}(k_x,k_y,k_z,\kk,\p)  \right\} \\
+\end{bmatrix}
+ + 
+\begin{bmatrix}
+\nu_r \\
+\nu_i \\
+\end{bmatrix}
 \]
+For similicity in notation, vector notation will be assumed.
+\[\boxed{
+z(\kk,\p) = \mathcal{G}(\kk,\p) + \nu
+\qquad
+\nu \sim N(0,\R)
+\qquad
+\R = 
+\begin{bmatrix}
+\sigma_z &      0    \\
+    0    & \sigma_z  \\
+\end{bmatrix}
+\quad
+\sigma_z \in \mathbb{R}
+}
+\]
+
+Note that the observation $z$ is a function of control parameters $\kk$ and
+parameters of interest $\p$.  The ultimate goal is to provide accurate estimate
+of the parameters $\p$, given some measurements $z$. 
+Precise estimation of parameters $\p$ crucially depends on the values of
+control parameters $\kk=\{T_D,T_E\}$ ( $\{T_R,\theta,\alpha\}$ \textbf{fixed}).  
+In other words, to ensure
+performance of the estimation algorithm, one needs to select the control
+parameters $\kk=\{T_D,T_E\}$ such that the observation $z$ provides
+useful information about the parameters $\p$. This is achieved my maximizing
+the mutual information between the measurements $z$ and parameters of interest
+$\p$. 
+
+
+\subsection{Alternative Image Space Formulation}
+Assume that the signal model  for $M_{TD}$ \eqn{mtd} is our measurment model in \textbf{image space}
+and is polluted with a white noise $\nu$ (with mean zero and variance $\R$). Hence, \eq{mtd} can be written as:
+\begin{equation}\label{mtdobs}
+z(\kk,\p)=\underbrace{M_{TD}(\kk,\p,\x)}_{\mathcal{G}(\kk,\p)}+\nu
+\qquad
+\nu \in \mathbb{R}^2
+\quad 
+\R = 
+\begin{bmatrix}
+\sigma_r &      0    \\
+    0    & \sigma_i  \\
+\end{bmatrix}
+\end{equation}
+
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{ Mathematical Framework}\label{GeneralMathFramework}
@@ -331,10 +271,10 @@ of mean $\mu \in \mathbb{R}^n $ and covariance $\Sigma \in \mathbb{R}^{n \times 
 
 
 \begin{enumerate}
-  \item Our data acquistion model, $\mathcal{G}(\vec{k},\theta): \mathbb{R}^a
+  \item Our data acquistion model, $\mathcal{G}(\kk,\p): \mathbb{R}^a
 \times \mathbb{R}^m \rightarrow \mathbb{R}^n $,
 maps deterministic acquisition
-parameters, $\vec{k} \in \mathbb{R}^a$, and uncertain parameters, $\theta \in \mathbb{R}^m$
+parameters, $\kk \in \mathbb{R}^a$, and uncertain parameters, $\p \in \mathbb{R}^m$
 to observables, $\vec{z} \in \mathbb{R}^n$ ( or $\vec{z} \in \mathbb{C}^n$).
 Explicitly, we will assume that the
 measurement models are corrupted by zero mean white noise noise of a
@@ -342,40 +282,58 @@ measurement models are corrupted by zero mean white noise noise of a
 \begin{equation}
 \label{sensormodelstructure}
 \begin{split}
-  \vec{z} & = \mathcal{G}(\vec{k};\theta) + \eta   \qquad   \eta \sim \mathcal{N}(0,\Sigma_z)
-      \\
-  \vec{k} & =  \text{(TE, TR, etc)}
-      \\
-  \theta &  =  \text{(T1, T2, etc)}
+  \vec{z} & = \mathcal{G}(\kk;\p) + \nu   \qquad   \nu \sim \mathcal{N}(0,\Sigma_z)
      \end{split}
 \end{equation}
-$\eta$ may be interpreted as the measurement noise or the acquisition noise
+$\nu$ may be interpreted as the measurement noise or the acquisition noise
 in the sensor model. For a deterministic measurement model $\mathcal{G}$,
 the conditional probablity distribution has an explicit analytical form
 and may be written as a  \textbf{known} Gaussian
 distribution. 
   \[ 
-      p(\vec{z}|\theta)   =  \mathcal{N}(\mathcal{G}(\vec{k};\theta),\Sigma_z)  
+      p(\vec{z}|\p)   =  \mathcal{N}(\mathcal{G}(\kk;\p),\Sigma_z)  
   \]
   \item Additional \textbf{known} information is the prior probability
-distributions for the model parameters, $p(\theta)$.  For simplicity,
+distributions for the model parameters, $p(\p)$.  For simplicity,
     assume that Prior parameters are Gaussian distributed of 
-   \textbf{known} mean, $\hat{\theta}$ and covariance, $\Sigma_\theta$
+   \textbf{known} mean, $\hat{\p}$ and covariance, $\Sigma_\p$
    \[
-      \theta \sim \mathcal{N} (\hat{\theta}, \Sigma_\theta)
+      \p \sim \mathcal{N} (\hat{\p}, \Sigma_\p)
    \]
-  \item Bayes theorem is fundamental to the approach.
+We will consider the tissue properties to be
+normally distributed Gaussian parameters.
+\[
+  \text{T1}_\text{WM}    =  \mathcal{N}(100ms, 20ms)  \qquad
+  \text{T1}_\text{GM}    =  \mathcal{N}(120ms, 20ms)  \qquad
+  \text{T1}_\text{CSF}   =  \mathcal{N}(320ms, 20ms)  \qquad
+  \text{T1}_\text{Tumor} =  \mathcal{N}(300ms, 20ms)
+\]
+\[
+  \text{T2}_\text{WM}    =  \mathcal{N}(100ms, 20ms)  \qquad
+  \text{T2}_\text{GM}    =  \mathcal{N}(120ms, 20ms)  \qquad
+  \text{T2}_\text{CSF}   =  \mathcal{N}(320ms, 20ms)  \qquad
+  \text{T2}_\text{Tumor} =  \mathcal{N}(300ms, 20ms)
+\]
+\[
+  \text{M0}_\text{WM}    =  \mathcal{N}(100??, 20??)  \qquad
+  \text{M0}_\text{GM}    =  \mathcal{N}(120??, 20??)  \qquad
+  \text{M0}_\text{CSF}   =  \mathcal{N}(320??, 20??)  \qquad
+  \text{M0}_\text{Tumor} =  \mathcal{N}(300??, 20??)
+\]
+{\color{red}(@kenphwang need exact numbers)}
+
+  \item Bayes theorem is fundamental to the approach, Appendix~\ref{IntuitiveBayes}.
 The probability of the measurements $p(z)$ must be interprited in terms of the
 known information. The probability of the measurements may be derived from
 the marginalization of the joint probability and has the interpretation as
 the projection of the joint probability onto the measurement axis.
 \[
-  p(z) = \int_\theta p(\theta,z)  \; d\theta 
-       = \int_\theta p(z|\theta) \; p(\theta)\; d\theta 
+  p(z) = \int_\p p(\p,z)  \; d\p 
+       = \int_\p p(z|\p) \; p(\p)\; d\p 
 \]
-  \item  The concept of informational entropy~\cite{Madankan15}, $H(Z)$,
+  \item  The concept of informational entropy~\cite{madankan2015accelerated}, $H(Z)$,
 provides a mathematically rigorous framework to look for measurement acquisition
-parameters, $\vec{k}$, with the high information content of the reconstruction.
+parameters, $\kk$, with the high information content of the reconstruction, Figure~\ref{Fig:entropy}.
 Given a probability space 
 $(\Omega, \mathcal{F},p)$ (probability maps from the
 sigma-algebra of possible events $p:\mathcal{F}\rightarrow [0,1]$
@@ -393,7 +351,7 @@ of the information content for a sigma algebra of events $\mathcal{F}$
 \[
 H(Z) = \int_Z  p(z) \ln\frac{1}{p(z)} \; dz
 \qquad
-  p(z) = \int_\theta p(z|\theta) \; p(\theta)\; d\theta 
+  p(z) = \int_\p p(z|\p) \; p(\p)\; d\p 
 \]
 Hence this entropy measure is an average of the information content
 for a given set of events, $\mathcal{F}$, and is proportional to the
@@ -406,44 +364,71 @@ is zero for a probability distribution in which
 only one event occurs. Zero information is gained when the same event
 always occurs ($0 \ln\frac{1}{0} = 0$). 
 Intuitively, we want to find acquisition parameters,
-$\vec{k}$, for which the measurements are most uncertain
+$\kk$, for which the measurements are most uncertain
 \[
 \max_k H(Z)
   \quad \Leftrightarrow \quad
 \min_k 
-    \int_Z   dz \underbrace{\int_\theta  d\theta \; p(z|\theta) \; p(\theta)}_{p(z)}
-                \underbrace{ln \left(\int_\theta  d\theta \; p(z|\theta) \; p(\theta)\right)}_{ln \; p(z)}
+    \int_Z   dz \underbrace{\int_\p  d\p \; p(z|\p) \; p(\p)}_{p(z)}
+                \underbrace{ln \left(\int_\p  d\p \; p(z|\p) \; p(\p)\right)}_{ln \; p(z)}
 \]
-Alternatively we may consider this entropy maximization problem as a
-sensitivity analysis for the variance of the measurement $Z$, ie . 
-$ \max_k H(Z) \approx  \max_k \text{Var}(Z) $
-\[ \begin{split}
-   \bar{Z} = \mathbb{E}[Z]  & = \int_Z   dz \; z
-   \underbrace{\int_\theta  d\theta \; p(z|\theta) \; p(\theta)}_{p(z)}
-  \\
-   \mathbb{E}[ ( Z - \bar{Z} )^2 ]  & = \int_Z   dz \;(z - \bar{Z})^2 
-   \underbrace{\int_\theta  d\theta \; p(z|\theta) \; p(\theta)}_{p(z)}
-  \\
-   &  \propto
-    \int_Z   dz \;(z - \bar{z})^2 \int_\theta  d\theta 
- \exp\left( - \frac{1}{2} \|  z- \mathcal{G}(\vec{k},\theta)  \|^2_{\Sigma_z}\right)
- \exp\left( - \frac{1}{2} \|  \theta - \hat{\theta}  \|^2_{\Sigma_\theta}\right)
- \end{split}
+
+\begin{figure}[h]
+Given a discrete probability function 
+\[
+p: \Omega \rightarrow \mathbb{R}^+
+\qquad
+  \Omega \equiv
+\left\{
+\begin{split}
+c_i
+= 
+[a+i \; dx , a + (i+1) dx ) & \subset [a,b]
+\\
+& i = 0,..., N =   (b-a)/dx -1
+\end{split}
+\right\}
+\qquad
+ \sum_{i=1}^N  \underbrace{p(c_i)}_{ \equiv p_i} = 1
 \]
-Probilistic integrals may be
-computed from uncertainty quantification
-techniques~\cite{fahrenholtz2013generalised}.
+\begin{minipage}{.7\textwidth}
+Recall $\log \frac{x}{y} = \log x - \log y$,
+       $\log x\; y       = \log x + \log y$.
+The entropy is defined as:
+\[
+H(p)=-\sum_i p_i \log(p_i)
+    =+\sum_i p_i ( \underbrace{\log 1}_{0} -  \log(p_i) ) 
+    = \sum_i p_i \log\left(1/p_i\right)
+\]
+\end{minipage}~\begin{minipage}{.29\textwidth}
+\scalebox{0.31}{\includegraphics*{\picdir/ProbInformation.png}} 
+\end{minipage}
 
- 
-
-\end{enumerate}
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\section{Optimal ($T_D$,$T_E$) Design}\label{oed}
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-As discussed before, performance of estimation process crucially depends on the
+Here we are using a frequentist interpretation of probability.
+I.e. $p_0 = 1 \Rightarrow$  the event occurs 10 out of 100 times.
+\centering
+\begin{tabular}{cc}
+\scalebox{0.41}{\includegraphics*{\picdir/EntropyBins.png}} 
+&
+\scalebox{0.41}{\includegraphics*{\picdir/EntropyValue.png}} 
+\end{tabular}
+\caption{Entropy.
+Similar to thermodynamics, the entropy
+is a measure of the spread or uncertainty in a probability
+distribution. A uniform probability distribution has the largest entropy.
+This agrees within our intuition. If we have relatively little information
+about a model parameter/variable, then it can be anywhere uniformly within
+the interval. The more information we have the more `peaked' the probability
+distribution. For example, suppose  an object is located with uniform
+probability, $x \sim \mathcal{U}[a,b]$. The object is located 
+between $[a,b]$ with equal probability and we are uncertain were it may
+actually be. Compared to $x \sim \mathcal{N}[(a+b)/2,1]$, we are more
+certain that the object is likely to be located near the mid-point
+so we have relatively more information about the location of the object.
+}\label{Fig:entropy}
+\end{figure}
+\item
+Performance of estimation process crucially depends on the
 value of control parameters $\kk$. Hence, it is important to develop
 mathematical tools to identify the control parameters $\kk$ such that they
 provide the best observation data for accurate estimation of parameter $\p$.
@@ -464,17 +449,38 @@ I(\p;z)=\int_z\int_p p(z|\p)p(\p)\ln\left(\frac{p(z|\p)p(\p)}{p(\p)p(z)}\right)d
 Or,
 \begin{equation} \label{mi3}
 I(\p;z)=\int_z\int_p p(z|\p)p(\p)\ln\left[p(z|\p)\right]d\p dz - \int_z p(z) \ln p(z)dz
+= H(Z) - H(Z|\p)
 \end{equation}
 
 
-
-Note that due to dependence of observation data $z$ on control parameters, the mutual information $I(\p;z)$ is a function of control parameter $\kk$. In order to maximize the reduction of uncertainty in parameter estimate (i.e. to have the most confident estimates of the parameter $\p$), one can simply maximize the mutual information between the observation data and parameters of interest:
+Here $H(Z|\p)$ is constant by assumption of Gaussian noise.
+Note that due to dependence of observation data $z$ on control parameters, the
+mutual information $I(\p;z)$ is a function of control parameter $\kk$. In order
+to maximize the reduction of uncertainty in parameter estimate (i.e. to have
+the most confident estimates of the parameter $\p$), one can simply maximize
+the mutual information between the observation data and parameters of interest:
 
 \begin{equation}\label{mimax}
 \max_{\kk \in \mathcal{F}} I(\p;z)
 \qquad
 \kk=\{T_D,T_E\} \in \mathcal{F} = (0,4sec] \times (0,140ms] \subset \mathbb{R}^2 
 \end{equation}
+\end{enumerate}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Entropy Approximation}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+{\color{red} @dmitchell412 need entropy approximations here}
+Probilistic integrals may be
+computed from uncertainty quantification
+techniques~\cite{fahrenholtz2013generalised}.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Optimal ($T_D$,$T_E$) Design}\label{oed}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 The above maximization results in \textit{optimal} values of control parameter
 $\kk$ for accurate estimation of parameter $\p$. 
@@ -641,94 +647,6 @@ should we further separate into predicted measurement vs actual measurement ? ie
  I(U;\tilde{Y}|Z) 
 \]
 }
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\subsection{Information theory identities}
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-The concept of entropy appears
-in image procesing as a quantative measure of the information content.
-Given a discrete probability function 
-\[
-p: \Omega \rightarrow \mathbb{R}^+
-\qquad
-  \Omega \equiv
-\left\{
-\begin{split}
-c_i
-= 
-[a+i \; dx , a + (i+1) dx ) & \subset [a,b]
-\\
-& i = 0,..., N =   (b-a)/dx -1
-\end{split}
-\right\}
-\qquad
- \sum_{i=1}^N  \underbrace{p(c_i)}_{ \equiv p_i} = 1
-\]
-\begin{minipage}{.7\textwidth}
-Recall $\log \frac{x}{y} = \log x - \log y$,
-       $\log x\; y       = \log x + \log y$.
-The entropy is defined as:
-\[
-H(p)=-\sum_i p_i \log(p_i)
-    =+\sum_i p_i ( \underbrace{\log 1}_{0} -  \log(p_i) ) 
-    = \sum_i p_i \log\left(1/p_i\right)
-\]
-\end{minipage}~\begin{minipage}{.29\textwidth}
-\scalebox{0.31}{\includegraphics*{\picdir/ProbInformation.png}} 
-\end{minipage}
-
-Here we are using a frequenstest interpretation of probability.
-I.e. $p_0 = 1 \Rightarrow$  the event occurs 10 out of 100 times.
-
-\begin{figure}[h]
-\centering
-\begin{tabular}{cc}
-\scalebox{0.41}{\includegraphics*{\picdir/EntropyBins.png}} 
-&
-\scalebox{0.41}{\includegraphics*{\picdir/EntropyValue.png}} 
-\end{tabular}
-\caption{Entropy.
-Similar to thermodynamics, the entropy
-is a measure of the spread or uncertainty in a probability
-distribution. A uniform probability distribution has the largest entropy.
-This agrees within our intuition. If we have relatively little information
-about a model parameter/variable, then it can be anywhere uniformly within
-the interval. The more information we have the more `peaked' the probability
-distribution. For example, suppose  an object is located with uniform
-probability, $x \sim \mathcal{U}[a,b]$. The object is located 
-between $[a,b]$ with equal probability and we are uncertain were it may
-actually be. Compared to $x \sim \mathcal{N}[(a+b)/2,1]$, we are more
-certain that the object is likely to be located near the mid-point
-so we have relatively more information about the location of the object.
-}
-\end{figure}
-
-
-Key ideas of active Bayesian learning follows from the  definition of conditional 
-mutual information~\cite{cover2012elements} and \textit{repeeated} application of
- the definition of conditional probability and conditional entropy.
-\[
- p(x,y|z) \equiv \frac{p(x,y,z)}{p(z)} 
-               = \frac{p(x|y,z)p(y,z)}{p(z)}
-               =       p(x|y,z)p(y|z)
-\]
-\[
- H(Y|X  ) \equiv E_x \left[ H(Y|X=x) \right] =  \sum_x p(x) H(Y|X=x) =  -\sum_{x} p(x) \sum_{y} p(y|x) \log p(y|x) 
-\]
-\[ 
-\begin{split}
-I(X;Y|Z) &\equiv \sum_x \sum_y \sum_z p(x,y,z) \log  \frac{  p(x,y|z)       }{p(x|z)p(y|z)} 
-             =   \sum_x \sum_y \sum_z p(x,y,z) \log  \frac{  p(x|y,z)p(y|z) }{p(x|z)p(y|z)} 
-             =   \sum_x \sum_y \sum_z p(x,y,z) \log  \frac{  p(x|y,z)       }{p(x|z)      } \\
-         &   =  -\sum_x \sum_y \sum_z p(x,y,z) \log                           p(x|z)       
-             +   \sum_x \sum_y \sum_z p(x,y,z) \log          p(x|y,z)                       \\
-         &   =  -\sum_x \sum_z        p(x,  z) \log                           p(x|z)       
-             +   \sum_x \sum_y \sum_z p(x|y,z) p(y,z)  \log  p(x|y,z)                       \\
-         &   =  -\sum_z p(z) \sum_x p(x|z) \log p(x|z) 
-             +   \sum_y \sum_z  p(y,z) \sum_x p(x|y,z) \log p(x|y,z)                      
-             =   H(X|Z) - H(X|Y,Z) 
-\end{split}
-\]
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{MI Calculations}
@@ -830,7 +748,7 @@ The reconstruction algorithms for T1, T2, M0 is as follows:
 \bibliography{references}
 
 \appendix
-\section{Bayes - An intuitive example}
+\section{Bayes - An intuitive example}\label{IntuitiveBayes}
 Bayes theorem is fundamental to the approach and is immediately
 follows from the definition of conditional probability
 \[
@@ -939,5 +857,35 @@ p(\eta_1|\eta_2) =  \frac{p(\eta_1,\eta_2)  }{p(\eta_2) }
 \]
 
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Information theory identities}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+Key ideas of active Bayesian learning follows from the  definition of conditional 
+mutual information~\cite{cover2012elements} and \textit{repeeated} application of
+ the definition of conditional probability and conditional entropy.
+\[
+ p(x,y|z) \equiv \frac{p(x,y,z)}{p(z)} 
+               = \frac{p(x|y,z)p(y,z)}{p(z)}
+               =       p(x|y,z)p(y|z)
+\]
+\[
+ H(Y|X  ) \equiv E_x \left[ H(Y|X=x) \right] =  \sum_x p(x) H(Y|X=x) =  -\sum_{x} p(x) \sum_{y} p(y|x) \log p(y|x) 
+\]
+\[ 
+\begin{split}
+I(X;Y|Z) &\equiv \sum_x \sum_y \sum_z p(x,y,z) \log  \frac{  p(x,y|z)       }{p(x|z)p(y|z)} 
+             =   \sum_x \sum_y \sum_z p(x,y,z) \log  \frac{  p(x|y,z)p(y|z) }{p(x|z)p(y|z)} 
+             =   \sum_x \sum_y \sum_z p(x,y,z) \log  \frac{  p(x|y,z)       }{p(x|z)      } \\
+         &   =  -\sum_x \sum_y \sum_z p(x,y,z) \log                           p(x|z)       
+             +   \sum_x \sum_y \sum_z p(x,y,z) \log          p(x|y,z)                       \\
+         &   =  -\sum_x \sum_z        p(x,  z) \log                           p(x|z)       
+             +   \sum_x \sum_y \sum_z p(x|y,z) p(y,z)  \log  p(x|y,z)                       \\
+         &   =  -\sum_z p(z) \sum_x p(x|z) \log p(x|z) 
+             +   \sum_y \sum_z  p(y,z) \sum_x p(x|y,z) \log p(x|y,z)                      
+             =   H(X|Z) - H(X|Y,Z) 
+\end{split}
+\]
 
 \end{document}

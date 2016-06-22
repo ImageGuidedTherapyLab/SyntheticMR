@@ -246,4 +246,67 @@ time  and addition parameters are needed:
    TODO - do we need to update signal model for multiple read out lines ? 
 }
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{WIP - k-space signal model}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+{\color{red} @wstefan @kenphwang need to develop full k-space model of echo train trajectories for subsampling.}
+
+Consider the schematic of the pulse sequence for the  acquistion provided in
+Figure~\ref{fig:Pulsesequencemfgre}(a).
+For a  given tissue, $\Omega \subset \mathbb{R}^3$,
+with heterogenious intrinistic relaxation properties $T1(r)$ and $T2^*(r)$
+we will assume a multi-echo signal, $s_l(t,n)\in\mathbb{C}$ ,
+from the l-th coil at the n-th echo 
+of the form of a linear combination of damped exponentials. 
+The signal strength is dependent on the coil sensitivity $c_l(r)$.
+\begin{equation}
+\label{multiechosignalmodel}
+\begin{split}
+ s_l(t,n) = \int_\Omega c_l(r)  w[n] e^{-i \int_0^t \gamma \vec{G}(\tau)\cdot r d \tau} \; dr
+\qquad
+ w[n]  = \sum_j^{N_\text{species}} 
+ C_j \Lambda_j^n 
+  \qquad  \qquad n = 0,1,2,\dots,N_\text{echo}-1
+\\
+\Lambda_j^n  = e^{-\left( 
+\underbrace{i\; \Delta B_{0_j}(r) }_\text{off-resonance} 
++
+\frac{1}{T2^*_j} \right) \left( \text{TE} + n \; \text{ESP}\right) } 
+\quad  \quad
+C_j = \frac{M_{0_j} \sin \left(\gamma \theta_N \right)\left( 1- e^{-TR/T1_j}\right)}{\left( 1- \cos \left(\gamma \theta_N \right) e^{-TR/T1_j}\right)}
+e^{-i  \phi_j} 
+\in  \mathbb{C} 
+\end{split}
+\end{equation}
+
+Each weighted exponential, $C_j \Lambda_j$, represents a distinct chemical species,
+ie water, fat, sodium hydroxide, etc. 
+The complex amplitude,
+$C_j \in \mathbb{C}$, 
+depends on (1) acquisition parameters - repetition time, TR,
+and flip angle, $\theta_N$, as well as (2) tissue dependent properties -
+ spin lattice relaxation,  $T1_j$,
+ proton density $M_{0_j}$, and
+ initial phase offset, $\phi_j$.
+Similarly, the complex exponential, $\Lambda_j$,
+depends on (1) acquisition parameters - echo time, TE,
+echo spacing , ESP, as well as (2) tissue dependent properties -
+ spin spin relaxation,  $T2^*_j$, and tissue depending off-resonsance
+arising from temperature change, motion, and/or susceptibility, 
+$\Delta B_{0_j}(r)$.
+\[
+ \Delta B_{0_j}(r) = 
+\left\{ 
+\begin{split}
+                2\pi f_j = 2\pi \underbrace{\alpha B_0 \Delta T_j(r)}_{f_j} & \qquad \text{temperature}   
+\\
+                ... =      & \qquad \text{susceptibility}   
+\\
+                ... =      & \qquad \text{motion}   
+\end{split}
+\right.
+\]
+
 \end{document}
