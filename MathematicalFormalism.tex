@@ -81,11 +81,12 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 Consider a \textbf{complex} magnetization signal $M_{TD} \in \mathbb{C}$ that
 is defined as as function of \textbf{acquisition parameters} 
-$\kk=\{T_R,T_D,\theta,T_E,\alpha\}$ 
+$\kk=\{\vec{k},T_R,T_D,\theta,T_E,\alpha\}$ 
 and \textbf{tissue properties} $\p \equiv \{T_1,T_2,M_0\}$. 
 Within the scope of this project, $T_R$=4sec, $\theta$=120\textsuperscript{o}, 
-and $\alpha$=90\textsuperscript{o} are \textbf{fixed}. Delay time, $T_D$, and echo time $T_E$
-are parameters under consideration for acquisition optimization. 
+and $\alpha$=90\textsuperscript{o} are \textbf{fixed}. Delay time, $T_D$, echo time $T_E$,
+and $k-$space location, $\vec{k}$, are parameters under consideration for
+acquisition optimization. 
 
 
 \begin{figure}[h] 
@@ -101,7 +102,7 @@ are parameters under consideration for acquisition optimization.
 \end{figure}
 
 \begin{equation}\label{mtd}
-M_{TD}(\kk,\p,\x)=
+M_{TD}(T_R,T_D,\theta,T_E,\alpha,\p,\x)=
    M_0 e^{i\psi(\x)}
 \left(
  (\x)\frac{1-(1-\cos \theta)e^{-\frac{T_D}{T_1(\x)}}-\cos \theta e^{-\frac{T_D}{T_1(\x)}}}{1-\cos \theta e^{-\frac{T_R}{T_1(\x)}}cos \alpha}
@@ -180,10 +181,14 @@ coil sensitivities, $c(r):  \mathbb{R}^3 \rightarrow \mathbb{R}$.
  
 \begin{equation}
 \label{FFTmultiecho}
-\mathcal{G}(k_x,k_y,k_z,\kk,\p) = \text{Fourier transform} \left\{ \underbrace{c_l(r) M_{TD}(\kk,\p,r) }_{\equiv f(r):\mathbb{R}^3 \rightarrow \mathbb{C} } \right\}
+\begin{split}
+\mathcal{G}(k_x,k_y,k_z,T_R,T_D,\theta,T_E,\alpha,\p) 
+  & = \text{Fourier transform} \left\{ \underbrace{c_l(r) M_{TD}(T_R,T_D,\theta,T_E,\alpha,\p,r) }_{\equiv f(r):\mathbb{R}^3 \rightarrow \mathbb{C} } \right\}
           = \mathcal{F}(f(r))
-          = \int_\Omega \left(M_{TD}(\kk,\p,r)c_l(r)  \right)
+\\
+ & = \int_\Omega \left(M_{TD}(T_R,T_D,\theta,T_E,\alpha,\p,r)c_l(r)  \right)
           e^{-2  \pi i \vec{k}  \cdot r } \; dr
+\end{split}
 \end{equation}
 
 Assuming the real and imaginary components of the signal are independent Gaussian noise our 
@@ -191,13 +196,13 @@ signal model may equivalently be understood in $\mathbb{R}^2$ in terms of the re
 and imaginary components.
 \[
 \begin{bmatrix}
-z_r(k_x,k_y,k_z,\kk,\p) \\
-z_i(k_x,k_y,k_z,\kk,\p) \\
+z_r(k_x,k_y,k_z,T_R,T_D,\theta,T_E,\alpha,\p) \\
+z_i(k_x,k_y,k_z,T_R,T_D,\theta,T_E,\alpha,\p) \\
 \end{bmatrix}
 = 
 \begin{bmatrix}
-\Re \left\{ \mathcal{G}(k_x,k_y,k_z,\kk,\p)  \right\} \\
-\Im \left\{ \mathcal{G}(k_x,k_y,k_z,\kk,\p)  \right\} \\
+\Re \left\{ \mathcal{G}(k_x,k_y,k_z,T_R,T_D,\theta,T_E,\alpha,\p)  \right\} \\
+\Im \left\{ \mathcal{G}(k_x,k_y,k_z,T_R,T_D,\theta,T_E,\alpha,\p)  \right\} \\
 \end{bmatrix}
  + 
 \begin{bmatrix}
@@ -225,10 +230,10 @@ Note that the observation $z$ is a function of control parameters $\kk$ and
 parameters of interest $\p$.  The ultimate goal is to provide accurate estimate
 of the parameters $\p$, given some measurements $z$. 
 Precise estimation of parameters $\p$ crucially depends on the values of
-control parameters $\kk=\{T_D,T_E\}$ ( $\{T_R,\theta,\alpha\}$ \textbf{fixed}).  
+control parameters $\kk=\{\vec{k},T_D,T_E\}$ ( $\{T_R,\theta,\alpha\}$ \textbf{fixed}).  
 In other words, to ensure
 performance of the estimation algorithm, one needs to select the control
-parameters $\kk=\{T_D,T_E\}$ such that the observation $z$ provides
+parameters $\kk=\{\vec{k},T_D,T_E\}$ such that the observation $z$ provides
 useful information about the parameters $\p$. This is achieved my maximizing
 the mutual information between the measurements $z$ and parameters of interest
 $\p$. 
@@ -291,7 +296,8 @@ the conditional probablity distribution has an explicit analytical form
 and may be written as a  \textbf{known} Gaussian
 distribution. 
   \[ 
-      p(\vec{z}|\p)   =  \mathcal{N}(\mathcal{G}(\kk;\p),\Sigma_z)  
+      p(z|\p)   =  \mathcal{N}(\mathcal{G}(\kk;\p),\Sigma_z)  
+                      =  \frac{1}{2 \; \pi \; \det{\Sigma_z}} \exp\left( - \frac{1}{2} \|\mathcal{G}(\kk;\p)  - z \|^2_{\Sigma_z}\right)
   \]
   \item Additional \textbf{known} information is the prior probability
 distributions for the model parameters, $p(\p)$.  For simplicity,
@@ -299,6 +305,9 @@ distributions for the model parameters, $p(\p)$.  For simplicity,
    \textbf{known} mean, $\hat{\p}$ and covariance, $\Sigma_\p$
    \[
       \p \sim \mathcal{N} (\hat{\p}, \Sigma_\p)
+                      =  \frac{1}{2 \; \pi \; \det{\Sigma_\p}} \exp\left( 
+          - \frac{1}{2} \|\hat{\p}  - \p \|^2_{\Sigma_\p}
+                                                                  \right)
    \]
 We will consider the tissue properties to be
 normally distributed Gaussian parameters.
@@ -327,9 +336,43 @@ The probability of the measurements $p(z)$ must be interprited in terms of the
 known information. The probability of the measurements may be derived from
 the marginalization of the joint probability and has the interpretation as
 the projection of the joint probability onto the measurement axis.
-\[
-  p(z) = \int_\p p(\p,z)  \; d\p 
-       = \int_\p p(z|\p) \; p(\p)\; d\p 
+\[ 
+\begin{split}
+p(z) & = \int_\p p(\p,z)  \; d\p  
+       = \underbrace{
+         \int_\p 
+          p(z|\p) \; p(\p)\; d\p  
+          }_{
+         \int_\p  =
+              \int_{\text{T1}_\text{WM}     }
+              \int_{\text{T1}_\text{GM}     }
+              \int_{\text{T1}_\text{CSF}    }
+              \int_{\text{T1}_\text{Tumor}  }
+              \int_{\text{T2}_\text{WM}     }
+              \int_{\text{T2}_\text{GM}     }
+              \int_{\text{T2}_\text{CSF}    }
+              \int_{\text{T2}_\text{Tumor}  }
+              \int_{\text{M0}_\text{WM}     }
+              \int_{\text{M0}_\text{GM}     }
+              \int_{\text{M0}_\text{CSF}    }
+              \int_{\text{M0}_\text{Tumor}  }
+            }
+    \\
+     & = C 
+          \int_\p
+            \; d\p  
+               \exp\left( - \frac{1}{2} \left(
+                     \|\mathcal{G}(\kk;\p)  - z \|^2_{\Sigma_z}
+                   + \|\hat{\p}  - \p \|^2_{\Sigma_\p}
+                  \right)              \right)
+       = C 
+          \int_\p
+            \; d\p  
+               \exp\left( - \frac{1}{2} \left(
+                     \|\mathcal{F}M_{TD}  - z \|^2_{\Sigma_z}
+                   + \|\hat{\p}  - \p \|^2_{\Sigma_\p}
+                  \right)              \right)
+\end{split}
 \]
   \item  The concept of informational entropy~\cite{madankan2015accelerated}, $H(Z)$,
 provides a mathematically rigorous framework to look for measurement acquisition
@@ -363,15 +406,6 @@ The entropy
 is zero for a probability distribution in which
 only one event occurs. Zero information is gained when the same event
 always occurs ($0 \ln\frac{1}{0} = 0$). 
-Intuitively, we want to find acquisition parameters,
-$\kk$, for which the measurements are most uncertain
-\[
-\max_k H(Z)
-  \quad \Leftrightarrow \quad
-\min_k 
-    \int_Z   dz \underbrace{\int_\p  d\p \; p(z|\p) \; p(\p)}_{p(z)}
-                \underbrace{ln \left(\int_\p  d\p \; p(z|\p) \; p(\p)\right)}_{ln \; p(z)}
-\]
 
 \begin{figure}[h]
 Given a discrete probability function 
@@ -453,7 +487,6 @@ I(\p;z)=\int_z\int_p p(z|\p)p(\p)\ln\left[p(z|\p)\right]d\p dz - \int_z p(z) \ln
 \end{equation}
 
 
-Here $H(Z|\p)$ is constant by assumption of Gaussian noise.
 Note that due to dependence of observation data $z$ on control parameters, the
 mutual information $I(\p;z)$ is a function of control parameter $\kk$. In order
 to maximize the reduction of uncertainty in parameter estimate (i.e. to have
@@ -463,18 +496,80 @@ the mutual information between the observation data and parameters of interest:
 \begin{equation}\label{mimax}
 \max_{\kk \in \mathcal{F}} I(\p;z)
 \qquad
-\kk=\{T_D,T_E\} \in \mathcal{F} = (0,4sec] \times (0,140ms] \subset \mathbb{R}^2 
+\kk=\{\vec{k},T_D,T_E\} \in \mathcal{F} = 
+   [\vec{k}_\text{lb},\vec{k}_\text{ub}] \times 
+   (0,4sec] \times (0,140ms] \subset  \mathbb{Z}^3 \times \mathbb{R}^2 
 \end{equation}
 \end{enumerate}
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\subsection{Entropy Approximation}
+\subsection{Mutual Information Approximation}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 {\color{red} @dmitchell412 need entropy approximations here}
-Probilistic integrals may be
-computed from uncertainty quantification
-techniques~\cite{fahrenholtz2013generalised}.
+
+By assumption of Gaussian noise, $H(Z|\p)$ is constant.
+Maximizing mutual information reduces to maximizing the entropy 
+in the measurements.
+Intuitively, we want to find acquisition parameters,
+$\kk$, for which the measurements are most uncertain
+Probilistic integrals may be computed from uncertainty quantification
+techniques using kernel density methods (KDM) about quadrature 
+points~\cite{walters2009estimation,
+tobin2013kernel,terejanu2012bayesian,fahrenholtz2013generalised}.
+\[
+\max_\kk I(\p;z)
+\propto
+\max_\kk H(Z)
+  \quad \Leftrightarrow \quad
+\max_\kk 
+    \int_Z   dz \underbrace{\int_\p  d\p \; p(z|\p) \; p(\p)}_{p(z)}
+                \underbrace{ln \left(\int_\p  d\p \; p(z|\p) \; p(\p)\right)}_{ln \; p(z)}
+\]
+\[
+    p(z) = 
+         C \int_\p
+            \; d\p  
+              \exp\left( - \frac{1}{2} \left(
+                     \|\mathcal{F}M_{TD}  - z \|^2_{\Sigma_z}
+                   + \|\hat{\p}  - \p \|^2_{\Sigma_\p}
+                  \right)              \right)
+\]
+
+To build intuition, Jensen inequality suggests that the expected value
+may be used to bound the entropy from below.
+\[
+ln \; ( E[Z] ) \leq
+E[ln\; p(z)] = H(z)  
+\]
+
+\[
+ E[Z] = \int_Z   dz \; p(z) 
+      = \int_Z   dz  \;
+         C \int_\p
+            \; d\p  
+              \exp\left( - \frac{1}{2} \left(
+                     \|\mathcal{F}M_{TD}  - z \|^2_{\Sigma_z}
+                   + \|\hat{\p}  - \p \|^2_{\Sigma_\p}
+                  \right)              \right)
+\]
+
+Further, \cite{madankan2015accelerated} showed that the variance is a reasonable
+approximation to the entropy. Quadrature rules may be used to build
+intuition on expect maximal locations.
+\[
+ H(z)   \propto H(\mathcal{F}M_{TD} )
+   \approx E\left[\mathcal{F}M_{TD} - \mu\right]^2
+   \approx \sum_{p=1}^Q \omega_p \left( \mathcal{F}M_{TD}(\p_p) \right)^2
+\]
+Resulting in 
+\[
+   \max_{\vec{k},TE,TD} \sum_{p=1}^Q \omega_p \left(
+     \int_\Omega M_{TD}(T_D,T_E,\p_p,r)
+          e^{-2  \pi i \vec{k}  \cdot r } \; dr
+     \right)^2
+\]
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -647,54 +742,6 @@ should we further separate into predicted measurement vs actual measurement ? ie
  I(U;\tilde{Y}|Z) 
 \]
 }
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\subsection{MI Calculations}
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-{\color{red}
-(@dmitchell412 need Entropy calculation algorithm compiled here using
-kernel density methods (KDM) about quadrature points~\cite{walters2009estimation,tobin2013kernel,terejanu2012bayesian})
-}
-
-
-A more direct calculation of the entropy is given as
-\[
-   p(z) = \int_\theta p(z|\theta) p (\theta) d \theta = \sum_q \omega_q p(z|\theta_q)
-\]
-\[ \begin{split}
- MI = H(z) &  = \int_z p(z) ln \; p(z) \; dz 
-          = \int_z ln \; p(z) \; \int_\theta p(z|\theta) p (\theta) d \theta   \; dz  
-    \approx \int_z ln \; p(z)  \sum_q \omega_q p(z|\theta_q)  \; dz 
-      \\ &  
-          =  \sum_q \omega_q \int_z ln \; p(z)  p(z|\theta_q)  \; dz 
-      \underbrace{ \approx }_{?}\sum_q \omega_q \sum_r \omega_{r} ln \; p(x_r + g(\theta_q) )
-      \underbrace{ \approx }_{?}\sum_q \omega_q \sum_r \omega_{r} ln \left( \sum_l \omega_l p( x_r + g(\theta_q) |\theta_l) \right) 
-      \\ &  
-      \underbrace{ \propto }_{?}\sum_q \omega_q \sum_r \omega_{r} ln \left( \sum_l \omega_l e^\frac{ x_r + g(\theta_q) - g(\theta_l)}{\sigma} \right) 
-\end{split}
-\]
-
-Derivatives for optimization with respect to control parameters $\kappa_i$ are computed with chain rule and sensitivities:
-\[
-\frac{\partial \; MI}{\partial \kappa_i} = 
-      \sum_q \omega_q \sum_r \omega_{r} ln \left( \sum_l \omega_l e^\frac{ x_r + g(\theta_q) - g(\theta_l)}{\sigma} 
-       \left( \frac{\partial g(\theta_q)}{\partial u}\frac{\partial u}{\partial \kappa_i} 
-           -  \frac{\partial g(\theta_l)}{\partial u}\frac{\partial u}{\partial \kappa_i} 
-      \right) \right) 
-\]
-
-%\begin{figure}[h] 
-%\centering
-%\begin{tabular}{ccc}
-%\includegraphics[width=.5\textwidth]{\picdir/20160519_115937.jpg} & 
-%\includegraphics[width=.49\textwidth]{\picdir/20160519_115947.jpg} \\
-%\end{tabular}
-%\caption{ 
-%\color{red}
-%WIP - @dmitchell412 Need higher order entropy approximation
-%}\label{fig:Pulsesequence}
-%\end{figure}
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
