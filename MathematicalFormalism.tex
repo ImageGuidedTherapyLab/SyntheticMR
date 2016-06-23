@@ -575,7 +575,6 @@ Resulting in
 \subsection{Analytic Geometry}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-{\color{red} @dmitchell412 need regression test}
 
 Suppose for example that the magnetization function was of the form of a complex Gaussian.
 \[
@@ -587,11 +586,23 @@ Suppose for example that the magnetization function was of the form of a complex
   \Rightarrow
   \qquad
   \mathcal{F} M_{TD} =
-            T1 \left(  e^{i \pi (1/4 - f_x^2)}
-                     + e^{i \pi (1/4 - f_y^2)}
-                     + e^{i \pi (1/4 - f_z^2)}
+            T1 \left(  e^{i \pi (1/4 - k_x^2)}
+                     + e^{i \pi (1/4 - k_y^2)}
+                     + e^{i \pi (1/4 - k_z^2)}
                \right)
 \]
+For a simple 1D geometry
+\[
+    p(z) = 
+         C \int_{T1}
+            \; dT1 \;   
+              \exp\left( - \frac{1}{2} \left(
+                     \|T1 \; e^{i \pi (1/4 - k_x^2)}  - z \|^2_{\Sigma_z}
+                   + \|\hat{T1}  - T1 \|^2_{\Sigma_\p}
+                  \right)              \right)
+\]
+{\color{red} @dmitchell412 need regression test.  What analytic form of
+$M_{TD}$ should be assumed such that this integral is analytic ?  }
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
