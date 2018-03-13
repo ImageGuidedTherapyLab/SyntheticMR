@@ -1,7 +1,7 @@
 
 %% MI_QALAS_popt_driver
 
-for optcase=2:3
+for optcase=3:3
     
 %     try
         

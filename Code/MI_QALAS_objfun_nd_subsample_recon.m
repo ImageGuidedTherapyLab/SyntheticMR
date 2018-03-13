@@ -2,7 +2,7 @@
 % MI-based optimization of parameter space using fminsearch
 % MI calculated by Gauss-Hermite quadrature
 
-function [MIobjfun]=MI_QALAS_objfun_nd(pspace,pspacelabels,tisinput,acqparam,materialID,subsamplemask,optcase,geometryflag,B1inhomflag)
+function [MIobjfun,MI,kspace,subsmplmask]=MI_QALAS_objfun_nd_subsample_recon(pspace,pspacelabels,subsmpllabels,tisinput,acqparam,materialID,optcase,geometryflag,B1inhomflag)
 
 %% Assign Acquisition Parameters
 % Default Parameters
@@ -18,6 +18,11 @@ TD=acqparam(8:6+nacq);
 % Optimization Parameters
 for iii=1:length(pspacelabels)
     eval(sprintf('%s=pspace(iii);',pspacelabels{iii}));
+end
+
+% Subsampling Parameters
+for iii=length(pspacelabels)+1:length(subsmpllabels)
+    eval(sprintf('%s=pspace(iii);',subsmpllabels{iii}));
 end
 
 %% Generate Quadrature Points for MI Calculation
@@ -123,34 +128,70 @@ switch optcase
         MIobjfun=-sum(MI(:,sub2ind(szmi(2:end),centercoord{2:end})));
     case 3
         % Sum over Poisson disc subsample
-%         nseed=100;
-%         szmi=size(MI);
-%         if szmi>=3
-%             poissonmask=zeros(szmi(2:max(3,end-1)));
-%             for iii=1:nseed
-%                 poissonpts=poissonDisc(szmi(2:max(3,end-1)),1);
-%                 poissonpts=round(poissonpts);
-%                 poissonind=zeros([size(poissonpts,1),1]);
-%                 for iii=1:size(poissonpts,1)
-%                     tmpcell=num2cell(poissonpts(iii,:));
-%                     poissonind(iii)=sub2ind(szmi(2:max(3,end-1)),tmpcell{:});
-%                 end
-%                 poissonmasktmp=zeros(szmi(2:max(3,end-1)));
-%                 poissonmasktmp(poissonind)=1;
-%                 poissonmask=poissonmask+poissonmasktmp;
-%             end
-%             szmi(2:1+ndims(poissonmask))=1;
-%             poissonmask=permute(poissonmask,[ndims(poissonmask)+1,1:ndims(poissonmask)]);
-%             poissonmask=repmat(poissonmask,szmi);
-%             MIobjfun=-sum(MI(:).*poissonmask(:)/nseed);
-            szmi=size(MI);
-        if szmi>=3
-            szmi(2:1+ndims(subsamplemask))=1;
-            subsamplemask=permute(subsamplemask,[ndims(subsamplemask)+1,1:ndims(subsamplemask)]);
-            subsamplemask=repmat(subsamplemask,szmi);
-            MIobjfun=-sum(MI(:).*subsamplemask(:));
-        else
-            MIobjfun=-sum(MI(:));
+        subsmpltype='continuousgauss';
+        switch subsmpltype
+            case 'importmask'
+                    szmi(2:1+ndims(subsmplmask))=1;
+                    subsmplmask=permute(subsmplmask,[ndims(subsmplmask)+1,1:ndims(subsmplmask)]);
+                    subsmplmask=repmat(subsmplmask,szmi);
+                    MIobjfun=-sum(MI(:).*subsmplmask(:)/nseed);                
+            case 'poissondisc'
+                nseed=100;
+                szmi=size(MI);
+                if szmi>=3
+                    poissonmask=zeros(szmi(2:max(3,end-1)));
+                    for iii=1:nseed
+                        poissonpts=poissonDisc(szmi(2:max(3,end-1)),pdspace);
+                        poissonpts=round(poissonpts);
+                        poissonind=zeros([size(poissonpts,1),1]);
+                        for iii=1:size(poissonpts,1)
+                            tmpcell=num2cell(poissonpts(iii,:));
+                            poissonind(iii)=sub2ind(szmi(2:max(3,end-1)),tmpcell{:});
+                        end
+                        poissonmasktmp=zeros(szmi(2:max(3,end-1)));
+                        poissonmasktmp(poissonind)=1;
+                        poissonmask=poissonmask+poissonmasktmp;
+                    end
+                    szmi(2:1+ndims(poissonmask))=1;
+                    poissonmask=permute(poissonmask,[ndims(poissonmask)+1,1:ndims(poissonmask)]);
+                    poissonmask=repmat(poissonmask,szmi);
+                    MIobjfun=-sum(MI(:).*poissonmask(:)/nseed);
+                else
+                    MIobjfun=-sum(MI(:));
+                end
+                %         szmi=size(MI);
+                %         if szmi>=3
+                %             szmi(2:1+ndims(subsamplemask))=1;
+                %             subsamplemask=permute(subsamplemask,[ndims(subsamplemask)+1,1:ndims(subsamplemask)]);
+                %             subsamplemask=repmat(subsamplemask,szmi);
+                %             MIobjfun=-sum(MI(:).*subsamplemask(:));
+                %         else
+                %             MIobjfun=-sum(MI(:));
+                %         end
+            case 'discretegauss'
+                szmi=size(MI);
+                for iii=1:2%max(2,ndims(MI)-2)
+                    gaussln{iii}=exp(-variance).*besseli(-ceil(szmi(iii+1)/2-1):floor(szmi(iii+1)/2),variance);
+                end
+                subsmplmask=kron(gaussln{1}',gaussln{2});
+                szmi(2:1+ndims(subsmplmask))=1;
+                subsmplmask=permute(subsmplmask,[ndims(subsmplmask)+1,1:ndims(subsmplmask)]);
+                subsmplmask=repmat(subsmplmask,szmi);
+                MIobjfun=-sum(MI(:).*subsmplmask(:));
+            case 'continuousgauss'
+                szmi=size(MI);
+                [xg,yg]=ndgrid(-ceil(szmi(2)/2-1):floor(szmi(2)/2),-ceil(szmi(3)/2-1):floor(szmi(3)/2));
+                sig=diag([variance,variance]);
+                mu=[0,0];
+                for iii=1:numel(xg)
+                    gauss2dc(iii)=(det(2*pi*sig))^(-0.5)*exp(-0.5*(mu-[xg(iii),yg(iii)])*inv(sig)*(mu-[xg(iii),yg(iii)])');
+                end
+                gauss2dc=reshape(gauss2dc,size(xg));
+                subsmplmask=gauss2dc/sum(gauss2dc(:));
+                szmi(2:1+ndims(subsmplmask))=1;
+                subsmplmask=permute(subsmplmask,[ndims(subsmplmask)+1,1:ndims(subsmplmask)]);
+                subsmplmask=repmat(subsmplmask,szmi);
+                MIobjfun=-sum(MI(:).*subsmplmask(:));
         end
     case 4
         % Morphological operations on segmentation, 20 patients
