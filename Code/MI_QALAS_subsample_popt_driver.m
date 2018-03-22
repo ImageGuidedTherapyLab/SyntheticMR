@@ -7,15 +7,16 @@ if exist(filename,'file')==2
 end
 
 for ttotal=[5,10]
-    for optcase=4:8;
+    for optcase=4:7;
         %     try
         
         close all; clearvars -except optcase ttotal;
         
-        
         %% Optimization Space Acquisition Parameters
         % optcase=1;
-        optcaseacc=[1,2,3,4,100];
+%         optcaseacc=[1,2,3,4,100];
+        optcaseacc=[1,1,1,1];
+        optcasevar=[1,3,10,20];
         geometrycase=2;
         lfname = '/rsrch1/ip/dmitchell2/github/SyntheticMR/Code/ICBM_grey_white_csf.nii.gz'; % population tissue segmentation
         switch geometrycase
@@ -46,8 +47,21 @@ for ttotal=[5,10]
                 tmpmatid = int32(tmptissue.img);
         end
         
-        subsmplconstrain=bart(sprintf('poisson -Y %i -Z %i -y %i -z %i -v',size(tmpmatid,1),size(tmpmatid,2),optcaseacc(optcase-3),optcaseacc(optcase-3)));
-        tconstrain=ttotal*60*100/sum(subsmplconstrain(:))-0.005-0.1-5*0.5-0.3; % seconds
+        %% Default Acquisition Parameters
+        flipAngle = 4;           % deg
+        TR = 0.005;              % s
+        TE_T2prep = 0.100;       % s
+        Tacq = 0.500;            % s
+        TDpT2 = 0.03;            % s
+        TDinv = 0;               % s
+        nacq = 5;
+        TD = [1,1,1,1];          % s
+        
+        acqparam=[flipAngle,TR,TE_T2prep,Tacq,TDpT2,TDinv,nacq,TD];
+%             dt=[0,0,Tacq,TDpT2,0,TDinv,Tacq,TD(1),Tacq,TD(2),Tacq,TD(3),Tacq,TD(4)];
+
+        subsmplconstrain=bart(sprintf('poisson -Y %i -Z %i -y %f -z %f -V %f',size(tmpmatid,1),size(tmpmatid,2),optcaseacc(optcase-3),optcaseacc(optcase-3),optcasevar(optcase-3)));
+        tconstrain=ttotal*60/ceil(sum(subsmplconstrain(:))/100)-TE_T2prep-TDpT2-nacq*Tacq-TDinv; % seconds
         
         B1inhomflag=1;
         pspacelabels={'flipAngle','TD(1)','TD(2)','TD(3)'};%,'TD(4)'};
@@ -73,7 +87,7 @@ for ttotal=[5,10]
         %% Driver Function
         %         tic;
         [popt,fval,exitflag,output,lambda,grad,hessian] = MI_QALAS_subsample_popt...
-            (optcase,geometrycase,B1inhomflag,pspacelabels,subsmpllabels,pinit,pAeq,pbeq,pmin,pmax,findiffrelstep,tolx,tolfun,maxiter);
+            (optcase,geometrycase,B1inhomflag,pspacelabels,subsmpllabels,acqparam,pinit,pAeq,pbeq,pmin,pmax,findiffrelstep,tolx,tolfun,maxiter);
         %         toc;
         
         %% Save
@@ -83,7 +97,7 @@ for ttotal=[5,10]
         saveas(gcf,sprintf('Figures/Paramopt_subsamp_%f_%f.png',ttotal,optcase));
         save(sprintf('results/optresults_subsamp_%f_%f.mat',ttotal,optcase),'-v7.3');
         system(sprintf('mv opt_history.txt results/opt_history_%f_%f.txt',ttotal,optcase));
-        
+        system(sprintf('mv /rsrch1/ip/dmitchell2/github/SyntheticMR/Code/MI_QALAS_subsample_poptrecons.mat /rsrch1/ip/dmitchell2/github/SyntheticMR/Code/results/MI_QALAS_subsample_poptrecons_%f_%f.mat',ttotal,optcase));
         %     catch
         %     end
         

@@ -33,7 +33,7 @@ lqp=length(xn{1}(:));
 if B1inhomflag==2
     parfor qp=1:lqp
         %     disp(sprintf('Model eval: %d of %d',qp,lqp))
-        dt=[0,0,Tacq,TDpT2,0,TDinv,Tacq,TD(1),Tacq,TD(2),Tacq,TD(3),Tacq,TD(4)];
+        dt=[0,TE_T2prep,Tacq,TDpT2,0,TDinv,Tacq,TD(1),Tacq,TD(2),Tacq,TD(3),Tacq,TD(4)];
         [~,Mmodel_GM(:,qp)]=qalas1p(tisinput(1,1),tisinput(1,1),xn{1}(qp),xn{4}(qp),TR,TE_T2prep,flipAngle+flipAngle*randn/(3*1.96),nacq,dt);
         [~,Mmodel_WM(:,qp)]=qalas1p(tisinput(1,2),tisinput(1,2),xn{2}(qp),xn{5}(qp),TR,TE_T2prep,flipAngle+flipAngle*randn/(3*1.96),nacq,dt);
         [~,Mmodel_CSF(:,qp)]=qalas1p(tisinput(1,3),tisinput(1,3),xn{3}(qp),xn{6}(qp),TR,TE_T2prep,flipAngle+flipAngle*randn/(3*1.96),nacq,dt);
@@ -41,7 +41,7 @@ if B1inhomflag==2
 else
     parfor qp=1:lqp
         %     disp(sprintf('Model eval: %d of %d',qp,lqp))
-        dt=[0,0,Tacq,TDpT2,0,TDinv,Tacq,TD(1),Tacq,TD(2),Tacq,TD(3),Tacq,TD(4)];
+        dt=[0,TE_T2prep,Tacq,TDpT2,0,TDinv,Tacq,TD(1),Tacq,TD(2),Tacq,TD(3),Tacq,TD(4)];
         [~,Mmodel_GM(:,qp)]=qalas1p(tisinput(1,1),tisinput(1,1),xn{1}(qp),xn{4}(qp),TR,TE_T2prep,flipAngle,nacq,dt);
         [~,Mmodel_WM(:,qp)]=qalas1p(tisinput(1,2),tisinput(1,2),xn{2}(qp),xn{5}(qp),TR,TE_T2prep,flipAngle,nacq,dt);
         [~,Mmodel_CSF(:,qp)]=qalas1p(tisinput(1,3),tisinput(1,3),xn{3}(qp),xn{6}(qp),TR,TE_T2prep,flipAngle,nacq,dt);
@@ -201,7 +201,7 @@ switch optcase
         end
     case 4
         szmi=size(MI);
-        subsmplmask=bart(sprintf('poisson -Y %i -Z %i -y %i -z %i -v',szmi(2),szmi(3),1,1));
+        subsmplmask=bart(sprintf('poisson -Y %i -Z %i -y %i -z %i -V %i',szmi(2),szmi(3),1,1,1));
         subsmplmask=double(squeeze(subsmplmask));
         szmi(2:1+ndims(subsmplmask))=1;
         subsmplmask=permute(subsmplmask,[ndims(subsmplmask)+1,1:ndims(subsmplmask)]);
@@ -209,7 +209,7 @@ switch optcase
         MIobjfun=-sum(MI(:).*subsmplmask(:));
     case 5
         szmi=size(MI);
-        subsmplmask=bart(sprintf('poisson -Y %i -Z %i -y %i -z %i -v',szmi(2),szmi(3),2,2));
+        subsmplmask=bart(sprintf('poisson -Y %i -Z %i -y %i -z %i -V %i',szmi(2),szmi(3),1,1,3));
         subsmplmask=double(squeeze(subsmplmask));
         szmi(2:1+ndims(subsmplmask))=1;
         subsmplmask=permute(subsmplmask,[ndims(subsmplmask)+1,1:ndims(subsmplmask)]);
@@ -217,7 +217,7 @@ switch optcase
         MIobjfun=-sum(MI(:).*subsmplmask(:));
     case 6
         szmi=size(MI);
-        subsmplmask=bart(sprintf('poisson -Y %i -Z %i -y %i -z %i -v',szmi(2),szmi(3),3,3));
+        subsmplmask=bart(sprintf('poisson -Y %i -Z %i -y %i -z %i -V %i',szmi(2),szmi(3),1,1,10));
         subsmplmask=double(squeeze(subsmplmask));
         szmi(2:1+ndims(subsmplmask))=1;
         subsmplmask=permute(subsmplmask,[ndims(subsmplmask)+1,1:ndims(subsmplmask)]);
@@ -225,7 +225,7 @@ switch optcase
         MIobjfun=-sum(MI(:).*subsmplmask(:));
     case 7
         szmi=size(MI);
-        subsmplmask=bart(sprintf('poisson -Y %i -Z %i -y %i -z %i -v',szmi(2),szmi(3),4,4));
+        subsmplmask=bart(sprintf('poisson -Y %i -Z %i -y %i -z %i -V %i',szmi(2),szmi(3),1,1,20));
         subsmplmask=double(squeeze(subsmplmask));
         szmi(2:1+ndims(subsmplmask))=1;
         subsmplmask=permute(subsmplmask,[ndims(subsmplmask)+1,1:ndims(subsmplmask)]);
@@ -268,7 +268,7 @@ if reconflag~=0
     end
     
     %% Create synthetic QALAS measurements
-    dt=[0,0,Tacq,TDpT2,0,TDinv,Tacq,TD(1),Tacq,TD(2),Tacq,TD(3),Tacq,TD(4)];
+    dt=[0,TE_T2prep,Tacq,TDpT2,0,TDinv,Tacq,TD(1),Tacq,TD(2),Tacq,TD(3),Tacq,TD(4)];
     [~,Mmeas]=qalas(synthdataM0,synthdataM0,synthdataT1,synthdataT2,TR,TE_T2prep,flipAngle,nacq,dt);
     stdmapmeas=normrnd(0,signu,size(materialID));
     Mmeas=Mmeas+stdmapmeas;
@@ -290,6 +290,16 @@ if reconflag~=0
         subsample=repmat(subsample,[1,1,size(kmeas,3),size(kmeas,4)]);
         % pics recon - replicate data in coil channel direction and input ones
         % for sens maps
+        Mmeassub=bart('fft -i 3',kmeas.*subsample)*size(kmeas,4)/numel(kmeas);
+        Mmeassub=real(Mmeassub);
+        Mmeassub(materialID==0)=nan;
+    end
+    if and(optcase>3,optcase<9)
+        Mmeassub(isnan(Mmeassub))=0;
+        kmeas=bart('fft 3',Mmeassub);
+        subsample=squeeze(subsmplmask(1,:,:));
+        subsample=repmat(subsample,[1,1,size(kmeas,3),size(kmeas,4)]);
+%         Mmeassub=bart('pics',kmeas.*subsample,ones(size(kmeas)));
         Mmeassub=bart('fft -i 3',kmeas.*subsample)*size(kmeas,4)/numel(kmeas);
         Mmeassub=real(Mmeassub);
         Mmeassub(materialID==0)=nan;
@@ -348,6 +358,7 @@ if reconflag~=0
         M0save=cat(ndims(M0pred)+1,M0save,M0pred);
         T1save=cat(ndims(T1pred)+1,T1save,T1pred);
         T2save=cat(ndims(T2pred)+1,T2save,T2pred);
+        Mmeassave=cat(ndims(Mmeas)+1,Mmeassave,Mmeas);
     else
         MIsave=MIobjfun;
         varsave=varstats;
@@ -356,8 +367,9 @@ if reconflag~=0
         M0save=M0pred;
         T1save=T1pred;
         T2save=T2pred;
+        Mmeassave=Mmeas;
     end
-    save(filename,'MIsave','varsave','meansave','mediansave','M0save','T1save','T2save','-v7.3');
+    save(filename,'MIsave','varsave','meansave','mediansave','M0save','T1save','T2save','Mmeassave','-v7.3');
 end
 
 end

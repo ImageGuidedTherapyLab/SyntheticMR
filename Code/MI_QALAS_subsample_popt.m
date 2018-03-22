@@ -1,6 +1,6 @@
 
 function [popt,fval,exitflag,output,lambda,grad,hessian] = MI_QALAS_subsample_popt...
-    (optcase,geometrycase,B1inhomflag,pspacelabels,subsmpllabels,pinit,pAeq,pbeq,pmin,pmax,findiffrelstep,tolx,tolfun,maxiter)
+    (optcase,geometrycase,B1inhomflag,pspacelabels,subsmpllabels,acqparam,pinit,pAeq,pbeq,pmin,pmax,findiffrelstep,tolx,tolfun,maxiter)
 
 %% Optimization Space Acquisition Parameters
 % optcase=1;
@@ -45,17 +45,17 @@ end
 
 tisinput=[M0mean;M0stdd;T1mean;T1stdd;T2mean;T2stdd];
 
-%% Default Acquisition Parameters
-flipAngle = 4;           % deg
-TR = 0.005;              % s
-TE_T2prep = 0.100;       % s
-Tacq = 0.500;            % s
-TDpT2 = 0.03;            % s
-TDinv = 0;               % s
-nacq = 5;
-TD = [1,1,1,1];          % s
-
-acqparam=[flipAngle,TR,TE_T2prep,Tacq,TDpT2,TDinv,nacq,TD];
+% %% Default Acquisition Parameters
+% flipAngle = 4;           % deg
+% TR = 0.005;              % s
+% TE_T2prep = 0.100;       % s
+% Tacq = 0.500;            % s
+% TDpT2 = 0.03;            % s
+% TDinv = 0;               % s
+% nacq = 5;
+% TD = [1,1,1,1];          % s
+% 
+% acqparam=[flipAngle,TR,TE_T2prep,Tacq,TDpT2,TDinv,nacq,TD];
 
 %% Input files
 labelfilename = '/rsrch1/ip/dmitchell2/github/SyntheticMR/Code/ICBM_grey_white_csf.nii.gz'; % population tissue segmentation
