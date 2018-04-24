@@ -1,8 +1,8 @@
 
-function[objfun]=qalasobjfun(input,Mmeas,TR,TE_T2prep,flipAngle,nacq,dt)
+function[T2]=qalasT2calc(M0,T1,Mmeas,TR,TE_T2prep,flipAngle,nacq,dt)
 
-M0=input(1);
-T1=input(2);
+% M0=input(1);
+% T1=input(2);
 % T2=input(3);
 
 star=(1-exp(-TR./T1))./(1-cosd(flipAngle)*exp(-TR./T1));
@@ -26,10 +26,7 @@ for iii=1:nacq-1
     M(6+2*iii)=M0-(M0-M(5+2*iii)).*exp(-dt(6+2*iii)./T1);
 end
 
-M=sind(flipAngle).*M;
-Mopt=[M(2),M(6:2:end-1)];
-% Mopt=[M(2),M(6:2:6+2*(nacq-2))];
-
-objfun=sum((Mopt-Mmeas).^2);
+M(2)=M0.*star-(M0.*star-Mmeas(1))./exp(-dt(3)./(T1.*star));
+T2=-TE_T2prep./log(M(2)./M(end));
 
 end

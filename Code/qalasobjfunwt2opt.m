@@ -1,19 +1,18 @@
 
-function[objfun]=qalasobjfun(input,Mmeas,TR,TE_T2prep,flipAngle,nacq,dt)
+function[objfun]=qalasobjfunwt2opt(input,Mmeas,TR,TE_T2prep,flipAngle,nacq,dt)
 
 M0=input(1);
 T1=input(2);
-% T2=input(3);
+T2=input(3);
 
 star=(1-exp(-TR./T1))./(1-cosd(flipAngle)*exp(-TR./T1));
 
 % T2 sensitization
 % M(1)=0;
 % M(2)=Mmeas(1);      % Fix first point?
-% M(1)=M0;        % assume initialization?
-% M(2)=M(1).*exp(-TE_T2prep./T2);
-% M(3)=M0.*star-(M0.*star-M(2)).*exp(-dt(3)./(T1.*star));
-M(3)=Mmeas(1);
+M(1)=M0;        % assume initialization?
+M(2)=M(1).*exp(-TE_T2prep./T2);
+M(3)=M0.*star-(M0.*star-M(2)).*exp(-dt(3)./(T1.*star));
 M(4)=M0-(M0-M(3)).*exp(-dt(4)./T1);
 
 % T1 sensitization

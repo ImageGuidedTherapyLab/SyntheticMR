@@ -1,6 +1,17 @@
 
 function[M,Mmeas]=qalas(Minit,M0,T1,T2,TR,TE_T2prep,flipAngle,nacq,dt)
 
+[M,Mmeas]=qalas1(Minit,M0,T1,T2,TR,TE_T2prep,flipAngle,nacq,dt);
+for iii=1:100
+    [M,Mmeas]=qalas1(M(:,:,:,end),M0,T1,T2,TR,TE_T2prep,flipAngle,nacq,dt);
+    merr=M(:,:,:,1)-M(:,:,:,end);
+    if min(merr(:))<=0.0001; break; end;
+end
+
+end
+
+function[M,Mmeas]=qalas1(Minit,M0,T1,T2,TR,TE_T2prep,flipAngle,nacq,dt)
+
 star=(1-exp(-TR./T1))./(1-cosd(flipAngle).*exp(-TR./T1));
 
 % T2 sensitization
@@ -19,7 +30,7 @@ for iii=1:nacq-1
     M(:,:,:,6+2*iii)=M0-(M0-M(:,:,:,5+2*iii)).*exp(-dt(6+2*iii)./T1);
 end
 
-M=sind(flipAngle).*M;
-Mmeas=cat(4,M(:,:,:,2),M(:,:,:,6:2:end-1));
+% M=sind(flipAngle).*M;
+Mmeas=sind(flipAngle).*cat(4,M(:,:,:,2),M(:,:,:,6:2:end-1));
 
 end

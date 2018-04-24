@@ -1,5 +1,5 @@
 
-function [] = MI_QALAS_subsample_popt_driver(tconoverride,acqtimes,pdvval,runnumber)
+function [] = MI_QALAS_subsample_popt_driver(acqtimes,pdvval,runnumber)
 
 %% MI_QALAS_popt_driver
 
@@ -8,10 +8,10 @@ if exist(filename,'file')==2
     delete(filename);
 end
 
-for ttotal=acqtimes%5:10;%[5,10]
-    for pdv=pdvval%[20,25];%4:7;
+for ttotal=acqtimes;%5:10;%[5,10]
+    for pdv=pdvval;%[20,25];%4:7;
         
-        close all; clearvars -except pdv tconoverride ttotal acqtimes pdvval runnumber;
+        close all; clearvars -except pdv ttotal acqtimes pdvval runnumber;
         pdxaccel=1;
         pdyaccel=1;
         pdarg=[pdxaccel,pdyaccel,pdv];
@@ -104,16 +104,12 @@ tisinput=[M0mean;M0stdd;T1mean;T1stdd;T2mean;T2stdd];
         
         acqparam=[flipAngle,TR,TE_T2prep,Tacq,TDpT2,TDinv,nacq,TD];
         
-        if tconoverride==1
-            tconstrain=ttotal;
+        if pdarg(3)==-1
+            subsmplconstrain=ones([size(materialID,1),size(materialID,2)]);
         else
-            if pdarg(3)==-1
-                subsmplconstrain=ones([size(materialID,1),size(materialID,2)]);
-            else
-                subsmplconstrain=bart(sprintf('poisson -Y %i -Z %i -y %f -z %f -V %f',size(materialID,1),size(materialID,2),pdarg(1),pdarg(2),pdarg(3)));
-            end
-            tconstrain=ttotal*60/ceil(sum(subsmplconstrain(:))/100)-TE_T2prep-TDpT2-nacq*Tacq-TDinv; % seconds
+            subsmplconstrain=bart(sprintf('poisson -Y %i -Z %i -y %f -z %f -V %f',size(materialID,1),size(materialID,2),pdarg(1),pdarg(2),pdarg(3)));
         end
+        tconstrain=ttotal*60/ceil(sum(subsmplconstrain(:))/100)-TE_T2prep-TDpT2-nacq*Tacq-TDinv; % seconds
         
         B1inhomflag=1;
         pspacelabels={'flipAngle','TD(1)','TD(2)','TD(3)','TD(4)'};
@@ -141,16 +137,16 @@ tisinput=[M0mean;M0stdd;T1mean;T1stdd;T2mean;T2stdd];
         
         %% Save
         figure(1)
-        saveas(gcf,sprintf('Figures/MIopt_subsamp_%f_%f_%f.png',tconoverride,ttotal,pdarg(3)));
+        saveas(gcf,sprintf('Figures/MIopt_subsamp_%f_%f.png',ttotal,pdarg(3)));
         figure(2)
-        saveas(gcf,sprintf('Figures/Paramopt_subsamp_%f_%f_%f.png',tconoverride,ttotal,pdarg(3)));
-        save(sprintf('results/optresults_subsamp_%f_%f_%f.mat',tconoverride,ttotal,pdarg(3)),'-v7.3');
+        saveas(gcf,sprintf('Figures/Paramopt_subsamp_%f_%f.png',ttotal,pdarg(3)));
+        save(sprintf('results/optresults_subsamp_%f_%f.mat',ttotal,pdarg(3)),'-v7.3');
         try
-        save(sprintf('/rsrch1/ip/dmitchell2/github/SyntheticMR/Code/results/MI_QALAS_goldstandards_%f_%f_%f.mat',tconoverride,ttotal,pdarg(3)),'synthdataM0','synthdataT1','synthdataT2','goldstandardM0','goldstandardT1','goldstandardT2','-v7.3');
+        save(sprintf('/rsrch1/ip/dmitchell2/github/SyntheticMR/Code/results/MI_QALAS_goldstandards_%f_%f.mat',ttotal,pdarg(3)),'synthdataM0','synthdataT1','synthdataT2','goldstandardM0','goldstandardT1','goldstandardT2','-v7.3');
         catch
         end
-        system(sprintf('mv opt_history.txt results/opt_history_%f_%f_%f.txt',tconoverride,ttotal,pdarg(3)));
-        system(sprintf('mv %s /rsrch1/ip/dmitchell2/github/SyntheticMR/Code/results/MI_QALAS_subsample_poptrecons_%f_%f_%f.mat',filenametmp,tconoverride,ttotal,pdarg(3)));
+        system(sprintf('mv opt_history.txt results/opt_history_%f_%f.txt',ttotal,pdarg(3)));
+        system(sprintf('mv %s /rsrch1/ip/dmitchell2/github/SyntheticMR/Code/results/MI_QALAS_subsample_poptrecons_%f_%f.mat',filenametmp,ttotal,pdarg(3)));
         
     end
 end
