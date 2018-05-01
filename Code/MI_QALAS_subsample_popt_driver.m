@@ -38,7 +38,7 @@ for ttotal=acqtimes%5:10;%[5,10]
                 system('rm resampleimg.nii.gz');
                 materialID = int32(tmptissue.img);
             case 0
-                system(sprintf('/opt/apps/itksnap/c3d-1.1.0-Linux-x86_64/bin/c3d %s -dilate 3 8x8x8vox -interpolation NearestNeighbor -resample 36x43x36 -o resampleimg.nii.gz',lfname));
+                system(sprintf('/opt/apps/itksnap/c3d-1.1.0-Linux-x86_64/bin/c3d %s -dilate 3 1x1x3vox -interpolation NearestNeighbor -resample 256x192x64 -o resampleimg.nii.gz',lfname));
                 tmptissue = load_untouch_nii('resampleimg.nii.gz');
                 system('rm resampleimg.nii.gz');
                 materialID = int32(tmptissue.img);
@@ -114,6 +114,7 @@ tisinput=[M0mean;M0stdd;T1mean;T1stdd;T2mean;T2stdd];
             end
             tconstrain=ttotal*60/ceil(sum(subsmplconstrain(:))/100)-TE_T2prep-TDpT2-nacq*Tacq-TDinv; % seconds
         end
+        % 80% elliptical sampling?
         
         B1inhomflag=1;
         pspacelabels={'flipAngle','TD(1)','TD(2)','TD(3)','TD(4)'};
