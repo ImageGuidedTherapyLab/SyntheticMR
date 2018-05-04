@@ -106,7 +106,9 @@ end
 % end
 
 N=length(xn);
-signu=1E-4;
+% std of patient csf = 9.8360; max signal in patient brain = 500; max
+% approx signal in synthdata = 0.0584
+signu=1.1E-3;
 if B1inhomflag==1
     signu=signu*(1+flipAngle/1.2);
 end
@@ -315,7 +317,7 @@ if pdarg(3)~=-1
 %         Mmeassub=bart('pics',kmeas.*subsample,ones(size(kmeas)));
         Mmeassub=bart('fft -i 3',kmeas.*subsample)*size(kmeas,4)/numel(kmeas);
         Mmeassub=real(Mmeassub);
-        Mmeassub(materialID==0)=nan;
+        Mmeassub(repmat(materialID,[1,1,size(Mmeassub,3),size(Mmeassub,4)])==0)=nan;
 end
 %     end
     

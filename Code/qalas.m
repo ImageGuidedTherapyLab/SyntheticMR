@@ -4,7 +4,7 @@ function[M,Mmeas]=qalas(Minit,M0,T1,T2,TR,TE_T2prep,flipAngle,nacq,dt)
 [M,Mmeas]=qalas1(Minit,M0,T1,T2,TR,TE_T2prep,flipAngle,nacq,dt);
 for iii=1:100
     [M,Mmeas]=qalas1(M(:,:,:,end),M0,T1,T2,TR,TE_T2prep,flipAngle,nacq,dt);
-    merr=M(:,:,:,1)-M(:,:,:,end);
+    merr=abs(M(:,:,:,1)-M(:,:,:,end));
     if min(merr(:))<=0.0001; break; end;
 end
 

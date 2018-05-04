@@ -4,7 +4,7 @@ function[M,Mmeas]=qalas1p(Minit,M0,T1,T2,TR,TE_T2prep,flipAngle,nacq,dt)
 [M,Mmeas]=qalas1time(Minit,M0,T1,T2,TR,TE_T2prep,flipAngle,nacq,dt);
 for iii=1:100
     [M,Mmeas]=qalas1time(M(end),M0,T1,T2,TR,TE_T2prep,flipAngle,nacq,dt);
-    if M(1)-M(end)<=0.0001; break; end;
+    if abs(M(1)-M(end))<=0.0001; break; end;
 end
 
 end

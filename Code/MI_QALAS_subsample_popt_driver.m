@@ -2,19 +2,10 @@
 function [] = MI_QALAS_subsample_popt_driver(tconoverride,acqtimes,pdvval,runnumber)
 
 %% MI_QALAS_popt_driver
-
-filename='/rsrch1/ip/dmitchell2/github/SyntheticMR/Code/MI_QALAS_subsample_poptrecons.mat';
-if exist(filename,'file')==2
-    delete(filename);
-end
-
 for ttotal=acqtimes%5:10;%[5,10]
     for pdv=pdvval%[20,25];%4:7;
         
         close all; clearvars -except pdv tconoverride ttotal acqtimes pdvval runnumber;
-        pdxaccel=1;
-        pdyaccel=1;
-        pdarg=[pdxaccel,pdyaccel,pdv];
         
         %% Optimization Space Acquisition Parameters
         geometrycase=2;
@@ -45,48 +36,47 @@ for ttotal=acqtimes%5:10;%[5,10]
             otherwise
                 tmptissue = load_untouch_nii(lfname);
                 materialID = int32(tmptissue.img);
-        end 
+        end
         
         %% Tissue Properties
-% M0/T1/T2 Variance Flags
-M0varflag = 1;
-T1varflag = 1;
-T2varflag = 1;
-% CSFvarflag
-
-% GM/WM/CSF M0/T1/T2 Values
-%              GM    WM   CSF  Tumor
-T1mean = [1200,  900, 4000, 1200]./1000; % s
-if T1varflag~=0
-    T1stdd = [ 100,  100,  200,  150]./1000; % s
-else
-    T1stdd = [   0,    0,    0,    0];
-end
-T2mean = [ 100,   80, 1000,  110]./1000; % s
-if T2varflag~=0
-    T2stdd = [   5,    4,   50,   10]./1000; % s
-else
-    T2stdd = [   0,    0,    0,    0];
-end
-M0mean = [ 0.9,  0.9,  1.0,  0.9];       % relative intensity
-if M0varflag~=0
-    M0stdd = [ .05,  .05,  .05,   .1];       % relative intensity
-else
-    M0stdd = [   0,    0,    0,    0];
-end
-
-tisinput=[M0mean;M0stdd;T1mean;T1stdd;T2mean;T2stdd];
+        % M0/T1/T2 Variance Flags
+        M0varflag = 1;
+        T1varflag = 1;
+        T2varflag = 1;
         
-            %% Create synthetic data
+        % GM/WM/CSF M0/T1/T2 Values
+        %              GM    WM   CSF  Tumor
+        T1mean = [1200,  900, 4000, 1200]./1000; % s
+        if T1varflag~=0
+            T1stdd = [ 100,  100,  200,  150]./1000; % s
+        else
+            T1stdd = [   0,    0,    0,    0];
+        end
+        T2mean = [ 100,   80, 1000,  110]./1000; % s
+        if T2varflag~=0
+            T2stdd = [   5,    4,   50,   10]./1000; % s
+        else
+            T2stdd = [   0,    0,    0,    0];
+        end
+        M0mean = [ 0.9,  0.9,  1.0,  0.9];       % relative intensity
+        if M0varflag~=0
+            M0stdd = [ .05,  .05,  .05,   .1];       % relative intensity
+        else
+            M0stdd = [   0,    0,    0,    0];
+        end
+        
+        tisinput=[M0mean;M0stdd;T1mean;T1stdd;T2mean;T2stdd];
+        
+        %% Create synthetic data
         stdmapT1=normrnd(0,1,size(materialID));
         stdmapT2=normrnd(0,1,size(materialID));
         stdmapM0=normrnd(0,1,size(materialID));
         
-        synthdataT1=(materialID==1).*(tisinput(3,1)+tisinput(4,1)*stdmapT1)+(materialID==2).*(tisinput(3,2)+tisinput(4,2)*tisinput(4,2)*stdmapT1)+(materialID==3).*(tisinput(3,3)+tisinput(4,3)*stdmapT1);
-        synthdataT2=(materialID==1).*(tisinput(5,1)+tisinput(6,1)*stdmapT2)+(materialID==2).*(tisinput(5,2)+tisinput(6,2)*tisinput(6,2)*stdmapT2)+(materialID==3).*(tisinput(5,3)+tisinput(6,3)*stdmapT2);
-        synthdataM0=(materialID==1).*(tisinput(1,1)+tisinput(2,1)*stdmapM0)+(materialID==2).*(tisinput(1,2)+tisinput(2,2)*tisinput(2,2)*stdmapM0)+(materialID==3).*(tisinput(1,3)+tisinput(2,3)*stdmapM0);
+        synthdataT1=(materialID==1).*(tisinput(3,1)+tisinput(4,1)*stdmapT1)+(materialID==2).*(tisinput(3,2)+tisinput(4,2)*stdmapT1)+(materialID==3).*(tisinput(3,3)+tisinput(4,3)*stdmapT1);
+        synthdataT2=(materialID==1).*(tisinput(5,1)+tisinput(6,1)*stdmapT2)+(materialID==2).*(tisinput(5,2)+tisinput(6,2)*stdmapT2)+(materialID==3).*(tisinput(5,3)+tisinput(6,3)*stdmapT2);
+        synthdataM0=(materialID==1).*(tisinput(1,1)+tisinput(2,1)*stdmapM0)+(materialID==2).*(tisinput(1,2)+tisinput(2,2)*stdmapM0)+(materialID==3).*(tisinput(1,3)+tisinput(2,3)*stdmapM0);
         synthdataT1(synthdataT1==0)=nan; synthdataT2(synthdataT2==0)=nan; synthdataM0(synthdataM0==0)=nan;
- 
+        
         goldstandardT1=(materialID==1).*tisinput(3,1)+(materialID==2).*tisinput(3,2)+(materialID==3).*tisinput(3,3);
         goldstandardT2=(materialID==1).*tisinput(5,1)+(materialID==2).*tisinput(5,2)+(materialID==3).*tisinput(5,3);
         goldstandardM0=(materialID==1).*tisinput(1,1)+(materialID==2).*tisinput(1,2)+(materialID==3).*tisinput(1,3);
@@ -100,10 +90,13 @@ tisinput=[M0mean;M0stdd;T1mean;T1stdd;T2mean;T2stdd];
         TDpT2 = 0.4;             % s
         TDinv = 0.03;            % s
         nacq = 5;
-        TD = [1,1,1,1];          % s
+        TD = [0.5,0.5,0.5,0.5];          % s
         
         acqparam=[flipAngle,TR,TE_T2prep,Tacq,TDpT2,TDinv,nacq,TD];
         
+        pdxaccel=1;
+        pdyaccel=1;
+        pdarg=[pdxaccel,pdyaccel,pdv];
         if tconoverride==1
             tconstrain=ttotal;
         else
@@ -127,18 +120,26 @@ tisinput=[M0mean;M0stdd;T1mean;T1stdd;T2mean;T2stdd];
         pmin=[0,0,0,0,0]';
         pmax=[180,2,2,2,2]';
         findiffrelstep=1.e-6;
-        tolx=1.e-5;
-        tolfun=1.e-5;
+        tolx=1.e-2;%1.e-5;
+        tolfun=1.e-2;%1.e-5;
         maxiter=500;
         
+        if exist('opt_history.txt','file')==2
+            delete('opt_history.txt');
+        end
         filenametmp=sprintf('/rsrch1/ip/dmitchell2/github/SyntheticMR/Code/MI_QALAS_subsample_poptreconstmp%i.mat',runnumber);
         if exist(filenametmp,'file')==2
             delete(filenametmp);
         end
         
         %% Driver Function
-        [popt,fval,exitflag,output,lambda,grad,hessian] = MI_QALAS_subsample_popt...
-            (pdarg,tisinput,materialID,synthdataT1,synthdataT2,synthdataM0,B1inhomflag,pspacelabels,subsmpllabels,acqparam,pinit,pAeq,pbeq,pmin,pmax,findiffrelstep,tolx,tolfun,maxiter,filenametmp);
+        %         [popt,fval,exitflag,output,lambda,grad,hessian] = MI_QALAS_subsample_popt...
+        %             (pdarg,tisinput,materialID,synthdataT1,synthdataT2,synthdataM0,B1inhomflag,pspacelabels,subsmpllabels,acqparam,pinit,pAeq,pbeq,pmin,pmax,findiffrelstep,tolx,tolfun,maxiter,filenametmp);
+        tic;
+        [popt,fval,exitflag,output,lambda,grad,hessian]=fmincon(@(x) MI_QALAS_objfun_nd_subsample(x,pspacelabels,subsmpllabels,tisinput,synthdataT1,synthdataT2,synthdataM0,acqparam,materialID,pdarg,B1inhomflag,filenametmp),...
+            pinit,pAeq,pbeq,[],[],pmin,pmax,[],...
+            optimset('FinDiffRelStep',findiffrelstep,'TolX',tolx,'TolFun',tolfun,'MaxIter',maxiter,'Display','iter-detailed','OutputFcn',@outfun));
+        toc;
         
         %% Save
         figure(1)
@@ -147,7 +148,7 @@ tisinput=[M0mean;M0stdd;T1mean;T1stdd;T2mean;T2stdd];
         saveas(gcf,sprintf('Figures/Paramopt_subsamp_%f_%f_%f.png',tconoverride,ttotal,pdarg(3)));
         save(sprintf('results/optresults_subsamp_%f_%f_%f.mat',tconoverride,ttotal,pdarg(3)),'-v7.3');
         try
-        save(sprintf('/rsrch1/ip/dmitchell2/github/SyntheticMR/Code/results/MI_QALAS_goldstandards_%f_%f_%f.mat',tconoverride,ttotal,pdarg(3)),'synthdataM0','synthdataT1','synthdataT2','goldstandardM0','goldstandardT1','goldstandardT2','-v7.3');
+            save(sprintf('/rsrch1/ip/dmitchell2/github/SyntheticMR/Code/results/MI_QALAS_goldstandards_%f_%f_%f.mat',tconoverride,ttotal,pdarg(3)),'synthdataM0','synthdataT1','synthdataT2','goldstandardM0','goldstandardT1','goldstandardT2','-v7.3');
         catch
         end
         system(sprintf('mv opt_history.txt results/opt_history_%f_%f_%f.txt',tconoverride,ttotal,pdarg(3)));

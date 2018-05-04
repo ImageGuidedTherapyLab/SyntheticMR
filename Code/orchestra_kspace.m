@@ -1,4 +1,4 @@
-function[kSpace] = orchestra_kspace(pfilePath)
+lfunction[kSpace] = orchestra_kspace(pfilePath)
    
     addpath('~/Documents/MATLAB/orchestra-sdk-1.5-2.matlab/');
 %     pfilePath='/rsrch1/ip/egates1/QALAS/20170601/P22016.7';
