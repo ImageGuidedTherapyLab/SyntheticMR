@@ -2,7 +2,7 @@
 % MI-based optimization of parameter space using fminsearch
 % MI calculated by Gauss-Hermite quadrature
 
-function [MIobjfun]=MI_QALAS_objfun_nd_subsample(pspace,pspacelabels,subsmpllabels,tisinput,synthdataT1,synthdataT2,synthdataM0,acqparam,materialID,pdarg,B1inhomflag,filename)
+function [MIobjfun]=MI_QALAS_objfun_nd_subsample(pspace,pspacelabels,subsmpllabels,tisinput,synthdataT1,synthdataT2,synthdataM0,noise,acqparam,materialID,pdarg,B1inhomflag,filename)
 
 %% Assign Acquisition Parameters
 % Default Parameters
@@ -106,9 +106,10 @@ end
 % end
 
 N=length(xn);
-% std of patient csf = 9.8360; max signal in patient brain = 500; max
-% approx signal in synthdata = 0.0584
-signu=1.1E-3;
+% std of patient csf = 9.8360; max signal in patient brain = 500; 
+% max approx signal in synthdata = 0.0584
+% std of noise in patient raw data = 17.8574; max signal approx 3000;
+signu=3.4762E-4;
 if B1inhomflag==1
     signu=signu*(1+flipAngle/1.2);
 end
@@ -284,7 +285,9 @@ if reconflag~=0
     %% Create synthetic QALAS measurements
     dt=[0,TE_T2prep,Tacq,TDpT2,0,TDinv,Tacq,TD(1),Tacq,TD(2),Tacq,TD(3),Tacq,TD(4)];
     [~,Mmeas]=qalas(synthdataM0,synthdataM0,synthdataT1,synthdataT2,TR,TE_T2prep,flipAngle,nacq,dt);
-    stdmapmeas=normrnd(0,signu,size(materialID));
+%     stdmapmeas=normrnd(0,signu,size(materialIDtemp)); %materialIDtemp?
+%     stdmapmeas=permute(stdmapmeas,[2,3,4,1]);
+    stdmapmeas=signu*noise;
     Mmeas=Mmeas+stdmapmeas;
     
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -333,11 +336,12 @@ end
             T1predvec(iii)=0;%nan;
             T2predvec(iii)=0;%nan;
         else
-            xm=fminsearch(@(x) qalasobjfun(x,squeeze(Mmeasvec(iii,:)),TR,TE_T2prep,flipAngle,nacq,dt),xinit);
-            M0predvec(iii)=xm(1);
-            T1predvec(iii)=xm(2);
-            T2predvec(iii)=qalasT2calc(M0predvec(iii),T1predvec(iii),squeeze(Mmeasvec(iii,:)),TR,TE_T2prep,flipAngle,nacq,dt);
+%             xm=fminsearch(@(x) qalasobjfun(x,squeeze(Mmeasvec(iii,:)),TR,TE_T2prep,flipAngle,nacq,dt),xinit);
+%             M0predvec(iii)=xm(1);
+%             T1predvec(iii)=xm(2);
+%             T2predvec(iii)=qalasT2calc(M0predvec(iii),T1predvec(iii),squeeze(Mmeasvec(iii,:)),TR,TE_T2prep,flipAngle,nacq,dt);
 %             T2predvec(iii)=xm(3);
+            [M0predvec(iii),T1predvec(iii),T2predvec(iii)=qalasrecon(squeeze(Mmeasvec(iii,:)),TR,TE_T2prep,flipAngle,nacq,dt);
         end
         %         fprintf('Element: %d of %d\n',iii,mmvsize)
     end

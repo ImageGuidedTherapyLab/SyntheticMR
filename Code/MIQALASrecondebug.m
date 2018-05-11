@@ -1,12 +1,6 @@
+function [M0pred,T1pred,T2pred,varstats,meanstats,medianstats] = MIQALASrecondebug()
 
-function [] = MI_QALAS_subsample_popt_driver(tconoverride,acqtimes,pdvval,runnumber)
-
-%% MI_QALAS_popt_driver
-for ttotal=acqtimes%5:10;%[5,10]
-    for pdv=pdvval%[20,25];%4:7;
-        
-        close all; clearvars -except pdv tconoverride ttotal acqtimes pdvval runnumber;
-        
+%% Reconstruct to Compute Variances
         %% Optimization Space Acquisition Parameters
         geometrycase=2;
         lfname = '/rsrch1/ip/dmitchell2/github/SyntheticMR/Code/ICBM_grey_white_csf.nii.gz'; % population tissue segmentation
@@ -94,88 +88,82 @@ for ttotal=acqtimes%5:10;%[5,10]
         
         acqparam=[flipAngle,TR,TE_T2prep,Tacq,TDpT2,TDinv,nacq,TD];
         
-        % Create consistent noise
-        noise=normrnd(0,1,[size(materialID,1),size(materialID,2),size(materialID,3),nacq]);
-        
-        pdxaccel=1;
-        pdyaccel=1;
-        pdarg=[pdxaccel,pdyaccel,pdv];
-        if tconoverride==1
-            tconstrain=ttotal;
-        else
-            if pdarg(3)==-1
-                subsmplconstrain=ones([size(materialID,1),size(materialID,2)]);
-            else
-                subsmplconstrain=bart(sprintf('poisson -Y %i -Z %i -y %f -z %f -V %f',size(materialID,1),size(materialID,2),pdarg(1),pdarg(2),pdarg(3)));
-            end
-            tconstrain=ttotal*60/ceil(sum(subsmplconstrain(:))/100)-TE_T2prep-TDpT2-nacq*Tacq-TDinv; % seconds
-        end
-        % 80% elliptical sampling?
-        
-        optFA=0;
-        if optFA==1
-            B1inhomflag=1;
-            pspacelabels={'flipAngle','TD(1)','TD(2)','TD(3)','TD(4)'};
-            subsmpllabels={};   %{'variance'};
-    %         pinit=[4,1,1,1,1]';
-            pinit=[4;tconstrain/4*ones([4,1])];
-            pAeq=zeros(length(pinit));
-            pAeq(2,2:end)=[1,1,1,1];
-            pbeq=zeros(size(pinit));
-            pbeq(2)=tconstrain;
-            pmin=[0,0,0,0,0]';
-            pmax=[180,2,2,2,2]';
-            findiffrelstep=1.e-6;
-            tolx=1.e-2;%1.e-5;
-            tolfun=1.e-2;%1.e-5;
-            maxiter=500;
-        else
-            B1inhomflag=0;
-            pspacelabels={'TD(1)','TD(2)','TD(3)','TD(4)'};
-            subsmpllabels={};   %{'variance'};
-    %         pinit=[4,1,1,1,1]';
-            pinit=tconstrain/4*ones([4,1]);
-            pAeq=zeros(length(pinit));
-            pAeq(2,:)=[1,1,1,1];
-            pbeq=zeros(size(pinit));
-            pbeq(2)=tconstrain;
-            pmin=[0,0,0,0]';
-            pmax=tconstrain*[1,1,1,1]';
-            findiffrelstep=1.e-6;
-            tolx=1.e-2;%1.e-5;
-            tolfun=1.e-2;%1.e-5;
-            maxiter=500;
-        end
-                
-        if exist('opt_history.txt','file')==2
-            delete('opt_history.txt');
-        end
-        filenametmp=sprintf('/rsrch1/ip/dmitchell2/github/SyntheticMR/Code/MI_QALAS_subsample_poptreconstmp%i.mat',runnumber);
-        if exist(filenametmp,'file')==2
-            delete(filenametmp);
-        end
-        
-        %% Driver Function
-        %         [popt,fval,exitflag,output,lambda,grad,hessian] = MI_QALAS_subsample_popt...
-        %             (pdarg,tisinput,materialID,synthdataT1,synthdataT2,synthdataM0,B1inhomflag,pspacelabels,subsmpllabels,acqparam,pinit,pAeq,pbeq,pmin,pmax,findiffrelstep,tolx,tolfun,maxiter,filenametmp);
-        tic;
-        [popt,fval,exitflag,output,lambda,grad,hessian]=fmincon(@(x) MI_QALAS_objfun_nd_subsample(x,pspacelabels,subsmpllabels,tisinput,synthdataT1,synthdataT2,synthdataM0,noise,acqparam,materialID,pdarg,B1inhomflag,filenametmp),...
-            pinit,pAeq,pbeq,[],[],pmin,pmax,[],...
-            optimset('FinDiffRelStep',findiffrelstep,'TolX',tolx,'TolFun',tolfun,'MaxIter',maxiter,'Display','iter-detailed','OutputFcn',@outfun));
-        toc;
-        
-        %% Save
-        figure(1)
-        saveas(gcf,sprintf('Figures/MIopt_subsamp_%f_%f_%f.png',tconoverride,ttotal,pdarg(3)));
-        figure(2)
-        saveas(gcf,sprintf('Figures/Paramopt_subsamp_%f_%f_%f.png',tconoverride,ttotal,pdarg(3)));
-        save(sprintf('results/optresults_subsamp_%f_%f_%f.mat',tconoverride,ttotal,pdarg(3)),'-v7.3');
-        try
-            save(sprintf('/rsrch1/ip/dmitchell2/github/SyntheticMR/Code/results/MI_QALAS_goldstandards_%f_%f_%f.mat',tconoverride,ttotal,pdarg(3)),'synthdataM0','synthdataT1','synthdataT2','goldstandardM0','goldstandardT1','goldstandardT2','-v7.3');
-        catch
-        end
-        system(sprintf('mv opt_history.txt results/opt_history_%f_%f_%f.txt',tconoverride,ttotal,pdarg(3)));
-        system(sprintf('mv %s /rsrch1/ip/dmitchell2/github/SyntheticMR/Code/results/MI_QALAS_subsample_poptrecons_%f_%f_%f.mat',filenametmp,tconoverride,ttotal,pdarg(3)));
-        
+%% Create synthetic QALAS measurements
+dt=[0,TE_T2prep,Tacq,TDpT2,0,TDinv,Tacq,TD(1),Tacq,TD(2),Tacq,TD(3),Tacq,TD(4)];
+[~,Mmeas]=qalas(synthdataM0,synthdataM0,synthdataT1,synthdataT2,TR,TE_T2prep,flipAngle,nacq,dt);
+stdmapmeas=normrnd(0,signu,size(materialID));
+Mmeas=Mmeas+stdmapmeas;
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% THE FOLLOWING SECTION ONLY WORKS FOR 2D!
+% FIX IT FOR N-D!!
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%% Subsample synthetic measurements
+Mmeassub=Mmeas;
+if pdarg(3)~=-1
+    Mmeassub(isnan(Mmeassub))=0;
+    kmeas=bart('fft 3',Mmeassub);
+    subsample=squeeze(subsmplmask(1,:,:));
+    subsample=repmat(subsample,[1,1,size(kmeas,3),size(kmeas,4)]);
+    %         Mmeassub=bart('pics',kmeas.*subsample,ones(size(kmeas)));
+    Mmeassub=bart('fft -i 3',kmeas.*subsample)*size(kmeas,4)/numel(kmeas);
+    Mmeassub=real(Mmeassub);
+    Mmeassub(repmat(materialID,[1,1,size(Mmeassub,3),size(Mmeassub,4)])==0)=nan;
+end
+%     end
+
+%% Reconstruct synthetic QALAS measurements
+% Optimization solution for M0 and T1 prediction
+xinit=[mean(tisinput(1,1:3)),mean(tisinput(3,1:3))];%,mean(tisinput(5,1:3))];
+smeas=size(Mmeassub);
+Mmeasvec=reshape(Mmeassub,[prod(smeas(1:3)),smeas(4:end)]);
+mmvsize=size(Mmeasvec,1);
+parfor iii=1:size(Mmeasvec,1)
+    if sum(isnan(squeeze(Mmeasvec(iii,:))))>0
+        M0predvec(iii)=0;%nan;
+        T1predvec(iii)=0;%nan;
+        T2predvec(iii)=0;%nan;
+    else
+        xm=fminsearch(@(x) qalasobjfun(x,squeeze(Mmeasvec(iii,:)),TR,TE_T2prep,flipAngle,nacq,dt),xinit);
+        M0predvec(iii)=xm(1);
+        T1predvec(iii)=xm(2);
+        T2predvec(iii)=qalasT2calc(M0predvec(iii),T1predvec(iii),squeeze(Mmeasvec(iii,:)),TR,TE_T2prep,flipAngle,nacq,dt);
     end
+end
+M0pred(:,:,:)=reshape(M0predvec,smeas(1:3));
+T1pred(:,:,:)=reshape(T1predvec,smeas(1:3));
+T2pred(:,:,:)=reshape(T2predvec,smeas(1:3));
+
+M0p1set=M0pred(:).*(materialID(:)==1); M0p1set=M0p1set(M0p1set~=0);
+M0p2set=M0pred(:).*(materialID(:)==2); M0p2set=M0p2set(M0p2set~=0);
+M0p3set=M0pred(:).*(materialID(:)==3); M0p3set=M0p3set(M0p3set~=0);
+T1p1set=T1pred(:).*(materialID(:)==1); T1p1set=T1p1set(T1p1set~=0);
+T1p2set=T1pred(:).*(materialID(:)==2); T1p2set=T1p2set(T1p2set~=0);
+T1p3set=T1pred(:).*(materialID(:)==3); T1p3set=T1p3set(T1p3set~=0);
+T2p1set=T2pred(:).*(materialID(:)==1); T2p1set=T2p1set(T2p1set~=0);
+T2p2set=T2pred(:).*(materialID(:)==2); T2p2set=T2p2set(T2p2set~=0);
+T2p3set=T2pred(:).*(materialID(:)==3); T2p3set=T2p3set(T2p3set~=0);
+
+M0varmeas=[quantile(M0p1set,0.975)-quantile(M0p1set,0.025)...
+    quantile(M0p2set,0.975)-quantile(M0p2set,0.025)...
+    quantile(M0p3set,0.975)-quantile(M0p3set,0.025)];
+T1varmeas=[quantile(T1p1set,0.975)-quantile(T1p1set,0.025)...
+    quantile(T1p2set,0.975)-quantile(T1p2set,0.025)...
+    quantile(T1p3set,0.975)-quantile(T1p3set,0.025)];
+T2varmeas=[quantile(T2p1set,0.975)-quantile(T2p1set,0.025)...
+    quantile(T2p2set,0.975)-quantile(T2p2set,0.025)...
+    quantile(T2p3set,0.975)-quantile(T2p3set,0.025)];
+varstats=[M0varmeas;T1varmeas;T2varmeas];
+
+meanstats=[mean(M0p1set),mean(M0p2set),mean(M0p3set);
+    mean(T1p1set),mean(T1p2set),mean(T1p3set);
+    mean(T2p1set),mean(T2p2set),mean(T2p3set)];
+
+medianstats=[median(M0p1set),median(M0p2set),median(M0p3set);
+    median(T1p1set),median(T1p2set),median(T1p3set);
+    median(T2p1set),median(T2p2set),median(T2p3set)];
+
 end

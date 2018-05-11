@@ -1,14 +1,14 @@
 
-function [] = MI_QALAS_plotfigs(tconoverride,ttotal,pdvval)
+function [] = MI_QALAS_plotfigs(tconoverridepf,ttotalpf,pdvvalpf)
 
 fmsym={'o','x','+','*','s','.','d','^'};
 fmcol={'r','g','b','c','m','y','k','w'};
 
 %% Load
-load(sprintf('results/optresults_subsamp_%f_%f_%f.mat',tconoverride,ttotal,pdvval));
-load(sprintf('/rsrch1/ip/dmitchell2/github/SyntheticMR/Code/results/MI_QALAS_goldstandards_%f_%f_%f.mat',tconoverride,ttotal,pdvval));
-load(sprintf('/rsrch1/ip/dmitchell2/github/SyntheticMR/Code/results/MI_QALAS_subsample_poptrecons_%f_%f_%f.mat',tconoverride,ttotal,pdvval));
-opt_hist_table=readtable(sprintf('/rsrch1/ip/dmitchell2/github/SyntheticMR/Code/results/opt_history_%f_%f_%f.txt',tconoverride,ttotal,pdvval));
+load(sprintf('results/optresults_subsamp_%f_%f_%f.mat',tconoverridepf,ttotalpf,pdvvalpf));
+load(sprintf('/rsrch1/ip/dmitchell2/github/SyntheticMR/Code/results/MI_QALAS_goldstandards_%f_%f_%f.mat',tconoverridepf,ttotalpf,pdvvalpf));
+load(sprintf('/rsrch1/ip/dmitchell2/github/SyntheticMR/Code/results/MI_QALAS_subsample_poptrecons_%f_%f_%f.mat',tconoverridepf,ttotalpf,pdvvalpf));
+opt_hist_table=readtable(sprintf('/rsrch1/ip/dmitchell2/github/SyntheticMR/Code/results/opt_history_%f_%f_%f.txt',tconoverridepf,ttotalpf,pdvvalpf));
 
 %% NAN Handling
 M0save(isnan(M0save))=0; T1save(isnan(T1save))=0; T2save(isnan(T2save))=0;
