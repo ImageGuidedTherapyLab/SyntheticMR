@@ -341,7 +341,7 @@ end
 %             T1predvec(iii)=xm(2);
 %             T2predvec(iii)=qalasT2calc(M0predvec(iii),T1predvec(iii),squeeze(Mmeasvec(iii,:)),TR,TE_T2prep,flipAngle,nacq,dt);
 %             T2predvec(iii)=xm(3);
-            [M0predvec(iii),T1predvec(iii),T2predvec(iii)=qalasrecon(squeeze(Mmeasvec(iii,:)),TR,TE_T2prep,flipAngle,nacq,dt);
+            [M0predvec(iii),T1predvec(iii),T2predvec(iii)]=qalasrecon(squeeze(Mmeasvec(iii,:)),TR,TE_T2prep,flipAngle,nacq,dt);
         end
         %         fprintf('Element: %d of %d\n',iii,mmvsize)
     end
