@@ -31,7 +31,7 @@ for iii=1:length(ttotalin)
         
         %% NAN Handling
         M0save(isnan(M0save))=0; T1save(isnan(T1save))=0; T2save(isnan(T2save))=0; T2save=real(T2save);
-        M0save(M0save>10)=0; T1save(T1save>10)=0; T2save(T2save>10)=0;
+%         M0save(M0save>10)=0; T1save(T1save>10)=0; T2save(T2save>10)=0;
         goldstandardM0(isnan(goldstandardM0))=0; goldstandardT1(isnan(goldstandardT1))=0; goldstandardT2(isnan(goldstandardT2))=0;
         synthdataM0(isnan(synthdataM0))=0; synthdataT1(isnan(synthdataT1))=0; synthdataT2(isnan(synthdataT2))=0;
         
@@ -153,33 +153,36 @@ tismax=[1.5,5,1];
 for kkk=1:3
     for jjj=1:length(pdvvalin)
         for iii=1:length(ttotalin)
-%             titlename=['Recon Init ',tisreconlabel{iii,jjj,kkk}];
-%             figure; imagesc(tisrecon{iii,jjj,kkk}(:,:,1),[0,tismax(kkk)]); colormap('gray'); colorbar;
-%             title(titlename);
-%             saveas(gcf,[resultspathname,titlename,'.png']);
-%             titlename=['Recon Opt ',tisreconlabel{iii,jjj,kkk}];
-%             kkk
-%             jjj
-%             iii
-%             figure; imagesc(tisrecon{iii,jjj,kkk}(:,:,2),[0,tismax(kkk)]); colormap('gray'); colorbar;
-%             title(titlename);
-%             saveas(gcf,[resultspathname,titlename,'.png']);
-%             titlename=['Recon Error Init ',tisreconlabel{iii,jjj,kkk}];
-%             figure; imagesc(tisreconerr{iii,jjj,kkk}(:,:,1),[0,tismax(kkk)]); colormap('gray'); colorbar;
-%             title(titlename);
-%             saveas(gcf,[resultspathname,titlename,'.png']);
-%             titlename=['Recon Error Opt ',tisreconlabel{iii,jjj,kkk}];
-%             figure; imagesc(tisreconerr{iii,jjj,kkk}(:,:,2),[0,tismax(kkk)]); colormap('gray'); colorbar;
-%             title(titlename);
-%             saveas(gcf,[resultspathname,titlename,'.png']);
-%             titlename=['Recon Rel Error Init ',tisreconlabel{iii,jjj,kkk}];
-%             figure; imagesc(tisreconrelerr{iii,jjj,kkk}(:,:,1),[0,0.5]); colormap('gray'); colorbar;
-%             title(titlename);
-%             saveas(gcf,[resultspathname,titlename,'.png']);
-%             titlename=['Recon Rel Error Opt ',tisreconlabel{iii,jjj,kkk}];
-%             figure; imagesc(tisreconrelerr{iii,jjj,kkk}(:,:,2),[0,0.5]); colormap('gray'); colorbar;
-%             title(titlename);
-%             saveas(gcf,[resultspathname,titlename,'.png']);
+            titlename=['Recon Init ',tisreconlabel{iii,jjj,kkk}];
+            figure; imagesc(tisrecon{iii,jjj,kkk}(:,:,1),[0,tismax(kkk)]); colormap('gray'); colorbar;
+            title(titlename);
+            saveas(gcf,[resultspathname,titlename,'.png']);
+            close;
+            titlename=['Recon Opt ',tisreconlabel{iii,jjj,kkk}];
+            figure; imagesc(tisrecon{iii,jjj,kkk}(:,:,2),[0,tismax(kkk)]); colormap('gray'); colorbar;
+            title(titlename);
+            saveas(gcf,[resultspathname,titlename,'.png']);
+            close;
+            titlename=['Recon Error Init ',tisreconlabel{iii,jjj,kkk}];
+            figure; imagesc(tisreconerr{iii,jjj,kkk}(:,:,1),[0,tismax(kkk)]); colormap('gray'); colorbar;
+            title(titlename);
+            saveas(gcf,[resultspathname,titlename,'.png']);
+            close;
+            titlename=['Recon Error Opt ',tisreconlabel{iii,jjj,kkk}];
+            figure; imagesc(tisreconerr{iii,jjj,kkk}(:,:,2),[0,tismax(kkk)]); colormap('gray'); colorbar;
+            title(titlename);
+            saveas(gcf,[resultspathname,titlename,'.png']);
+            close;
+            titlename=['Recon Rel Error Init ',tisreconlabel{iii,jjj,kkk}];
+            figure; imagesc(tisreconrelerr{iii,jjj,kkk}(:,:,1),[0,0.5]); colormap('gray'); colorbar;
+            title(titlename);
+            saveas(gcf,[resultspathname,titlename,'.png']);
+            close;
+            titlename=['Recon Rel Error Opt ',tisreconlabel{iii,jjj,kkk}];
+            figure; imagesc(tisreconrelerr{iii,jjj,kkk}(:,:,2),[0,0.5]); colormap('gray'); colorbar;
+            title(titlename);
+            saveas(gcf,[resultspathname,titlename,'.png']);
+            close;
         end
     end
 end
@@ -303,27 +306,35 @@ saveas(gcf,[resultspathname,titlename],'png');
 %% Data Matrix
 % Data array: MI, TD1,TD2,TD3,TD4, scan time, wm m0, wm t1, wm t2
 dataarray=[];
+dataarrayfull=[];
 for iii=1:size(MIstats,1)
     for jjj=1:size(MIstats,2)
         dataarray=[dataarray;[MIstats{iii,jjj}([1,end]),pspacestats{iii,jjj}(:,[1,end])',...
             scantime{iii,jjj}([1,end])',M0ORtis{iii,jjj}([1,end],2),T1ORtis{iii,jjj}([1,end],2),...
             T2ORtis{iii,jjj}([1,end],2)]];
+        dataarrayfull=[dataarrayfull;[MIstats{iii,jjj},pspacestats{iii,jjj}',...
+            scantime{iii,jjj}',M0ORtis{iii,jjj}(:,2),T1ORtis{iii,jjj}(:,2),T2ORtis{iii,jjj}(:,2)]];
     end
 end
 
-figure;
+titlename='Parameter Trends';
+% tight_subplot(9,9,[.01,.03],[.1,.01],[.01,.01]);
 for jjj=1:size(dataarray,2)
     for iii=1:size(dataarray,2)
         subplot(size(dataarray,2),size(dataarray,2),size(dataarray,2)*(jjj-1)+iii);
         if iii==jjj
             hist(dataarray(:,iii));
         elseif iii>jjj
-            histogram2(dataarray(:,iii),dataarray(:,jjj));
+%             histogram2(dataarray(:,iii),dataarray(:,jjj));
+            plot(dataarrayfull(:,iii),dataarrayfull(:,jjj),'g+');
         else
-            plot(dataarray(:,iii),dataarray(:,jjj),'o');
+            hold on;
+            plot(dataarray(1:2:end,iii),dataarray(1:2:end,jjj),'bo');
+            plot(dataarray(2:2:end,iii),dataarray(2:2:end,jjj),'rx');
         end
     end
 end
+saveas(gcf,[resultspathname,titlename],'png');
 
 % nparam = 3;
 %
