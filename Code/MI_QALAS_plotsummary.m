@@ -30,7 +30,8 @@ for iii=1:length(ttotalin)
         scantime{iii,jjj}(:)=(tdtime{iii,jjj}(:)+TE_T2prep+TDpT2+nacq*Tacq+TDinv)*ceil(sum(subsmplconstrain(:))/100);
         
         %% NAN Handling
-        M0save(isnan(M0save))=0; T1save(isnan(T1save))=0; T2save(isnan(T2save))=0;
+        M0save(isnan(M0save))=0; T1save(isnan(T1save))=0; T2save(isnan(T2save))=0; T2save=real(T2save);
+        M0save(M0save>10)=0; T1save(T1save>10)=0; T2save(T2save>10)=0;
         goldstandardM0(isnan(goldstandardM0))=0; goldstandardT1(isnan(goldstandardT1))=0; goldstandardT2(isnan(goldstandardT2))=0;
         synthdataM0(isnan(synthdataM0))=0; synthdataT1(isnan(synthdataT1))=0; synthdataT2(isnan(synthdataT2))=0;
         
@@ -152,30 +153,33 @@ tismax=[1.5,5,1];
 for kkk=1:3
     for jjj=1:length(pdvvalin)
         for iii=1:length(ttotalin)
-            titlename=['Recon Init ',tisreconlabel{iii,jjj,kkk}];
-            figure; imagesc(tisrecon{iii,jjj,kkk}(:,:,1),[0,tismax(kkk)]); colormap('gray'); colorbar;
-            title(titlename);
-            saveas(gcf,[resultspathname,titlename,'.png']);
-            titlename=['Recon Opt ',tisreconlabel{iii,jjj,kkk}];
-            figure; imagesc(tisrecon{iii,jjj,kkk}(:,:,2),[0,tismax(kkk)]); colormap('gray'); colorbar;
-            title(titlename);
-            saveas(gcf,[resultspathname,titlename,'.png']);
-            titlename=['Recon Error Init ',tisreconlabel{iii,jjj,kkk}];
-            figure; imagesc(tisreconerr{iii,jjj,kkk}(:,:,1),[0,tismax(kkk)]); colormap('gray'); colorbar;
-            title(titlename);
-            saveas(gcf,[resultspathname,titlename,'.png']);
-            titlename=['Recon Error Opt ',tisreconlabel{iii,jjj,kkk}];
-            figure; imagesc(tisreconerr{iii,jjj,kkk}(:,:,2),[0,tismax(kkk)]); colormap('gray'); colorbar;
-            title(titlename);
-            saveas(gcf,[resultspathname,titlename,'.png']);
-            titlename=['Recon Rel Error Init ',tisreconlabel{iii,jjj,kkk}];
-            figure; imagesc(tisreconrelerr{iii,jjj,kkk}(:,:,1),[0,0.5]); colormap('gray'); colorbar;
-            title(titlename);
-            saveas(gcf,[resultspathname,titlename,'.png']);
-            titlename=['Recon Rel Error Opt ',tisreconlabel{iii,jjj,kkk}];
-            figure; imagesc(tisreconrelerr{iii,jjj,kkk}(:,:,2),[0,0.5]); colormap('gray'); colorbar;
-            title(titlename);
-            saveas(gcf,[resultspathname,titlename,'.png']);
+%             titlename=['Recon Init ',tisreconlabel{iii,jjj,kkk}];
+%             figure; imagesc(tisrecon{iii,jjj,kkk}(:,:,1),[0,tismax(kkk)]); colormap('gray'); colorbar;
+%             title(titlename);
+%             saveas(gcf,[resultspathname,titlename,'.png']);
+%             titlename=['Recon Opt ',tisreconlabel{iii,jjj,kkk}];
+%             kkk
+%             jjj
+%             iii
+%             figure; imagesc(tisrecon{iii,jjj,kkk}(:,:,2),[0,tismax(kkk)]); colormap('gray'); colorbar;
+%             title(titlename);
+%             saveas(gcf,[resultspathname,titlename,'.png']);
+%             titlename=['Recon Error Init ',tisreconlabel{iii,jjj,kkk}];
+%             figure; imagesc(tisreconerr{iii,jjj,kkk}(:,:,1),[0,tismax(kkk)]); colormap('gray'); colorbar;
+%             title(titlename);
+%             saveas(gcf,[resultspathname,titlename,'.png']);
+%             titlename=['Recon Error Opt ',tisreconlabel{iii,jjj,kkk}];
+%             figure; imagesc(tisreconerr{iii,jjj,kkk}(:,:,2),[0,tismax(kkk)]); colormap('gray'); colorbar;
+%             title(titlename);
+%             saveas(gcf,[resultspathname,titlename,'.png']);
+%             titlename=['Recon Rel Error Init ',tisreconlabel{iii,jjj,kkk}];
+%             figure; imagesc(tisreconrelerr{iii,jjj,kkk}(:,:,1),[0,0.5]); colormap('gray'); colorbar;
+%             title(titlename);
+%             saveas(gcf,[resultspathname,titlename,'.png']);
+%             titlename=['Recon Rel Error Opt ',tisreconlabel{iii,jjj,kkk}];
+%             figure; imagesc(tisreconrelerr{iii,jjj,kkk}(:,:,2),[0,0.5]); colormap('gray'); colorbar;
+%             title(titlename);
+%             saveas(gcf,[resultspathname,titlename,'.png']);
         end
     end
 end
@@ -219,8 +223,8 @@ end
 % plot(plotvarinit(4:4:end,3),plotvarinit(4:4:end,9),'-.s');
 % plot(plotvarinit(4:4:end,2),plotvarinit(4:4:end,8),'r-o');
 xlabel('TD Sum (s)'); ylabel('Overall Error'); title(titlename);
-legendkey={'100% Opt','70% Opt','50% Opt','25% Opt','Init'};
-legend(legendkey{[1:szgs(2),end]},'Location','NorthEast');
+legendkey={'100% Opt','100% Init','70% Opt','70% Init','50% Opt','50% Init','25% Opt','25% Init'};
+legend(legendkey{1:2*szgs(2)},'Location','NorthEast');
 saveas(gcf,[resultspathname,titlename],'png');
 
 titlename='White Matter T1 Reconstruction - Acq Time';
@@ -238,8 +242,9 @@ end
 % plot(plotvarinit(3:4:end,4),plotvarinit(3:4:end,8),'r:+');
 % plot(plotvarinit(4:4:end,4),plotvarinit(4:4:end,8),'r-.s');
 xlabel('Acquisition Time (s)'); ylabel('Overall Error'); title(titlename);
-legendkey={'100% Opt','70% Opt','50% Opt','25% Opt','100% Init','70% Init','50% Init','25% Init'};
-legend(legendkey{[1:szgs(2),(1:szgs(2))+4]},'Location','NorthEast');
+% legendkey={'100% Opt','70% Opt','50% Opt','25% Opt','100% Init','70% Init','50% Init','25% Init'};
+legendkey={'100% Opt','100% Init','70% Opt','70% Init','50% Opt','50% Init','25% Opt','25% Init'};
+legend(legendkey{1:2*szgs(2)},'Location','NorthEast');
 saveas(gcf,[resultspathname,titlename],'png');
 
 titlename='White Matter M0 Reconstruction';
@@ -255,8 +260,8 @@ end
 % plot(plotvarinit(4:4:end,3),plotvarinit(4:4:end,7),'-.s');
 % plot(plotvarinit(4:4:end,2),plotvarinit(4:4:end,6),'r-o');
 xlabel('TD Sum (s)'); ylabel('Overall Error'); title(titlename);
-legendkey={'100% Opt','70% Opt','50% Opt','25% Opt','Init'};
-legend(legendkey{[1:szgs(2),end]},'Location','NorthEast');
+legendkey={'100% Opt','100% Init','70% Opt','70% Init','50% Opt','50% Init','25% Opt','25% Init'};
+legend(legendkey{1:2*szgs(2)},'Location','NorthEast');
 saveas(gcf,[resultspathname,titlename],'png');
 
 titlename='White Matter M0 Reconstruction - Acq Time';
@@ -274,8 +279,9 @@ end
 % plot(plotvarinit(3:4:end,4),plotvarinit(3:4:end,6),'r:+');
 % plot(plotvarinit(4:4:end,4),plotvarinit(4:4:end,6),'r-.s');
 xlabel('Acquisition Time (s)'); ylabel('Overall Error'); title(titlename);
-legendkey={'100% Opt','70% Opt','50% Opt','25% Opt','100% Init','70% Init','50% Init','25% Init'};
-legend(legendkey{[1:szgs(2),(1:szgs(2))+4]},'Location','NorthEast');
+% legendkey={'100% Opt','70% Opt','50% Opt','25% Opt','100% Init','70% Init','50% Init','25% Init'};
+legendkey={'100% Opt','100% Init','70% Opt','70% Init','50% Opt','50% Init','25% Opt','25% Init'};
+legend(legendkey{1:2*szgs(2)},'Location','NorthEast');
 saveas(gcf,[resultspathname,titlename],'png');
 
 titlename='White Matter Mmeas';
@@ -295,7 +301,29 @@ xlabel('Acquisition Number'); ylabel('Mmeas'); title(titlename);
 saveas(gcf,[resultspathname,titlename],'png');
 
 %% Data Matrix
+% Data array: MI, TD1,TD2,TD3,TD4, scan time, wm m0, wm t1, wm t2
+dataarray=[];
+for iii=1:size(MIstats,1)
+    for jjj=1:size(MIstats,2)
+        dataarray=[dataarray;[MIstats{iii,jjj}([1,end]),pspacestats{iii,jjj}(:,[1,end])',...
+            scantime{iii,jjj}([1,end])',M0ORtis{iii,jjj}([1,end],2),T1ORtis{iii,jjj}([1,end],2),...
+            T2ORtis{iii,jjj}([1,end],2)]];
+    end
+end
 
+figure;
+for jjj=1:size(dataarray,2)
+    for iii=1:size(dataarray,2)
+        subplot(size(dataarray,2),size(dataarray,2),size(dataarray,2)*(jjj-1)+iii);
+        if iii==jjj
+            hist(dataarray(:,iii));
+        elseif iii>jjj
+            histogram2(dataarray(:,iii),dataarray(:,jjj));
+        else
+            plot(dataarray(:,iii),dataarray(:,jjj),'o');
+        end
+    end
+end
 
 % nparam = 3;
 %

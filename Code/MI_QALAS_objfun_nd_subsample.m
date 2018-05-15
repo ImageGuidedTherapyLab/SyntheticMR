@@ -319,14 +319,14 @@ if pdarg(3)~=-1
         subsample=repmat(subsample,[1,1,size(kmeas,3),size(kmeas,4)]);
 %         Mmeassub=bart('pics',kmeas.*subsample,ones(size(kmeas)));
         Mmeassub=bart('fft -i 3',kmeas.*subsample)*size(kmeas,4)/numel(kmeas);
-        Mmeassub=real(Mmeassub);
+        Mmeassub=double(real(Mmeassub));
         Mmeassub(repmat(materialID,[1,1,size(Mmeassub,3),size(Mmeassub,4)])==0)=nan;
 end
 %     end
     
     %% Reconstruct synthetic QALAS measurements
     % Optimization solution for M0 and T1 prediction
-    xinit=[mean(tisinput(1,1:3)),mean(tisinput(3,1:3))];%,mean(tisinput(5,1:3))];
+%     xinit=[mean(tisinput(1,1:3)),mean(tisinput(3,1:3))];%,mean(tisinput(5,1:3))];
     smeas=size(Mmeassub);
     Mmeasvec=reshape(Mmeassub,[prod(smeas(1:3)),smeas(4:end)]);
     mmvsize=size(Mmeasvec,1);

@@ -2,7 +2,8 @@
 function[M0,T1,T2]=qalasrecon(Mmeas,TR,TE_T2prep,flipAngle,nacq,dt)
 
 xinit=[0,1,1];
-xm=fminsearch(@(x) qalasobjfun(x,Mmeas,TR,flipAngle,nacq,dt),xinit);
+xm=fmincon(@(x) qalasobjfun(x,Mmeas,TR,flipAngle,nacq,dt),xinit,[],[],[],[],[-1.,0.,0.],[1.,5.,10.],[]);
+% xm=fminsearch(@(x) qalasobjfun(x,Mmeas,TR,flipAngle,nacq,dt),xinit);
 M0=xm(2);
 T1=xm(3);
 Mend=M0-(M0-Mmeas(end)./sind(flipAngle)).*exp(-dt(end)./T1);
