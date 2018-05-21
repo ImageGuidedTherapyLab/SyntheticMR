@@ -251,15 +251,16 @@ MI=Hz-Hzmu;
 
 szmi=size(MI);
 if pdarg(3)==-1
-    subsmplmask=ones([1,szmi(2),szmi(3)]);
+%     subsmplmask=ones([1,szmi(2),szmi(3)]);
+    MIobjfun=-sum(MI(:));
 else
     subsmplmask=bart(sprintf('poisson -Y %i -Z %i -y %i -z %i -V %i',szmi(2),szmi(3),pdarg(1),pdarg(2),pdarg(3)));
     subsmplmask=double(squeeze(subsmplmask));
+    szmi(2:1+ndims(subsmplmask))=1;
+    subsmplmask=permute(subsmplmask,[ndims(subsmplmask)+1,1:ndims(subsmplmask)]);
+    subsmplmask=repmat(subsmplmask,szmi);
+    MIobjfun=-sum(MI(:).*subsmplmask(:));
 end
-szmi(2:1+ndims(subsmplmask))=1;
-subsmplmask=permute(subsmplmask,[ndims(subsmplmask)+1,1:ndims(subsmplmask)]);
-subsmplmask=repmat(subsmplmask,szmi);
-MIobjfun=-sum(MI(:).*subsmplmask(:));
 
 %% Reconstruct to Compute Variances
 reconflag=1;

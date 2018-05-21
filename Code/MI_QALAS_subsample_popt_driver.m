@@ -1,14 +1,14 @@
 
-function [] = MI_QALAS_subsample_popt_driver(tconoverride,acqtimes,pdvval,runnumber)
+function [] = MI_QALAS_subsample_popt_driver(tconoverride,acqtimes,pdvval,runnumber,geometrycase)
 
 %% MI_QALAS_popt_driver
 for ttotal=acqtimes%5:10;%[5,10]
     for pdv=pdvval%[20,25];%4:7;
         
-        close all; clearvars -except pdv tconoverride ttotal acqtimes pdvval runnumber;
+        close all; clearvars -except pdv tconoverride ttotal acqtimes pdvval runnumber geometrycase;
         
         %% Optimization Space Acquisition Parameters
-        geometrycase=2;
+%         geometrycase=2;
         lfname = '/rsrch1/ip/dmitchell2/github/SyntheticMR/Code/ICBM_grey_white_csf.nii.gz'; % population tissue segmentation
         switch geometrycase
             case 1
@@ -29,10 +29,11 @@ for ttotal=acqtimes%5:10;%[5,10]
                 system('rm resampleimg.nii.gz');
                 materialID = int32(tmptissue.img);
             case 0
-                system(sprintf('/opt/apps/itksnap/c3d-1.1.0-Linux-x86_64/bin/c3d %s -dilate 3 1x1x3vox -interpolation NearestNeighbor -resample 256x192x64 -o resampleimg.nii.gz',lfname));
-                tmptissue = load_untouch_nii('resampleimg.nii.gz');
-                system('rm resampleimg.nii.gz');
-                materialID = int32(tmptissue.img);
+%                 system(sprintf('/opt/apps/itksnap/c3d-1.1.0-Linux-x86_64/bin/c3d %s -dilate 3 1x1x3vox -interpolation NearestNeighbor -resample 256x192x64 -o resampleimg.nii.gz',lfname));
+%                 tmptissue = load_untouch_nii('resampleimg.nii.gz');
+%                 system('rm resampleimg.nii.gz');
+%                 materialID = int32(tmptissue.img);
+                materialID=1;
             otherwise
                 tmptissue = load_untouch_nii(lfname);
                 materialID = int32(tmptissue.img);
@@ -63,6 +64,18 @@ for ttotal=acqtimes%5:10;%[5,10]
             M0stdd = [ .05,  .05,  .05,   .1];       % relative intensity
         else
             M0stdd = [   0,    0,    0,    0];
+        end
+        
+        overwritecsf=1;
+        if overwritecsf==1
+            T1mean = [1200,  900, 900, 1200]./1000; % s
+            T1stdd = [ 100,  100,  100,  150]./1000; % s
+            
+            T2mean = [ 100,   80, 80,  110]./1000; % s
+            T2stdd = [   5,    4,   4,   10]./1000; % s
+            
+            M0mean = [ 0.9,  0.9,  0.9,  0.9];       % relative intensity
+            M0stdd = [ .05,  .05,  .05,   .1];       % relative intensity
         end
         
         tisinput=[M0mean;M0stdd;T1mean;T1stdd;T2mean;T2stdd];
@@ -165,17 +178,27 @@ for ttotal=acqtimes%5:10;%[5,10]
         toc;
         
         %% Save
-        figure(1)
-        saveas(gcf,sprintf('Figures/MIopt_subsamp_%f_%f_%f.png',tconoverride,ttotal,pdarg(3)));
-        figure(2)
-        saveas(gcf,sprintf('Figures/Paramopt_subsamp_%f_%f_%f.png',tconoverride,ttotal,pdarg(3)));
-        save(sprintf('results/optresults_subsamp_%f_%f_%f.mat',tconoverride,ttotal,pdarg(3)),'-v7.3');
-        try
+        if geometrycase~=0
+            figure(1)
+            saveas(gcf,sprintf('Figures/MIopt_subsamp_%f_%f_%f.png',tconoverride,ttotal,pdarg(3)));
+            figure(2)
+            saveas(gcf,sprintf('Figures/Paramopt_subsamp_%f_%f_%f.png',tconoverride,ttotal,pdarg(3)));
+            save(sprintf('results/optresults_subsamp_%f_%f_%f.mat',tconoverride,ttotal,pdarg(3)),'-v7.3');
             save(sprintf('/rsrch1/ip/dmitchell2/github/SyntheticMR/Code/results/MI_QALAS_goldstandards_%f_%f_%f.mat',tconoverride,ttotal,pdarg(3)),'synthdataM0','synthdataT1','synthdataT2','goldstandardM0','goldstandardT1','goldstandardT2','-v7.3');
-        catch
+
+            system(sprintf('mv opt_history.txt results/opt_history_%f_%f_%f.txt',tconoverride,ttotal,pdarg(3)));
+            system(sprintf('mv %s /rsrch1/ip/dmitchell2/github/SyntheticMR/Code/results/MI_QALAS_subsample_poptrecons_%f_%f_%f.mat',filenametmp,tconoverride,ttotal,pdarg(3)));
+        else
+            figure(1)
+            saveas(gcf,sprintf('Figures/MIopt_subsamp_%f_%f_test.png',tconoverride,ttotal));
+            figure(2)
+            saveas(gcf,sprintf('Figures/Paramopt_subsamp_%f_%f_test.png',tconoverride,ttotal));
+            save(sprintf('results/optresults_subsamp_%f_%f_test.mat',tconoverride,ttotal),'-v7.3');
+            save(sprintf('/rsrch1/ip/dmitchell2/github/SyntheticMR/Code/results/MI_QALAS_goldstandards_%f_%f_test.mat',tconoverride,ttotal),'synthdataM0','synthdataT1','synthdataT2','goldstandardM0','goldstandardT1','goldstandardT2','-v7.3');
+
+            system(sprintf('mv opt_history.txt results/opt_history_%f_%f_test.txt',tconoverride,ttotal));
+            system(sprintf('mv %s /rsrch1/ip/dmitchell2/github/SyntheticMR/Code/results/MI_QALAS_subsample_poptrecons_%f_%f_test.mat',filenametmp,tconoverride,ttotal));
+
         end
-        system(sprintf('mv opt_history.txt results/opt_history_%f_%f_%f.txt',tconoverride,ttotal,pdarg(3)));
-        system(sprintf('mv %s /rsrch1/ip/dmitchell2/github/SyntheticMR/Code/results/MI_QALAS_subsample_poptrecons_%f_%f_%f.mat',filenametmp,tconoverride,ttotal,pdarg(3)));
-        
     end
 end

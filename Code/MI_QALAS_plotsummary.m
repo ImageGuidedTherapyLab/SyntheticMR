@@ -72,6 +72,13 @@ for iii=1:length(ttotalin)
         %% Optimization Stats
         MIstats{iii,jjj}=squeeze(MIsave);
         pspacestats{iii,jjj}=squeeze(pspacesave);
+        for kkk=1:3
+            for lll=1:3
+                meanstats{iii,jjj,lll,kkk}=squeeze(meansave(lll,kkk,:));
+                medianstats{iii,jjj,lll,kkk}=squeeze(mediansave(lll,kkk,:));
+                varstats{iii,jjj,lll,kkk}=squeeze(varsave(lll,kkk,:));
+            end
+        end
     end
 end
 
@@ -200,10 +207,17 @@ end
 %% Main Results Tissue Figure
 % White Matter (N=2)
 plotvarinit=[]; plotvaropt=[];
+plotvar1=[]; plotvar2=[]; plotvar3=[];
 for iii=1:size(M0ORtis,1)
     for jjj=1:size(M0ORtis,2)
         plotvarinit=[plotvarinit;subpct{iii,jjj},tdtime{iii,jjj}(1),tdtime{iii,jjj}(end),scantime{iii,jjj}(1),scantime{iii,jjj}(end),...
             M0ORtis{iii,jjj}(1,2),M0ORtis{iii,jjj}(end,2),T1ORtis{iii,jjj}(1,2),T1ORtis{iii,jjj}(end,2),T2ORtis{iii,jjj}(1,2),T2ORtis{iii,jjj}(end,2)];
+        plotvar1=[plotvar;subpct{iii,jjj},tdtime{iii,jjj}(1),tdtime{iii,jjj}(end),scantime{iii,jjj}(1),scantime{iii,jjj}(end),...
+            varstats{iii,jjj,1,1}(1),varstats{iii,jjj,1,1}(end),varstats{iii,jjj,2,1}(1),varstats{iii,jjj,2,1}(end),varstats{iii,jjj,3,1}(1),varstats{iii,jjj,3,1}(end)];
+        plotvar2=[plotvar;subpct{iii,jjj},tdtime{iii,jjj}(1),tdtime{iii,jjj}(end),scantime{iii,jjj}(1),scantime{iii,jjj}(end),...
+            varstats{iii,jjj,1,2}(1),varstats{iii,jjj,1,2}(end),varstats{iii,jjj,2,2}(1),varstats{iii,jjj,2,2}(end),varstats{iii,jjj,3,2}(1),varstats{iii,jjj,3,2}(end)];
+        plotvar3=[plotvar;subpct{iii,jjj},tdtime{iii,jjj}(1),tdtime{iii,jjj}(end),scantime{iii,jjj}(1),scantime{iii,jjj}(end),...
+            varstats{iii,jjj,1,3}(1),varstats{iii,jjj,1,3}(end),varstats{iii,jjj,2,3}(1),varstats{iii,jjj,2,3}(end),varstats{iii,jjj,3,3}(1),varstats{iii,jjj,3,3}(end)];
         %         plotvaropt=[plotvaropt;scantime{iii,jjj}(end,2),M0ORtis{iii,jjj}(end,2),T1ORtis{iii,jjj}(end,2),T2ORtis{iii,jjj}(end,2)];
     end
 end
@@ -212,6 +226,48 @@ end
 plotsym={'-o','--x',':+','-.s','-*','--d',':v','-.^','-<','-->',':p','-.h'};
 % plotsym={'b-o','b--x','b:x','b-.s','b-*','r-o','r--x','r:x','r-.s','r-*'};
 szgs=size(M0ORtis);
+
+titlename='GM M0 Recon Var';
+figure; hold on;
+for iii=1:szgs(2)
+    plot(plotvar1(iii:szgs(2):end,3),plotvar1(iii:szgs(2):end,7),['b',plotsym{iii}]);
+    plot(plotvar1(iii:szgs(2):end,2),plotvar1(iii:szgs(2):end,6),['r',plotsym{iii}]);
+end
+
+titlename='GM T1 Recon Var';
+figure; hold on;
+for iii=1:szgs(2)
+    plot(plotvar1(iii:szgs(2):end,3),plotvar1(iii:szgs(2):end,9),['b',plotsym{iii}]);
+    plot(plotvar1(iii:szgs(2):end,2),plotvar1(iii:szgs(2):end,8),['r',plotsym{iii}]);
+end
+
+titlename='GM M0 Recon Var';
+figure; hold on;
+for iii=1:szgs(2)
+    plot(plotvar1(iii:szgs(2):end,3),plotvar1(iii:szgs(2):end,11),['b',plotsym{iii}]);
+    plot(plotvar1(iii:szgs(2):end,2),plotvar1(iii:szgs(2):end,10),['r',plotsym{iii}]);
+end
+
+titlename='WM M0 Recon Var';
+figure; hold on;
+for iii=1:szgs(2)
+    plot(plotvar2(iii:szgs(2):end,3),plotvar2(iii:szgs(2):end,7),['b',plotsym{iii}]);
+    plot(plotvar2(iii:szgs(2):end,2),plotvar2(iii:szgs(2):end,6),['r',plotsym{iii}]);
+end
+
+titlename='WM T1 Recon Var';
+figure; hold on;
+for iii=1:szgs(2)
+    plot(plotvar2(iii:szgs(2):end,3),plotvar2(iii:szgs(2):end,9),['b',plotsym{iii}]);
+    plot(plotvar2(iii:szgs(2):end,2),plotvar2(iii:szgs(2):end,8),['r',plotsym{iii}]);
+end
+
+titlename='WM T2 Recon Var';
+figure; hold on;
+for iii=1:szgs(2)
+    plot(plotvar2(iii:szgs(2):end,3),plotvar2(iii:szgs(2):end,11),['b',plotsym{iii}]);
+    plot(plotvar2(iii:szgs(2):end,2),plotvar2(iii:szgs(2):end,10),['r',plotsym{iii}]);
+end
 
 titlename='White Matter T1 Reconstruction';
 figure; hold on;
