@@ -160,36 +160,36 @@ tismax=[1.5,5,1];
 for kkk=1:3
     for jjj=1:length(pdvvalin)
         for iii=1:length(ttotalin)
-            titlename=['Recon Init ',tisreconlabel{iii,jjj,kkk}];
-            figure; imagesc(tisrecon{iii,jjj,kkk}(:,:,1),[0,tismax(kkk)]); colormap('gray'); colorbar;
-            title(titlename);
-            saveas(gcf,[resultspathname,titlename,'.png']);
-            close;
-            titlename=['Recon Opt ',tisreconlabel{iii,jjj,kkk}];
-            figure; imagesc(tisrecon{iii,jjj,kkk}(:,:,2),[0,tismax(kkk)]); colormap('gray'); colorbar;
-            title(titlename);
-            saveas(gcf,[resultspathname,titlename,'.png']);
-            close;
-            titlename=['Recon Error Init ',tisreconlabel{iii,jjj,kkk}];
-            figure; imagesc(tisreconerr{iii,jjj,kkk}(:,:,1),[0,tismax(kkk)]); colormap('gray'); colorbar;
-            title(titlename);
-            saveas(gcf,[resultspathname,titlename,'.png']);
-            close;
-            titlename=['Recon Error Opt ',tisreconlabel{iii,jjj,kkk}];
-            figure; imagesc(tisreconerr{iii,jjj,kkk}(:,:,2),[0,tismax(kkk)]); colormap('gray'); colorbar;
-            title(titlename);
-            saveas(gcf,[resultspathname,titlename,'.png']);
-            close;
-            titlename=['Recon Rel Error Init ',tisreconlabel{iii,jjj,kkk}];
-            figure; imagesc(tisreconrelerr{iii,jjj,kkk}(:,:,1),[0,0.5]); colormap('gray'); colorbar;
-            title(titlename);
-            saveas(gcf,[resultspathname,titlename,'.png']);
-            close;
-            titlename=['Recon Rel Error Opt ',tisreconlabel{iii,jjj,kkk}];
-            figure; imagesc(tisreconrelerr{iii,jjj,kkk}(:,:,2),[0,0.5]); colormap('gray'); colorbar;
-            title(titlename);
-            saveas(gcf,[resultspathname,titlename,'.png']);
-            close;
+%             titlename=['Recon Init ',tisreconlabel{iii,jjj,kkk}];
+%             figure; imagesc(tisrecon{iii,jjj,kkk}(:,:,1),[0,tismax(kkk)]); colormap('gray'); colorbar;
+%             title(titlename);
+%             saveas(gcf,[resultspathname,titlename,'.png']);
+%             close;
+%             titlename=['Recon Opt ',tisreconlabel{iii,jjj,kkk}];
+%             figure; imagesc(tisrecon{iii,jjj,kkk}(:,:,2),[0,tismax(kkk)]); colormap('gray'); colorbar;
+%             title(titlename);
+%             saveas(gcf,[resultspathname,titlename,'.png']);
+%             close;
+%             titlename=['Recon Error Init ',tisreconlabel{iii,jjj,kkk}];
+%             figure; imagesc(tisreconerr{iii,jjj,kkk}(:,:,1),[0,tismax(kkk)]); colormap('gray'); colorbar;
+%             title(titlename);
+%             saveas(gcf,[resultspathname,titlename,'.png']);
+%             close;
+%             titlename=['Recon Error Opt ',tisreconlabel{iii,jjj,kkk}];
+%             figure; imagesc(tisreconerr{iii,jjj,kkk}(:,:,2),[0,tismax(kkk)]); colormap('gray'); colorbar;
+%             title(titlename);
+%             saveas(gcf,[resultspathname,titlename,'.png']);
+%             close;
+%             titlename=['Recon Rel Error Init ',tisreconlabel{iii,jjj,kkk}];
+%             figure; imagesc(tisreconrelerr{iii,jjj,kkk}(:,:,1),[0,0.5]); colormap('gray'); colorbar;
+%             title(titlename);
+%             saveas(gcf,[resultspathname,titlename,'.png']);
+%             close;
+%             titlename=['Recon Rel Error Opt ',tisreconlabel{iii,jjj,kkk}];
+%             figure; imagesc(tisreconrelerr{iii,jjj,kkk}(:,:,2),[0,0.5]); colormap('gray'); colorbar;
+%             title(titlename);
+%             saveas(gcf,[resultspathname,titlename,'.png']);
+%             close;
         end
     end
 end
@@ -212,11 +212,11 @@ for iii=1:size(M0ORtis,1)
     for jjj=1:size(M0ORtis,2)
         plotvarinit=[plotvarinit;subpct{iii,jjj},tdtime{iii,jjj}(1),tdtime{iii,jjj}(end),scantime{iii,jjj}(1),scantime{iii,jjj}(end),...
             M0ORtis{iii,jjj}(1,2),M0ORtis{iii,jjj}(end,2),T1ORtis{iii,jjj}(1,2),T1ORtis{iii,jjj}(end,2),T2ORtis{iii,jjj}(1,2),T2ORtis{iii,jjj}(end,2)];
-        plotvar1=[plotvar;subpct{iii,jjj},tdtime{iii,jjj}(1),tdtime{iii,jjj}(end),scantime{iii,jjj}(1),scantime{iii,jjj}(end),...
+        plotvar1=[plotvar1;subpct{iii,jjj},tdtime{iii,jjj}(1),tdtime{iii,jjj}(end),scantime{iii,jjj}(1),scantime{iii,jjj}(end),...
             varstats{iii,jjj,1,1}(1),varstats{iii,jjj,1,1}(end),varstats{iii,jjj,2,1}(1),varstats{iii,jjj,2,1}(end),varstats{iii,jjj,3,1}(1),varstats{iii,jjj,3,1}(end)];
-        plotvar2=[plotvar;subpct{iii,jjj},tdtime{iii,jjj}(1),tdtime{iii,jjj}(end),scantime{iii,jjj}(1),scantime{iii,jjj}(end),...
+        plotvar2=[plotvar2;subpct{iii,jjj},tdtime{iii,jjj}(1),tdtime{iii,jjj}(end),scantime{iii,jjj}(1),scantime{iii,jjj}(end),...
             varstats{iii,jjj,1,2}(1),varstats{iii,jjj,1,2}(end),varstats{iii,jjj,2,2}(1),varstats{iii,jjj,2,2}(end),varstats{iii,jjj,3,2}(1),varstats{iii,jjj,3,2}(end)];
-        plotvar3=[plotvar;subpct{iii,jjj},tdtime{iii,jjj}(1),tdtime{iii,jjj}(end),scantime{iii,jjj}(1),scantime{iii,jjj}(end),...
+        plotvar3=[plotvar3;subpct{iii,jjj},tdtime{iii,jjj}(1),tdtime{iii,jjj}(end),scantime{iii,jjj}(1),scantime{iii,jjj}(end),...
             varstats{iii,jjj,1,3}(1),varstats{iii,jjj,1,3}(end),varstats{iii,jjj,2,3}(1),varstats{iii,jjj,2,3}(end),varstats{iii,jjj,3,3}(1),varstats{iii,jjj,3,3}(end)];
         %         plotvaropt=[plotvaropt;scantime{iii,jjj}(end,2),M0ORtis{iii,jjj}(end,2),T1ORtis{iii,jjj}(end,2),T2ORtis{iii,jjj}(end,2)];
     end

@@ -1,4 +1,4 @@
-function [M0pred,T1pred,T2pred,varstats,meanstats,medianstats] = MIQALASrecondebug(tconoverridein,ttotalin,pdvvalin)
+function [plotvar1,plotvar2,plotvar3] = MIQALASrecondebug(tconoverridein,ttotalin,pdvvalin)
 
 plotvar1=[]; plotvar2=[]; plotvar3=[];
 % meancell=cell(length(ttotalin),length(pdvvalin),3,3,2);
@@ -36,13 +36,14 @@ for iii=1:length(ttotalin)
             %% Subsample synthetic measurements
             Mmeassub=Mmeas;
             if pdarg(3)~=-1
+                subsmplmask=bart(sprintf('poisson -Y %i -Z %i -y %i -z %i -V %i',size(materialID,1),size(materialID,2),pdarg(1),pdarg(2),pdarg(3)));
                 Mmeassub(isnan(Mmeassub))=0;
                 kmeas=bart('fft 3',Mmeassub);
                 subsample=squeeze(subsmplmask(1,:,:));
                 subsample=repmat(subsample,[1,1,size(kmeas,3),size(kmeas,4)]);
                 %             Mmeassub=bart('pics',kmeas.*subsample,ones(size(kmeas)));
                 Mmeassub=bart('fft -i 3',kmeas.*subsample)*size(kmeas,4)/numel(kmeas);
-                Mmeassub=real(Mmeassub);
+                Mmeassub=double(real(Mmeassub));
                 Mmeassub(repmat(materialID,[1,1,size(Mmeassub,3),size(Mmeassub,4)])==0)=nan;
             end
             
@@ -105,9 +106,15 @@ for iii=1:length(ttotalin)
     end
 end
 
-plotvar1=[plotvar;meancell{iii,jjj,1,1,1},meancell{iii,jjj,1,1,2},meancell{iii,jjj,2,1,1},meancell{iii,jjj,2,1,2},meancell{iii,jjj,3,1,1},meancell{iii,jjj,3,1,2}];
-plotvar2=[plotvar;mediancell{iii,jjj,1,2,1},mediancell{iii,jjj,1,2,2},mediancell{iii,jjj,2,2,1},mediancell{iii,jjj,2,2,2},mediancell{iii,jjj,3,2,1},mediancell{iii,jjj,3,2,2}];
-plotvar3=[plotvar;varcell{iii,jjj,1,3,1},varcell{iii,jjj,1,3,2},varcell{iii,jjj,2,3,1},varcell{iii,jjj,2,3,2},varcell{iii,jjj,3,3,1},varcell{iii,jjj,3,3,2}];
+for iii=1:length(ttotalin)
+    for jjj=1:length(pdvvalin)
+        plotvar1=[plotvar1;meancell{iii,jjj,1,1,1},meancell{iii,jjj,1,1,2},meancell{iii,jjj,2,1,1},meancell{iii,jjj,2,1,2},meancell{iii,jjj,3,1,1},meancell{iii,jjj,3,1,2}];
+        plotvar2=[plotvar2;mediancell{iii,jjj,1,2,1},mediancell{iii,jjj,1,2,2},mediancell{iii,jjj,2,2,1},mediancell{iii,jjj,2,2,2},mediancell{iii,jjj,3,2,1},mediancell{iii,jjj,3,2,2}];
+        plotvar3=[plotvar3;varcell{iii,jjj,1,3,1},varcell{iii,jjj,1,3,2},varcell{iii,jjj,2,3,1},varcell{iii,jjj,2,3,2},varcell{iii,jjj,3,3,1},varcell{iii,jjj,3,3,2}];
 %         plotvaropt=[plotvaropt;scantime{iii,jjj}(end,2),M0ORtis{iii,jjj}(end,2),T1ORtis{iii,jjj}(end,2),T2ORtis{iii,jjj}(end,2)];
+    end
+end
+
+
 
 end
