@@ -53,7 +53,7 @@ for iii=1:TD4in %length(TD4in)  %TD4 times
             subsample=squeeze(subsmplmask(1,:,:));
             if bartrecon==1
                 for reconind=1:size(kmeas,4)
-                    Mmeassub(:,:,:,reconind)=bart('pics -l1 -r0.01',kmeas(:,:,:,reconind).*subsample,ones(size(kmeas(:,:,:,reconind))));
+                    Mmeassub(:,:,:,reconind)=bart('pics -l1 -r0.01 -S -w1',kmeas(:,:,:,reconind).*subsample,ones(size(kmeas(:,:,:,reconind))));
                 end
             else
                 subsample=repmat(subsample,[1,1,size(kmeas,3),size(kmeas,4)]);
