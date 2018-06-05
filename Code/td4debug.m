@@ -1,6 +1,6 @@
 function [tduniform,plotvarinit,plotmeangm,plotmeanwm,plotmedgm,plotmedwm,plotvargm,plotvarwm,Mmeasfullsave,Mmeassave,M0save,T1save,T2save,M0ORtis,T1ORtis,T2ORtis,meancell,mediancell,varcell] = td4debug(TD4in,subsampin,bartrecon)
 
-tduniform=rand(TD4in,4);
+tduniform=repmat(rand(TD4in,1),[1,4]);
 
 flipAngle = 4;           % deg
 TR = 0.005;              % s
@@ -160,7 +160,7 @@ for iii=1:TD4in %length(TD4in)  %TD4 times
             T2ORtis{iii,jjj}(lll)=norm((T2pred(:,:)-goldstandardT2).*(materialID==lll),2)/norm(goldstandardT2.*(materialID==lll),2);
         end
 %         save td4debugresults.mat -v7.3;
-        save(sprintf('td4debugresults%i.mat',bartrecon),'-v7.3');
+        save(sprintf('td4debugresultsfixtd%i.mat',bartrecon),'-v7.3');
     end
 end
 
@@ -178,7 +178,7 @@ for iii=1:length(TD4in)
     end
 end
 % save td4debugresults.mat -v7.3;
-save(sprintf('td4debugresults%i.mat',bartrecon),'-v7.3');
+save(sprintf('td4debugresultsfixtd%i.mat',bartrecon),'-v7.3');
 
 %% Plot Figures
 plotsym={'-o','--x',':+','-.s','-*','--d',':v','-.^','-<','-->',':p','-.h'};

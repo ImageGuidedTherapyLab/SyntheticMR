@@ -1,4 +1,14 @@
 
+load /rsrch1/ip/dmitchell2/github/SyntheticMR/Code/synthphantom_goldstandards.mat;
+
+flipAngle = 4;           % deg
+TR = 0.005;              % s
+TE_T2prep = 0.100;       % s
+Tacq = 0.500;            % s
+TDpT2 = 0.4;             % s
+TDinv = 0.03;            % s
+nacq = 5;
+
 %% Tissue Properties
 % M0/T1/T2 Variance Flags
 M0varflag = 1;
@@ -92,7 +102,9 @@ for xxx=1:size(Mmeassave,1)
         szmi=size(MI);
         if subsampin(yyy)==-1
             %     subsmplmask=ones([1,szmi(2),szmi(3)]);
-            MIobjfun=-sum(MI(:));
+            MIobjfun{xxx,yyy}=-sum(MI(:));
+            MIobjfun_n{xxx,yyy}=MIobjfun{xxx,yyy}/numel(materialIDtemp);
+            MIobjfun_nc{xxx,yyy}=sum(MI(:,ceil(szmi(2)/2),ceil(szmi(3)/2)))/numel(materialIDtemp);
         else
             subsmplmask=bart(sprintf('poisson -Y %i -Z %i -y %i -z %i -V %i -C 10',szmi(2),szmi(3),1,1,subsampin(yyy)));
             subsmplmask=double(squeeze(subsmplmask));
@@ -100,6 +112,8 @@ for xxx=1:size(Mmeassave,1)
             subsmplmask=permute(subsmplmask,[ndims(subsmplmask)+1,1:ndims(subsmplmask)]);
             subsmplmask=repmat(subsmplmask,szmi);
             MIobjfun{xxx,yyy}=-sum(MI(:).*subsmplmask(:));
+            MIobjfun_n{xxx,yyy}=MIobjfun{xxx,yyy}/sum(subsmplmask(:));
+            MIobjfun_nc{xxx,yyy}=sum(MI(:,ceil(szmi(2)/2),ceil(szmi(3)/2)))/sum(subsmplmask(:));
         end
         
     end

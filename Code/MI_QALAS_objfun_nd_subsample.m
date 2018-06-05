@@ -1,4 +1,4 @@
-
+xr
 % MI-based optimization of parameter space using fminsearch
 % MI calculated by Gauss-Hermite quadrature
 
