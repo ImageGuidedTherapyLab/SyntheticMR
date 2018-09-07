@@ -1,4 +1,4 @@
-function[finalImage,kSpace] = OrchestraCartesian3DRecon()
+function[finalImage,kSpace] = OrchestraCartesian3DRecon(pfilePath)
 %% CartesianRecon - Reconstruct 3D Cartesian K-Space
 %
 % Copyright 2016 General Electric Company. All rights reserved.
@@ -14,7 +14,7 @@ function[finalImage,kSpace] = OrchestraCartesian3DRecon()
     % Load Pfile
     
 %     pfilePath='/rsrch1/ip/egates1/QALAS/20170601/P22016.7';
-    pfilePath='/rsrch1/ip/egates1/QALAS/20180427/P11264.7';
+%     pfilePath='/rsrch1/ip/egates1/QALAS/20180427/P11264.7';
 
     pfile = GERecon('Pfile.Load', pfilePath);
     header = GERecon('Pfile.Header', pfile);

@@ -13,7 +13,7 @@ labels = {'M0_{GM}','T1_{GM}','T2_{GM}','M0_{WM}','T1_{WM}','T2_{WM}','M0_{CSF}'
 %                 histogram(post_samples(:,i), 50)
                 wp = [i];
                 posteriors_nofig(post_samples, wp, {prior{wp,1}});
-                hold on; yyaxis right; plot(prior{i,3}-1*prior{i,4}:prior{i,4}/100:prior{i,3}+1*prior{i,4},normpdf(prior{i,3}-1*prior{i,4}:prior{i,4}/100:prior{i,3}+1*prior{i,4},prior{i,3},prior{i,4}),'r');
+                hold on; plot(prior{i,3}-2*prior{i,4}:prior{i,4}/100:prior{i,3}+2*prior{i,4},normpdf(prior{i,3}-2*prior{i,4}:prior{i,4}/100:prior{i,3}+2*prior{i,4},prior{i,3},prior{i,4}),'r');
 %                 subplot(nparam, nparam, count)
 %                 scatter(post_samples(:,i), post_samples(:,nparam+1), '.')
             end
@@ -30,7 +30,7 @@ labels = {'M0_{GM}','T1_{GM}','T2_{GM}','M0_{WM}','T1_{WM}','T2_{WM}','M0_{CSF}'
 %                 scatter3(post_samples(:,i), post_samples(:,j), post_samples(:,nparam+1), '.')
             end
             if j == 1;
-                yyaxis left; ylabel(labels{i});
+                ylabel(labels{i});
             end
             if i == 9
                 xlabel(labels{j});

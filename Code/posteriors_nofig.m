@@ -32,7 +32,7 @@ end
 if lwp == 1
     % make histogram plot
 %     figure()
-    hist(post_samples(:,wp), nbins);
+    histogram(post_samples(:,wp),nbins,'Normalization','pdf');
 %     xlabel(parnames{1},'fontsize',12);
 
     % calculate mean and std deviation

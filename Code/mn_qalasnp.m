@@ -1,4 +1,6 @@
 
+function [logZ,nest_samples,post_samples,prior]=mn_qalasnp(TDin,noisein,Nlive,Nmcmc)
+
 global verbose;
 verbose = 1;
 global DEBUG;
@@ -9,11 +11,11 @@ tconoverride=1;
 ttotal=2;
 
 %% Optimization Space Acquisition Parameters
-geometrycase=1;
+geometrycase=1.5;
 lfname = '/rsrch1/ip/dmitchell2/github/SyntheticMR/Code/ICBM_grey_white_csf.nii.gz'; % population tissue segmentation
 switch geometrycase
     case 1
-        materialID = int32(3);
+        materialID = int32(1);
     case 1.5
 %         materialID = int32([1,2;1,3]);
         materialID = int32(ones(6));
@@ -91,7 +93,7 @@ Tacq = 0.500;            % s
 TDpT2 = 0.4;             % s
 TDinv = 0.03;            % s
 nacq = 5;
-TD = [10,10,10,10]; %[0.5,0.5,0.5,0.5];          % s
+TD = TDin*ones([1,4]); %[10,10,10,10]; %[0.5,0.5,0.5,0.5];          % s
 
 acqparam=[flipAngle,TR,TE_T2prep,Tacq,TDpT2,TDinv,nacq,TD];
 
@@ -129,7 +131,8 @@ end
 % std of patient csf = 9.8360; max signal in patient brain = 500;
 % max approx signal in synthdata = 0.0584
 % std of noise in patient raw data = 17.8574; max signal approx 3000;
-signu=3.4762E-4;
+% signu=3.4762E-4;
+signu=noisein;
 
 % Dummy variables
 data{1}=1:15;
@@ -142,8 +145,8 @@ data{3}=signu*ones(size(data{2}));
 data{3} = data{3}.^2;
 
 % define nested sampling parameters
-Nlive = 500;
-Nmcmc = 10; %input('Input number of iterations for MCMC sampling: (enter 0 for multinest sampling)\n');
+% Nlive = 500;
+% Nmcmc = 0; %input('Input number of iterations for MCMC sampling: (enter 0 for multinest sampling)\n');
 tolerance = 0.1;
 likelihood = @logL_tis2img_gaussian;
 model = @qalasnp_model;
@@ -175,27 +178,32 @@ extraparams = {'materialID',materialID; ...
     tolerance, likelihood, model, prior, extraparams, 'Nmcmc', Nmcmc);
 
 % plot posterior distributions
-wp = [1];
-posteriors(post_samples, wp, {prior{wp,1}});
-wp = [2];
-posteriors(post_samples, wp, {prior{wp,1}});
-wp = [3];
-posteriors(post_samples, wp, {prior{wp,1}});
-wp = [1 2];
-posteriors(post_samples, wp, {prior{wp(1),1}, prior{wp(2),1}});
-wp = [4];
-posteriors(post_samples, wp, {prior{wp,1}});
-wp = [5];
-posteriors(post_samples, wp, {prior{wp,1}});
-wp = [6];
-posteriors(post_samples, wp, {prior{wp,1}});
-wp = [4 5];
-posteriors(post_samples, wp, {prior{wp(1),1}, prior{wp(2),1}});
-wp = [7];
-posteriors(post_samples, wp, {prior{wp,1}});
-wp = [8];
-posteriors(post_samples, wp, {prior{wp,1}});
-wp = [9];
-posteriors(post_samples, wp, {prior{wp,1}});
-wp = [7 8];
-posteriors(post_samples, wp, {prior{wp(1),1}, prior{wp(2),1}});
+plotflag=0;
+if plotflag==1
+    wp = [1];
+    posteriors(post_samples, wp, {prior{wp,1}});
+    wp = [2];
+    posteriors(post_samples, wp, {prior{wp,1}});
+    wp = [3];
+    posteriors(post_samples, wp, {prior{wp,1}});
+    wp = [1 2];
+    posteriors(post_samples, wp, {prior{wp(1),1}, prior{wp(2),1}});
+    wp = [4];
+    posteriors(post_samples, wp, {prior{wp,1}});
+    wp = [5];
+    posteriors(post_samples, wp, {prior{wp,1}});
+    wp = [6];
+    posteriors(post_samples, wp, {prior{wp,1}});
+    wp = [4 5];
+    posteriors(post_samples, wp, {prior{wp(1),1}, prior{wp(2),1}});
+    wp = [7];
+    posteriors(post_samples, wp, {prior{wp,1}});
+    wp = [8];
+    posteriors(post_samples, wp, {prior{wp,1}});
+    wp = [9];
+    posteriors(post_samples, wp, {prior{wp,1}});
+    wp = [7 8];
+    posteriors(post_samples, wp, {prior{wp(1),1}, prior{wp(2),1}});
+end
+
+end
