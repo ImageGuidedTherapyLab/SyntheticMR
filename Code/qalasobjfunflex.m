@@ -17,7 +17,9 @@ for iii=1:nacq-1
 end
 
 % Mopt=sind(flipAngle).*[M(2),M(6:2:end-1)];
-Mopt=[M(2),M(6:2:end-1)];
-objfun=double(norm(Mopt(2:end)-Mmeas(2:end)));
+% Mopt=[M(2),M(6:2:end-1)];
+% objfun=norm(Mopt(2:end)-Mmeas(2:end));
+Mopt=M(6:2:end-1);
+objfun=norm(Mopt-Mmeas);
 
 end
