@@ -65,9 +65,6 @@ qalasimg(evalmask==0)=nan;
 % [M0pred,T1pred,T2pred]=qalasrecon(qalasimg,xinit,3,TR,TE_T2prep,flipAngle,nacq,dt);
 [M0pred,T1pred,T2pred]=qalasrecon(qalasimg,3,TR,TE_T2prep,flipAngle,nacq,dt);
 
-% Save results
-save([scanArchivePath,'_parampred.mat'],'M0pred','T1pred','T2pred','-v7.3');
-
 try
 % Make figures
 for iii=1:42
@@ -82,6 +79,9 @@ for iii=1:42
 end
 M6v=M0v-(M0v-M5v).*exp(-dt(end)./T1v);
 
+% Save results
+save([scanArchivePath,'_parampred.mat'],'M0pred','T1pred','T2pred','M0v','T1v','T2v','M1v','M2v','M3v','M4v','M5v','M6v','-v7.3');
+
 % PD Element Property Distributions
 figure;
 boxplot(M0v(1:14,:)','Positions',1:14);
@@ -92,6 +92,7 @@ xlabel('PD Element Number'); ylabel('T1 (s)'); title('PD Element T1'); pause(1);
 figure;
 boxplot(real(T2v(1:14,:))','Positions',1:14);
 xlabel('PD Element Number'); ylabel('T2 (s)'); title('PD Element T2'); pause(1);
+axis([0,15,0,2]);
 
 % T1 Element Property Distributions
 figure;
@@ -105,6 +106,7 @@ figure; hold on;
 boxplot(real(T2v(15:28,:))','Positions',1:14);
 plot(phantomProp.T1element.T30.T2./1000,'gx');
 xlabel('T1 Element Number'); ylabel('T2 (s)'); title('T1 Element T2'); pause(1);
+axis([0,15,0,2]);
 
 % T2 Element Property Distributions
 figure;
@@ -118,6 +120,7 @@ figure; hold on;
 boxplot(real(T2v(29:42,:))','Positions',1:14);
 plot(phantomProp.T2element.T30.T2./1000,'gx');
 xlabel('T2 Element Number'); ylabel('T2 (s)'); title('T2 Element T2'); pause(1);
+axis([0,15,0,2]);
 
 % Plot Measurement Distributions
 csdt=cumsum(dt);
