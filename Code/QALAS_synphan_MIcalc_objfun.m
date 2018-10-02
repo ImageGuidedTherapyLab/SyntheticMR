@@ -2,13 +2,13 @@
 % MI-based optimization of parameter space using fminsearch
 % MI calculated by Gauss-Hermite quadrature
 
-function [MI]=QALAS_synphan_MIcalc_objfun(scanArchivePath,fileflag)
+function [MI]=QALAS_synphan_MIcalc_objfun(scanArchivePath,fileflag,paraminput)
 
 if nargin==0
     scanArchivePath='/home/dmitchell412/QALASData/ScanArchive_713792AMR16_20180808_141752849';
     fileflag=1;
 end
-if nargin==1
+if nargin==1 || nargin==3
     if scanArchivePath==1
         scanArchivePath='/home/dmitchell412/QALASData/ScanArchive_713792AMR16_20180808_141752849';
         fileflag=1;
@@ -32,7 +32,8 @@ archive = GERecon('Archive.Load', [scanArchivePath,'.h5']);
 
 flipAngle = archive.DownloadData.rdb_hdr_image.mr_flip; %4;           % deg
 TR = archive.DownloadData.rdb_hdr_image.tr/1E6; %0.005;              % s
-TE_T2prep = archive.DownloadData.rdb_hdr_image.t2PrepTE/1E6; %0.100;       % s
+% TE_T2prep = archive.DownloadData.rdb_hdr_image.t2PrepTE/1E6; %0.100;       % s
+TE_T2prep = .100;
 Tacq = TR*102; %0.500;            % s
 TDpT2 = 230632/1E6;             % s
 TDinv = archive.DownloadData.rdb_hdr_image.ti/1E6; %0.03;            % s
@@ -67,6 +68,15 @@ T2stdd = [   5,    4,   50,   10]./1000; % s
 M0mean = [ 0.9,  0.9,  1.0,  0.9];       % relative intensity
 M0stdd = [ .05,  .05,  .05,   .1];       % relative intensity
 tisinput=[M0mean;M0stdd;T1mean;T1stdd;T2mean;T2stdd];
+
+if ~isempty(paraminput)
+    tisinput(1,1)=paraminput(1);
+    tisinput(1,2)=paraminput(1);
+    tisinput(3,1)=paraminput(2);
+    tisinput(3,2)=paraminput(2);
+    tisinput(5,1)=paraminput(3);
+    tisinput(5,2)=paraminput(3);
+end
 
 overwritecsf=1;
 if overwritecsf==1; tisinput(:,3)=tisinput(:,2); end;
@@ -118,5 +128,7 @@ detSigz=(pi^(-N/2)*signu^2 + Sigrr - Ezr.^2).*(pi^(-N/2)*signu^2 + Sigii - Ezi.^
 Hz=0.5.*log((2*pi*2.7183)^2.*detSigz);
 Hzmu=0.5.*log((2*pi*2.7183)^2.*signu.^4);
 MI=Hz-Hzmu;
+
+% MI=sum(MI(:));
 
 end

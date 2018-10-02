@@ -36,7 +36,8 @@ load /rsrch1/ip/dmitchell2/github/SyntheticMR/Code/phantomProp.mat;
 
 flipAngle = archive.DownloadData.rdb_hdr_image.mr_flip; %4;           % deg
 TR = archive.DownloadData.rdb_hdr_image.tr/1E6; %0.005;              % s
-TE_T2prep = archive.DownloadData.rdb_hdr_image.t2PrepTE/1E6; %0.100;       % s
+% TE_T2prep = archive.DownloadData.rdb_hdr_image.t2PrepTE/1E6; %0.100;       % s
+TE_T2prep = .100;
 Tacq = TR*102; %0.500;            % s
 TDpT2 = 230632/1E6;             % s
 TDinv = archive.DownloadData.rdb_hdr_image.ti/1E6; %0.03;            % s
