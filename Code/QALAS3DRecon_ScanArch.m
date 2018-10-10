@@ -85,42 +85,78 @@ save([scanArchivePath,'_parampred.mat'],'M0pred','T1pred','T2pred','M0v','T1v','
 
 % PD Element Property Distributions
 figure;
+subplot(2,3,1);
 boxplot(M0v(1:14,:)','Positions',1:14);
 xlabel('PD Element Number'); ylabel('M0'); title('PD Element M0'); pause(1);
-figure;
+subplot(2,3,2);
 boxplot(T1v(1:14,:)','Positions',1:14);
 xlabel('PD Element Number'); ylabel('T1 (s)'); title('PD Element T1'); pause(1);
-figure;
+subplot(2,3,3);
 boxplot(real(T2v(1:14,:))','Positions',1:14);
 xlabel('PD Element Number'); ylabel('T2 (s)'); title('PD Element T2'); pause(1);
 axis([0,15,0,2]);
 
+subplot(2,3,4);
+boxplot(M0v(1:14,:)'./mean(M0v(1:14,:)',1),'Positions',1:14);
+xlabel('PD Element Number'); ylabel('M0 Relative Variance'); title('PD Element M0'); pause(1);
+subplot(2,3,5);
+boxplot(T1v(1:14,:)'./mean(T1v(1:14,:)',1),'Positions',1:14);
+xlabel('PD Element Number'); ylabel('T1 Relative Variance'); title('PD Element T1'); pause(1);
+subplot(2,3,6);
+boxplot(real(T2v(1:14,:))'./mean(real(T2v(1:14,:))',1),'Positions',1:14);
+xlabel('PD Element Number'); ylabel('T2 Relative Variance'); title('PD Element T2'); pause(1);
+axis([0,15,0,2]);
+
 % T1 Element Property Distributions
 figure;
+subplot(2,3,1);
 boxplot(M0v(15:28,:)','Positions',1:14);
 xlabel('T1 Element Number'); ylabel('M0'); title('T1 Element M0'); pause(1);
-figure; hold on;
+subplot(2,3,2); hold on;
 boxplot(T1v(15:28,:)','Positions',1:14);
 plot(phantomProp.T1element.T30.T1./1000,'gx');
 xlabel('T1 Element Number'); ylabel('T1 (s)'); title('T1 Element T1'); pause(1);
-figure; hold on;
+subplot(2,3,3); hold on;
 boxplot(real(T2v(15:28,:))','Positions',1:14);
 plot(phantomProp.T1element.T30.T2./1000,'gx');
 xlabel('T1 Element Number'); ylabel('T2 (s)'); title('T1 Element T2'); pause(1);
 axis([0,15,0,2]);
 
+subplot(2,3,4);
+boxplot(M0v(15:28,:)'./mean(M0v(15:28,:)',1),'Positions',1:14);
+xlabel('T1 Element Number'); ylabel('M0 Relative Variance'); title('T1 Element M0'); pause(1);
+subplot(2,3,5);
+boxplot(T1v(15:28,:)'./mean(T1v(15:28,:)',1),'Positions',1:14);
+xlabel('T1 Element Number'); ylabel('T1 Relative Variance'); title('T1 Element T1'); pause(1);
+subplot(2,3,6);
+boxplot(real(T2v(15:28,:))'./mean(real(T2v(15:28,:))',1),'Positions',1:14);
+xlabel('T1 Element Number'); ylabel('T2 Relative Variance'); title('T1 Element T2'); pause(1);
+axis([0,15,0,2]);
+
 % T2 Element Property Distributions
 figure;
+subplot(2,3,1);
 boxplot(M0v(29:42,:)','Positions',1:14);
 xlabel('T2 Element Number'); ylabel('M0'); title('T2 Element M0'); pause(1);
-figure; hold on;
+subplot(2,3,2); hold on;
 boxplot(T1v(29:42,:)','Positions',1:14);
 plot(phantomProp.T2element.T30.T1./1000,'gx');
 xlabel('T2 Element Number'); ylabel('T1 (s)'); title('T2 Element T1'); pause(1);
-figure; hold on;
+subplot(2,3,3); hold on;
 boxplot(real(T2v(29:42,:))','Positions',1:14);
 plot(phantomProp.T2element.T30.T2./1000,'gx');
 xlabel('T2 Element Number'); ylabel('T2 (s)'); title('T2 Element T2'); pause(1);
+axis([0,15,0,2]);
+
+subplot(2,3,4);
+boxplot(M0v(29:42,:)'./mean(M0v(29:42,:)',1),'Positions',1:14);
+xlabel('T2 Element Number'); ylabel('M0 Relative Variance'); title('T2 Element M0'); pause(1);
+subplot(2,3,5);
+boxplot(T1v(29:42,:)'./mean(T1v(29:42,:)',1),'Positions',1:14);
+xlabel('T2 Element Number'); ylabel('T1 Relative Variance'); title('T2 Element T1'); pause(1);
+subplot(2,3,6);
+boxplot(real(T2v(29:42,:))'./mean(real(T2v(29:42,:))',1),'Positions',1:14);
+xlabel('T2 Element Number'); ylabel('T2 Relative Variance'); title('T2 Element T2'); pause(1);
 axis([0,15,0,2]);
 
 % Plot Measurement Distributions
@@ -143,6 +179,26 @@ for iii=29:42
     xticklabels(strtrim(cellstr(num2str(csdt([2,6:2:end-1]),'%2.1f\n'))));
     title(['TD2 Elem ',num2str(iii-28)]);
 end
+% Normalized
+figure;
+for iii=1:14
+    subplot(2,7,iii); boxplot(cat(1,M1v(iii,:)./median(M5v(iii,:)),M2v(iii,:)./median(M5v(iii,:)),M3v(iii,:)./median(M5v(iii,:)),M4v(iii,:)./median(M5v(iii,:)),M5v(iii,:)./median(M5v(iii,:)),M6v(iii,:)./median(M5v(iii,:)))','Positions',csdt([2,6:2:end]));%({'M1','M2','M3','M4','M5'});
+    xticklabels(strtrim(cellstr(num2str(csdt([2,6:2:end-1]),'%2.1f\n'))));
+    title(['PD Elem ',num2str(iii)]);
+end
+figure;
+for iii=15:28
+    subplot(2,7,iii-14); boxplot(cat(1,M1v(iii,:)./median(M5v(iii,:)),M2v(iii,:)./median(M5v(iii,:)),M3v(iii,:)./median(M5v(iii,:)),M4v(iii,:)./median(M5v(iii,:)),M5v(iii,:)./median(M5v(iii,:)),M6v(iii,:)./median(M5v(iii,:)))','Positions',csdt([2,6:2:end]));
+    xticklabels(strtrim(cellstr(num2str(csdt([2,6:2:end-1]),'%2.1f\n'))));
+    title(['TD1 Elem ',num2str(iii-14)]);
+end
+figure;
+for iii=29:42
+    subplot(2,7,iii-28); boxplot(cat(1,M1v(iii,:)./median(M5v(iii,:)),M2v(iii,:)./median(M5v(iii,:)),M3v(iii,:)./median(M5v(iii,:)),M4v(iii,:)./median(M5v(iii,:)),M5v(iii,:)./median(M5v(iii,:)),M6v(iii,:)./median(M5v(iii,:)))','Positions',csdt([2,6:2:end]));
+    xticklabels(strtrim(cellstr(num2str(csdt([2,6:2:end-1]),'%2.1f\n'))));
+    title(['TD2 Elem ',num2str(iii-28)]);
+end
+
 catch
 end
 
