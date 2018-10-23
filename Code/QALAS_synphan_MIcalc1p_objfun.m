@@ -128,10 +128,14 @@ N=length(xn);
 %     signu=signu*(1+flipAngle/1.2);
 % end
 signu=paraminput(7);
-detSigz=(pi^(-N/2)*signu^2 + Sigrr - Ezr.^2).*(pi^(-N/2)*signu^2 + Sigii - Ezi.^2) - (Sigri - Ezr.*Ezi).^2;
+detSigz=(pi^(-N/2)*signu.^2 + Sigrr - Ezr.^2).*(pi^(-N/2)*signu.^2 + Sigii - Ezi.^2) - (Sigri - Ezr.*Ezi).^2;
+% detSigz=(pi^(-N/2)*signu^2 + Sigrr - Ezr.^2).*(pi^(-N/2)*signu^2);
 Hz=0.5.*log((2*pi*2.7183)^2.*detSigz);
 Hzmu=0.5.*log((2*pi*2.7183)^2.*signu.^4);
 MI=Hz-Hzmu;
+
+% MI=0.5.*log((2*pi*2.7183)^2.*(pi^(-N/2)*signu.^2 + Sigrr - Ezr.^2).*(pi^(-N/2)*signu.^2))-0.5.*log((2*pi*2.7183)^2.*signu.^4);
+% MI=0.5.*log((pi^(-N/2)*signu^2 + Sigrr - Ezr.^2).*(pi^(-N/2)*signu^2)/signu.^4);
 
 % MI=sum(MI(:));
 

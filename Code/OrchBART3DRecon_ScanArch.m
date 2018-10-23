@@ -3,6 +3,8 @@ function[realimg,bartrecon,kSpace,sensmag,sensphs] = OrchBART3DRecon_ScanArch(sc
 % scanArchivePath1='/home/dmitchell412/QALASData/ScanArchive_713792AMR16_20180808_141752849';
 % scanArchivePath2='/home/dmitchell412/QALASData/ScanArchive_713792AMR16_20180808_144530716';
 
+scanArchivePath='/home/khwang/Documents/MATLAB/qalasCS/data/20181004phant/ScanArchive_713792AMR16_20181004_162834615';
+
 if nargin==0
     scanArchivePath='/home/dmitchell412/QALASData/ScanArchive_713792AMR16_20180808_141752849';
 end

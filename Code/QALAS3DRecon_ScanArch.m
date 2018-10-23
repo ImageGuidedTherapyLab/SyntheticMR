@@ -22,6 +22,7 @@ end
 if isempty(fileflag)
     fileflag=1;
 end
+
 archive = GERecon('Archive.Load', [scanArchivePath,'.h5']);
 % realimg=load_untouch_nii([scanArchivePath,'_realimg.nii']);
 % realimg=realimg.img;
@@ -50,23 +51,11 @@ end
 dt=[0,TE_T2prep,Tacq,TDpT2,0,TDinv,Tacq,TD(1),Tacq,TD(2),Tacq,TD(3),Tacq,TD(4)];
 
 GERecon('Archive.Close', archive);
-
-% xinit=zeros([size(evalmask),3]);
-% for iii=1:14
-%     xinit(:,:,:,2)=xinit(:,:,:,2)+phantomProp.PDelement.concentration(iii).*(evalmask==iii)./100;
-%     xinit(:,:,:,3)=xinit(:,:,:,3)+(evalmask==iii);
-%     xinit(:,:,:,2)=xinit(:,:,:,2)+phantomProp.PDelement.concentration(iii).*(evalmask==(14+iii))./100;
-%     xinit(:,:,:,3)=xinit(:,:,:,3)+phantomProp.T1element.T30.T1(iii).*(evalmask==(14+iii))./1000;
-%     xinit(:,:,:,2)=xinit(:,:,:,2)+phantomProp.PDelement.concentration(iii).*(evalmask==(28+iii))./100;
-%     xinit(:,:,:,3)=xinit(:,:,:,3)+phantomProp.T2element.T30.T1(iii).*(evalmask==(28+iii))./1000;
-% end
-    
+   
 qalasimg=realimg;
 qalasimg(evalmask==0)=nan;
-% [M0pred,T1pred,T2pred]=qalasrecon(qalasimg,xinit,3,TR,TE_T2prep,flipAngle,nacq,dt);
 [M0pred,T1pred,T2pred]=qalasrecon(qalasimg,3,TR,TE_T2prep,flipAngle,nacq,dt);
 
-try
 % Make figures
 for iii=1:42
     M0v(iii,:)=M0pred(evalmask==iii);
@@ -80,8 +69,26 @@ for iii=1:42
 end
 M6v=M0v-(M0v-M5v).*exp(-dt(end)./T1v);
 
+% Exclude Gibbs Ringing Voxels
+nstd=1;
+Mv=cat(3,M1v,M2v,M3v,M4v,M5v);
+Mmed=median(Mv,2);
+Mstd=std(Mv,[],2);
+M_ub=repmat(Mmed+nstd*Mstd,[1,size(Mv,2),1]);
+M_lb=repmat(Mmed-nstd*Mstd,[1,size(Mv,2),1]);
+gibbs_mask=(Mv<M_ub)&(Mv>M_lb);
+gibbs_mask=prod(gibbs_mask,3);
+
 % Save results
-save([scanArchivePath,'_parampred.mat'],'M0pred','T1pred','T2pred','M0v','T1v','T2v','M1v','M2v','M3v','M4v','M5v','M6v','-v7.3');
+save([scanArchivePath,'_parampred.mat'],'M0pred','T1pred','T2pred','M0v','T1v','T2v','M1v','M2v','M3v','M4v','M5v','M6v','gibbs_mask','-v7.3');
+
+gibbs_exclude=1;
+if gibbs_exclude~=0
+    Mv(~gibbs_mask)=nan;
+    M0v(~gibbs_mask)=nan;
+    T1v(~gibbs_mask)=nan;
+    T2v(~gibbs_mask)=nan;
+end
 
 % PD Element Property Distributions
 figure;
@@ -97,13 +104,13 @@ xlabel('PD Element Number'); ylabel('T2 (s)'); title('PD Element T2'); pause(1);
 axis([0,15,0,2]);
 
 subplot(2,3,4);
-boxplot(M0v(1:14,:)'./mean(M0v(1:14,:)',1),'Positions',1:14);
+boxplot(M0v(1:14,:)'./nanmean(M0v(1:14,:)',1),'Positions',1:14);
 xlabel('PD Element Number'); ylabel('M0 Relative Variance'); title('PD Element M0'); pause(1);
 subplot(2,3,5);
-boxplot(T1v(1:14,:)'./mean(T1v(1:14,:)',1),'Positions',1:14);
+boxplot(T1v(1:14,:)'./nanmean(T1v(1:14,:)',1),'Positions',1:14);
 xlabel('PD Element Number'); ylabel('T1 Relative Variance'); title('PD Element T1'); pause(1);
 subplot(2,3,6);
-boxplot(real(T2v(1:14,:))'./mean(real(T2v(1:14,:))',1),'Positions',1:14);
+boxplot(real(T2v(1:14,:))'./nanmean(real(T2v(1:14,:))',1),'Positions',1:14);
 xlabel('PD Element Number'); ylabel('T2 Relative Variance'); title('PD Element T2'); pause(1);
 axis([0,15,0,2]);
 
@@ -123,13 +130,13 @@ xlabel('T1 Element Number'); ylabel('T2 (s)'); title('T1 Element T2'); pause(1);
 axis([0,15,0,2]);
 
 subplot(2,3,4);
-boxplot(M0v(15:28,:)'./mean(M0v(15:28,:)',1),'Positions',1:14);
+boxplot(M0v(15:28,:)'./nanmean(M0v(15:28,:)',1),'Positions',1:14);
 xlabel('T1 Element Number'); ylabel('M0 Relative Variance'); title('T1 Element M0'); pause(1);
 subplot(2,3,5);
-boxplot(T1v(15:28,:)'./mean(T1v(15:28,:)',1),'Positions',1:14);
+boxplot(T1v(15:28,:)'./nanmean(T1v(15:28,:)',1),'Positions',1:14);
 xlabel('T1 Element Number'); ylabel('T1 Relative Variance'); title('T1 Element T1'); pause(1);
 subplot(2,3,6);
-boxplot(real(T2v(15:28,:))'./mean(real(T2v(15:28,:))',1),'Positions',1:14);
+boxplot(real(T2v(15:28,:))'./nanmean(real(T2v(15:28,:))',1),'Positions',1:14);
 xlabel('T1 Element Number'); ylabel('T2 Relative Variance'); title('T1 Element T2'); pause(1);
 axis([0,15,0,2]);
 
@@ -149,13 +156,13 @@ xlabel('T2 Element Number'); ylabel('T2 (s)'); title('T2 Element T2'); pause(1);
 axis([0,15,0,2]);
 
 subplot(2,3,4);
-boxplot(M0v(29:42,:)'./mean(M0v(29:42,:)',1),'Positions',1:14);
+boxplot(M0v(29:42,:)'./nanmean(M0v(29:42,:)',1),'Positions',1:14);
 xlabel('T2 Element Number'); ylabel('M0 Relative Variance'); title('T2 Element M0'); pause(1);
 subplot(2,3,5);
-boxplot(T1v(29:42,:)'./mean(T1v(29:42,:)',1),'Positions',1:14);
+boxplot(T1v(29:42,:)'./nanmean(T1v(29:42,:)',1),'Positions',1:14);
 xlabel('T2 Element Number'); ylabel('T1 Relative Variance'); title('T2 Element T1'); pause(1);
 subplot(2,3,6);
-boxplot(real(T2v(29:42,:))'./mean(real(T2v(29:42,:))',1),'Positions',1:14);
+boxplot(real(T2v(29:42,:))'./nanmean(real(T2v(29:42,:))',1),'Positions',1:14);
 xlabel('T2 Element Number'); ylabel('T2 Relative Variance'); title('T2 Element T2'); pause(1);
 axis([0,15,0,2]);
 
@@ -182,24 +189,21 @@ end
 % Normalized
 figure;
 for iii=1:14
-    subplot(2,7,iii); boxplot(cat(1,M1v(iii,:)./median(M5v(iii,:)),M2v(iii,:)./median(M5v(iii,:)),M3v(iii,:)./median(M5v(iii,:)),M4v(iii,:)./median(M5v(iii,:)),M5v(iii,:)./median(M5v(iii,:)),M6v(iii,:)./median(M5v(iii,:)))','Positions',csdt([2,6:2:end]));%({'M1','M2','M3','M4','M5'});
+    subplot(2,7,iii); boxplot(cat(1,M1v(iii,:)./nanmedian(M5v(iii,:)),M2v(iii,:)./nanmedian(M5v(iii,:)),M3v(iii,:)./nanmedian(M5v(iii,:)),M4v(iii,:)./nanmedian(M5v(iii,:)),M5v(iii,:)./nanmedian(M5v(iii,:)),M6v(iii,:)./nanmedian(M5v(iii,:)))','Positions',csdt([2,6:2:end]));%({'M1','M2','M3','M4','M5'});
     xticklabels(strtrim(cellstr(num2str(csdt([2,6:2:end-1]),'%2.1f\n'))));
     title(['PD Elem ',num2str(iii)]);
 end
 figure;
 for iii=15:28
-    subplot(2,7,iii-14); boxplot(cat(1,M1v(iii,:)./median(M5v(iii,:)),M2v(iii,:)./median(M5v(iii,:)),M3v(iii,:)./median(M5v(iii,:)),M4v(iii,:)./median(M5v(iii,:)),M5v(iii,:)./median(M5v(iii,:)),M6v(iii,:)./median(M5v(iii,:)))','Positions',csdt([2,6:2:end]));
+    subplot(2,7,iii-14); boxplot(cat(1,M1v(iii,:)./nanmedian(M5v(iii,:)),M2v(iii,:)./nanmedian(M5v(iii,:)),M3v(iii,:)./nanmedian(M5v(iii,:)),M4v(iii,:)./nanmedian(M5v(iii,:)),M5v(iii,:)./nanmedian(M5v(iii,:)),M6v(iii,:)./nanmedian(M5v(iii,:)))','Positions',csdt([2,6:2:end]));
     xticklabels(strtrim(cellstr(num2str(csdt([2,6:2:end-1]),'%2.1f\n'))));
     title(['TD1 Elem ',num2str(iii-14)]);
 end
 figure;
 for iii=29:42
-    subplot(2,7,iii-28); boxplot(cat(1,M1v(iii,:)./median(M5v(iii,:)),M2v(iii,:)./median(M5v(iii,:)),M3v(iii,:)./median(M5v(iii,:)),M4v(iii,:)./median(M5v(iii,:)),M5v(iii,:)./median(M5v(iii,:)),M6v(iii,:)./median(M5v(iii,:)))','Positions',csdt([2,6:2:end]));
+    subplot(2,7,iii-28); boxplot(cat(1,M1v(iii,:)./nanmedian(M5v(iii,:)),M2v(iii,:)./nanmedian(M5v(iii,:)),M3v(iii,:)./nanmedian(M5v(iii,:)),M4v(iii,:)./nanmedian(M5v(iii,:)),M5v(iii,:)./nanmedian(M5v(iii,:)),M6v(iii,:)./nanmedian(M5v(iii,:)))','Positions',csdt([2,6:2:end]));
     xticklabels(strtrim(cellstr(num2str(csdt([2,6:2:end-1]),'%2.1f\n'))));
     title(['TD2 Elem ',num2str(iii-28)]);
-end
-
-catch
 end
 
 end
