@@ -2,7 +2,7 @@
 % MI-based optimization of parameter space using fminsearch
 % MI calculated by Gauss-Hermite quadrature
 
-function [MIsum,MI]=QALAS_synphan_MIcalc_objfun(scanArchivePath,fileflag,paraminput,erodedilateflag)
+function [MIsum,MI]=QALAS_synphan_MIcalc_objfun_globalsearch(scanArchivePath,fileflag,paraminput,erodedilateflag,td1,td2)
 
 if nargin==0
     scanArchivePath='/home/dmitchell412/QALASData/ScanArchive_713792AMR16_20180808_141752849';
@@ -43,7 +43,7 @@ if fileflag==2
     TDpT2=500000/1E6;
     TD = [142592,142592,142592,500000]./1E6;
 end
-
+TD(1)=td1; TD(2)=td2;
 % TD=tdin./1E6*ones([1,4]);
 
 dt=[0,TE_T2prep,Tacq,TDpT2,0,TDinv,Tacq,TD(1),Tacq,TD(2),Tacq,TD(3),Tacq,TD(4)];

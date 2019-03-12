@@ -13,6 +13,12 @@ if nargin==1
         scanArchivePath='/home/dmitchell412/QALASData/ScanArchive_713792AMR16_20180808_141752849';
     elseif scanArchivePath==2
         scanArchivePath='/home/dmitchell412/QALASData/ScanArchive_713792AMR16_20180808_144530716';
+    elseif scanArchivePath==3
+        scanArchivePath='/rsrch1/ip/dmitchell2/github/SyntheticMR/Code/Scan Data/ScanArchive_SCRB3MR_20190124_163432701';
+    elseif scanArchivePath==4
+        scanArchivePath='/rsrch1/ip/dmitchell2/github/SyntheticMR/Code/Scan Data/ScanArchive_SCRB3MR_20190124_163251485';
+    elseif scanArchivePath==5
+        scanArchivePath='/rsrch1/ip/dmitchell2/github/SyntheticMR/Code/Scan Data/ScanArchive_SCRB3MR_20190124_163430054';
     else
         scanArchivePath='/home/dmitchell412/QALASData/ScanArchive_713792AMR16_20180808_141752849';
     end

@@ -38,6 +38,7 @@ M0v_1=M0v; T1v_1=T1v; T2v_1=T2v; %signuin1=nanvar(M5v(15:end,:),[],2)';
 scanArchivePath='/home/dmitchell412/QALASData/ScanArchive_713792AMR16_20180808_144530716';
 fileflag=2;
 load([scanArchivePath,'_parampred.mat']);
+
 if gibbs_exclude~=0
     Mv(~gibbs_mask)=nan;
     M0v(~gibbs_mask)=nan;
@@ -45,17 +46,17 @@ if gibbs_exclude~=0
     T2v(~gibbs_mask)=nan;
     M5v(~gibbs_mask)=nan;
 end
-% if t1correction~=0
-%     t1manexclude=[0,0,0,0,0,.1,.1,.075,.1,.1,0,0,.01,.01];
-%     for iii=15:28
-%         t1tmp=T1v(iii,:);
-%         t1tmp(t1tmp<t1manexclude(iii-14))=nan;
-%         T1v(iii,:)=t1tmp;
-% %         T1v(T1v<t1manexclude(iii-14))=nan;
-%     end
-% %     T1v(T1v<.1)=nan;
-% end
-% M0v_2=M0v; T1v_2=T1v; T2v_2=T2v; %signuin2=nanvar(M5v(15:end,:),[],2)';
+if t1correction~=0
+    t1manexclude=[0,0,0,0,0,.1,.1,.075,.1,.1,0,0,.01,.01];
+    for iii=15:28
+        t1tmp=T1v(iii,:);
+        t1tmp(t1tmp<t1manexclude(iii-14))=nan;
+        T1v(iii,:)=t1tmp;
+%         T1v(T1v<t1manexclude(iii-14))=nan;
+    end
+%     T1v(T1v<.1)=nan;
+end
+M0v_2=M0v; T1v_2=T1v; T2v_2=T2v; %signuin2=nanvar(M5v(15:end,:),[],2)';
 
 load /rsrch1/ip/dmitchell2/github/SyntheticMR/Code/phantomProp.mat;
 M0=nanmedian(M0v(15:end,:),2)';
@@ -203,45 +204,45 @@ switch MIcalcflag
         
         subplot(1,3,2); hold on;
         plot(T1MI1(17:28),nanstd(T1v_1(17:28,:),[],2),'o');
-        xlabel('Mutual Information'); ylabel('T1 Standard Deviation');
+        xlabel('Mutual Information'); ylabel('T1 Standard Deviation (s)');
         % yyaxis right;
         plot(T1MI2(17:28),nanstd(T1v_2(17:28,:),[],2),'x');
-        xlabel('Mutual Information'); ylabel('T1 Standard Deviation');
+        xlabel('Mutual Information'); ylabel('T1 Standard Deviation (s)');
         legend('Scan 1','Scan 2');
         
         subplot(1,3,3); hold on;
         plot(T2MI1(31:42),nanstd(T2v_1(31:42,:),[],2),'o');
-        xlabel('Mutual Information'); ylabel('T2 Standard Deviation');
+        xlabel('Mutual Information'); ylabel('T2 Standard Deviation (s)');
         % yyaxis right;
         plot(T2MI2(31:42),nanstd(T2v_2(31:42,:),[],2),'x');
-        xlabel('Mutual Information'); ylabel('T2 Standard Deviation');
+        xlabel('Mutual Information'); ylabel('T2 Standard Deviation (s)');
         legend('Scan 1','Scan 2');
         
         saveas(gcf,'Figures/mivarresultspart','jpg');
         
         figure('pos',[10,10,1810,610]);
         subplot(1,3,1); hold on;
-        plot(M0MI1([3:14,17:28,31:42]),nanstd(M0v_1([3:14,17:28,31:42],:),[],2),'o');
+        plot(M0MI1([3:14,17:28,31:42]),nanstd(M0v_1([3:14,17:28,31:42],:),[],2),'bo');
         % yyaxis right;
-        plot(M0MI2([3:14,17:28,31:42]),nanstd(M0v_2([3:14,17:28,31:42],:),[],2),'x');
-        xlabel('Mutual Information'); ylabel('M0 Standard Deviation');
-        legend('Scan 1','Scan 2');
+        plot(M0MI2([3:14,17:28,31:42]),nanstd(M0v_2([3:14,17:28,31:42],:),[],2),'rx');
+        xlabel('Mutual Information'); ylabel('M0 Standard Deviation'); title('M0');
+%         legend('Scan 1','Scan 2');
         
         subplot(1,3,2); hold on;
-        plot(T1MI1([3:14,17:28,31:42]),nanstd(T1v_1([3:14,17:28,31:42],:),[],2),'o');
-        xlabel('Mutual Information'); ylabel('T1 Standard Deviation');
+        plot(T1MI1([3:14,17:28,31:42]),nanstd(T1v_1([3:14,17:28,31:42],:),[],2),'bo');
+        xlabel('Mutual Information'); ylabel('T1 Standard Deviation (s)');
         % yyaxis right;
-        plot(T1MI2([3:14,17:28,31:42]),nanstd(T1v_2([3:14,17:28,31:42],:),[],2),'x');
-        xlabel('Mutual Information'); ylabel('T1 Standard Deviation');
-        legend('Scan 1','Scan 2');
+        plot(T1MI2([3:14,17:28,31:42]),nanstd(T1v_2([3:14,17:28,31:42],:),[],2),'rx');
+        xlabel('Mutual Information'); ylabel('T1 Standard Deviation (s)'); title('T1');
+%         legend('Scan 1','Scan 2');
         
         subplot(1,3,3); hold on;
-        plot(T2MI1([3:14,17:28,31:42]),nanstd(T2v_1([3:14,17:28,31:42],:),[],2),'o');
-        xlabel('Mutual Information'); ylabel('T2 Standard Deviation');
+        plot(T2MI1([3:14,17:28,31:42]),nanstd(T2v_1([3:14,17:28,31:42],:),[],2),'bo');
+        xlabel('Mutual Information'); ylabel('T2 Standard Deviation (s)'); title('T2');
         % yyaxis right;
-        plot(T2MI2([3:14,17:28,31:42]),nanstd(T2v_2([3:14,17:28,31:42],:),[],2),'x');
+        plot(T2MI2([3:14,17:28,31:42]),nanstd(T2v_2([3:14,17:28,31:42],:),[],2),'rx');
         axis([382,390,0,1]);
-        xlabel('Mutual Information'); ylabel('T2 Standard Deviation');
+        xlabel('Mutual Information'); ylabel('T2 Standard Deviation (s)');
         legend('Scan 1','Scan 2');
 
         saveas(gcf,'Figures/mivarresultsfull','jpg');
