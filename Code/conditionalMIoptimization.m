@@ -73,12 +73,14 @@ end
 %% Calculate Conditional MI on Low Res Patient Image
 delayit=0:.02:1;
 for iii=1:10
+    patientmatID_hires=syntheticPatientPop{iii,1}(15:165,20:200,92);
     patientmatID_lores=syntheticPatientPop{iii,2}(4:42,5:50,23);
     patient_tisinput=syntheticPatientPop{iii,3};
     for jjj=1:51
     iii
     jjj
         pinit=delayit(jjj)*ones([1,4]);
-        mi(iii,jjj)=conditionalMI_objfun(pinit,pspacelabels,subsmpllabels,patient_tisinput,acqparam,patientmatID_lores);
+%         [mi(iii,jjj),Ezr(:,:,iii,jjj),Sigrr(:,:,iii,jjj)]
+        [mi(iii,jjj)]=conditionalMI_objfun(pinit,pspacelabels,subsmpllabels,patient_tisinput,acqparam,patientmatID_lores,patientmatID_hires,filename);
     end
 end
