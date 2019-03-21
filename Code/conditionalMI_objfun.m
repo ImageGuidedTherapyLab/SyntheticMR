@@ -102,7 +102,7 @@ else
 end
 
 %% Reconstruct to Compute Variances
-reconflag=1;
+reconflag=0;
 if reconflag~=0
     
     %% Create synthetic data

@@ -29,3 +29,31 @@ p
 for iii=1:9
 [h(iii),p(iii)]=vartestn(post_samples{5,1}(:,iii),post_samples{5,2}(:,iii));
 end
+
+
+for iii=[1,3,5,7]
+    for jjj=1:2
+        psstd1(:,iii,jjj)=std(post_samples{iii,jjj},[],1);
+    end
+end
+psstd1(:,2:2:end,:)=[];
+relstdshift1=(psstd1(:,:,1)-psstd1(:,:,2))./psstd1(:,:,2);
+savestd1=relstdshift1(1:9,:)';
+
+
+
+load conditionalMIresults2.mat;
+
+
+for iii=1:10
+    for jjj=1:2
+        psstd(:,iii,jjj)=std(post_samples{iii,jjj},[],1);
+    end
+end
+relstdshift=(psstd(:,:,1)-psstd(:,:,2))./psstd(:,:,2);
+savestd=[relstdshift(1:9,:)',TDin];
+
+
+
+
+

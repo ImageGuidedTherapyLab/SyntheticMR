@@ -2,7 +2,7 @@
 % MI-based optimization of parameter space using fminsearch
 % MI calculated by Gauss-Hermite quadrature
 
-function [MIobjfun]=MI_objfun_ernst(flipAngle,tisinput,acqparam)
+function [MIobjfun,Ezr,Sigrr,detSigz]=MI_objfun_ernst(flipAngle,tisinput,acqparam)
 
 %% Assign Acquisition Parameters
 % Default Parameters
@@ -47,14 +47,14 @@ N=length(xn);
 % std of noise in patient raw data = 17.8574; max signal approx 3000;
 signu=3.4762E-4;
 
-detSigz=(pi^(-N/2)*signu^2 + Sigrr - Ezr.^2).*(pi^(-N/2)*signu^2 + Sigii - Ezi.^2) - (Sigri - Ezr.*Ezi).^2;
+% detSigz=(pi^(-N/2)*signu^2 + Sigrr - Ezr.^2).*(pi^(-N/2)*signu^2 + Sigii - Ezi.^2) - (Sigri - Ezr.*Ezi).^2;
+detSigz=Sigrr;
 Hz=0.5.*log((2*pi*2.7183)^2.*detSigz);
 Hzmu=0.5.*log((2*pi*2.7183)^2.*signu.^4);
 MI=Hz-Hzmu;
 
 % szmi=size(MI);
 MIobjfun=-sum(MI(:));
-MIobjfun
 end
 
 function S = spoiledgre(K,H,flipAngle,TR,TE,T1,T2star)
