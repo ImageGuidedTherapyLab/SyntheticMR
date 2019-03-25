@@ -73,3 +73,10 @@ figure; contourf(TR,T1,100*(popt-ernst_angle)./ernst_angle,15); cbar=colorbar;
 ylabel(cbar,'Relative Error (%)');
 xlabel('TR (s)'); ylabel('T1 (s)'); title('Relative Error');
 saveas(gcf,'Figures/err_ernstangles','png');
+
+figure; plot(ernst_angle(:),popt(:),'r.');
+
+figure; histogram(ernst_angle(:)-popt(:));
+
+figure; plot((ernst_angle(:)+popt(:))/2,-ernst_angle(:)+popt(:),'r.');
+axis([0,70,-3,3]);
