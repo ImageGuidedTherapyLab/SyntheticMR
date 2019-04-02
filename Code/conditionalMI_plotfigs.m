@@ -3,6 +3,8 @@
 
 %% Processing Flags
 nind=[3:14,17:28,31:42];
+nind2=nind;
+nind2(20:24)=[];
 gibbs_exclude=0;
 t1correction=1;
 t1correctionfull=1;
@@ -54,6 +56,10 @@ T1predlr_1=T1predlr; T1vlr_1=T1vlr; T2predlr_1=T2predlr; T2vlr_1=T2vlr;
 M0stdlr_1=cellfun(@nanstd,M0vlr_1);
 T1stdlr_1=cellfun(@nanstd,T1vlr_1);
 T2stdlr_1=cellfun(@nanstd,T2vlr_1);
+% M0Hlr_1=log((2*pi*exp(1)).^(12/2)*M0stdlr_1);
+% T1Hlr_1=log((2*pi*exp(1)).^(12/2)*T1stdlr_1);
+% T2Hlr_1=log((2*pi*exp(1)).^(12/2)*T2stdlr_1);
+
 M0Hlr_1=log(sqrt(2*pi*exp(1))*M0stdlr_1);
 T1Hlr_1=log(sqrt(2*pi*exp(1))*T1stdlr_1);
 T2Hlr_1=log(sqrt(2*pi*exp(1))*T2stdlr_1);
@@ -103,6 +109,10 @@ T1predlr_2=T1predlr; T1vlr_2=T1vlr; T2predlr_2=T2predlr; T2vlr_2=T2vlr;
 M0stdlr_2=cellfun(@nanstd,M0vlr_2);
 T1stdlr_2=cellfun(@nanstd,T1vlr_2);
 T2stdlr_2=cellfun(@nanstd,T2vlr_2);
+% M0Hlr_2=log((2*pi*exp(1)).^(12/2)*M0stdlr_2);
+% T1Hlr_2=log((2*pi*exp(1)).^(12/2)*T1stdlr_2);
+% T2Hlr_2=log((2*pi*exp(1)).^(12/2)*T2stdlr_2);
+
 M0Hlr_2=log(sqrt(2*pi*exp(1))*M0stdlr_2);
 T1Hlr_2=log(sqrt(2*pi*exp(1))*T1stdlr_2);
 T2Hlr_2=log(sqrt(2*pi*exp(1))*T2stdlr_2);
@@ -166,18 +176,178 @@ end
 %% Plot Figures
 
 
-figure; plot(T1MI1(nind),T1std_1(nind),'bo');
-hold on; plot(T1MI1(nind),T1stdlr_1(nind),'rx');
+% figure; plot(T1MI1(nind),T1std_1(nind),'bo');
+% hold on; plot(T1MI1(nind),T1stdlr_1(nind),'rx');
+% 
+% figure; plot(T1MI1(nind),T1stdlr_1(nind)-T1std_1(nind)','bo');
+% figure; plot(T1MI2(nind),T1stdlr_2(nind)-T1std_2(nind)','bo');
+% 
+% figure; plot(M0MI1(nind),M0stdlr_1(nind)-M0std_1(nind)','bo');
+% figure; plot(T2MI1(nind),T2stdlr_1(nind)-T2std_1(nind)','bo');
 
-figure; plot(T1MI1(nind),T1stdlr_1(nind)-T1std_1(nind)','bo');
+% figure; plot(T1MI1(nind),T1H1(nind),'bo')
+% hold on; plot(T1MI1(nind),T1Hlr_1(nind),'rx');
+% legend('High Res','Low Res');
+% 
+% figure; plot(T1MI1(nind),T1std_1(nind),'bo')
+% hold on; plot(T1MI1(nind),T1stdlr_1(nind),'rx');
+% legend('High Res','Low Res');
 
-figure; plot(M0MI1(nind),M0stdlr_1(nind)-M0std_1(nind)','bo');
-figure; plot(T2MI1(nind),T2stdlr_1(nind)-T2std_1(nind)','bo');
+% figure; plot(T1MI1(nind),T1H1(nind)-T1Hlr_1(nind),'bo');
+
+% Conditional MI
+Hzmulr=0.5.*(5+length(T1vlr_1{1})).*log(2*pi*2.7183*(0.05*M0(3)*T1(3)*T2(3)));
+
+% figure;
+% plot(Hzmulr-M0Hlr_1(nind)-M0H1(nind),M0std_1(nind),'bo');
+% % hold on;
+% % plot(Hzmulr-M0Hlr_2(nind)-M0H2(nind),M0std_2(nind),'rx');
+% xlabel('Conditional Mutual Information'); ylabel('M0 Standard Deviation');
+% 
+% figure;
+% plot(Hzmulr-T1Hlr_1(nind)-T1H1(nind),T1std_1(nind),'bo');
+% % hold on;
+% % plot(Hzmulr-T1Hlr_2(nind)-T1H2(nind),T1std_2(nind),'rx');
+% xlabel('Conditional Mutual Information'); ylabel('T1 Standard Deviation (s)');
+% 
+% figure;
+% plot(Hzmulr-T2Hlr_1(nind)-T2H1(nind),T2std_1(nind),'bo');
+% % hold on;
+% % plot(Hzmulr-T2Hlr_2(nind)-T1H2(nind),T2std_2(nind),'rx');
+% xlabel('Conditional Mutual Information'); ylabel('T2 Standard Deviation (s)');
 
 
+figure;
+plot(Hzmulr+T1Hlr_1(nind2(1))-T1H1(nind2),T1std_1(nind2)-T1stdlr_1(nind2(1)),'bo');
+xlabel('Conditional Mutual Information'); ylabel('Delta T1 Std. Dev.');
+title('Prediction from Element 3 Properties');
+saveas(gcf,'Figures/Pred_el3','png');
 
-figure; plot(T1MI1(nind),T1H1(nind),'bo')
-hold on; plot(T1MI1(nind),T1Hlr_1(nind),'rx');
-legend('High Res','Low Res');
+figure;
+plot(Hzmulr+T1Hlr_1(nind2(11))-T1H1(nind2),T1std_1(nind2)-T1stdlr_1(nind2(11)),'bo');
+xlabel('Conditional Mutual Information'); ylabel('Delta T1 Std. Dev.');
+title('Prediction from Element 13 Properties');
+saveas(gcf,'Figures/Pred_el13','png');
+
+figure;
+plot(Hzmulr+T1Hlr_1(nind2(21))-T1H1(nind2),T1std_1(nind2)-T1stdlr_1(nind2(21)),'bo');
+xlabel('Conditional Mutual Information'); ylabel('Delta T1 Std. Dev.');
+title('Prediction from Element 10 Properties');
+saveas(gcf,'Figures/Pred_el10','png');
 
 
+figure; hold on;
+[~,sortind]=sort(M0std_1(nind2));
+for iii=1:length(nind2)
+    plot(Hzmulr+M0Hlr_1(nind2(iii))-M0H1(nind2(sortind)),M0std_1(nind2(sortind))-M0stdlr_1(nind2(iii)),'-o');
+end
+xlabel('Conditional Mutual Information'); ylabel('Delta M0 Std. Dev.');
+title('Prediction between Elements');
+saveas(gcf,'Figures/Pred_els_M0_lines','png');
+figure; hold on;
+[~,sortind]=sort(M0std_1(nind2));
+for iii=1:length(nind2)
+    plot(Hzmulr+M0Hlr_1(nind2(iii))-M0H1(nind2(sortind)),M0std_1(nind2(sortind))-M0stdlr_1(nind2(iii)),'bo');
+end
+xlabel('Conditional Mutual Information'); ylabel('Delta M0 Std. Dev.');
+title('Prediction between Elements');
+saveas(gcf,'Figures/Pred_els_M0','png');
+
+figure; hold on;
+[~,sortind]=sort(T1std_1(nind2));
+for iii=1:length(nind2)
+    plot(Hzmulr+T1Hlr_1(nind2(iii))-T1H1(nind2(sortind)),T1std_1(nind2(sortind))-T1stdlr_1(nind2(iii)),'-o');
+end
+xlabel('Conditional Mutual Information'); ylabel('Delta T1 Std. Dev.');
+title('Prediction between Elements');
+saveas(gcf,'Figures/Pred_els_T1_lines','png');
+figure; hold on;
+[~,sortind]=sort(T1std_1(nind2));
+for iii=1:length(nind2)
+    plot(Hzmulr+T1Hlr_1(nind2(iii))-T1H1(nind2(sortind)),T1std_1(nind2(sortind))-T1stdlr_1(nind2(iii)),'bo');
+end
+xlabel('Conditional Mutual Information'); ylabel('Delta T1 Std. Dev.');
+title('Prediction between Elements');
+saveas(gcf,'Figures/Pred_els_T1','png');
+
+figure; hold on;
+[~,sortind]=sort(T2std_1(nind2));
+for iii=1:length(nind2)
+    plot(Hzmulr+T2Hlr_1(nind2(iii))-T2H1(nind2(sortind(1:end-2))),T2std_1(nind2(sortind(1:end-2)))-T2stdlr_1(nind2(iii)),'-o');
+end
+xlabel('Conditional Mutual Information'); ylabel('Delta T2 Std. Dev.');
+title('Prediction between Elements');
+saveas(gcf,'Figures/Pred_els_T2_lines','png');
+figure; hold on;
+[~,sortind]=sort(T2std_1(nind2));
+for iii=1:length(nind2)
+    plot(Hzmulr+T2Hlr_1(nind2(iii))-T2H1(nind2(sortind(1:end-2))),T2std_1(nind2(sortind(1:end-2)))-T2stdlr_1(nind2(iii)),'bo');
+end
+xlabel('Conditional Mutual Information'); ylabel('Delta T2 Std. Dev.');
+title('Prediction between Elements');
+saveas(gcf,'Figures/Pred_els_T2','png');
+
+
+figure; hold on;
+plot(Hzmulr+M0Hlr_1(nind2)-M0H2(nind2),M0std_2(nind2)'-M0stdlr_1(nind2),'bo');
+lsline;
+xlabel('Conditional Mutual Information'); ylabel('Delta M0 Std. Dev.');
+title('Prediction of Scan 1 High Res.');
+saveas(gcf,'Figures/Pred_scan1_M0','png');
+
+figure; hold on;
+plot(Hzmulr+M0Hlr_2(nind)-M0H1(nind),M0std_1(nind)'-M0stdlr_2(nind),'bo');
+lsline;
+xlabel('Conditional Mutual Information'); ylabel('Delta M0 Std. Dev.');
+title('Prediction of Scan 2 High Res.');
+saveas(gcf,'Figures/Pred_scan2_M0','png');
+
+% figure; hold on;
+% plot(Hzmulr+T1Hlr_1(nind)-T1H2(nind),T1std_2(nind)'-T1stdlr_1(nind),'bo');
+% lsline;
+% xlabel('Conditional Mutual Information'); ylabel('Delta T1 Std. Dev. (s)');
+% title('Prediction of Scan 1 High Res.');
+
+figure; hold on;
+plot(Hzmulr+T1Hlr_1(nind([1:19,25:36]))-T1H2(nind([1:19,25:36])),T1std_2(nind([1:19,25:36]))'-T1stdlr_1(nind([1:19,25:36])),'bo');
+lsline;
+xlabel('Conditional Mutual Information'); ylabel('Delta T1 Std. Dev. (s)');
+title('Prediction of Scan 1 High Res.');
+saveas(gcf,'Figures/Pred_scan1_T1','png');
+
+figure; hold on;
+[~,sortind]=sort(Hzmulr+T1Hlr_2(nind)-T1H1(nind));
+plot(Hzmulr+T1Hlr_2(nind([1:19,25:36]))-T1H1(nind([1:19,25:36])),T1std_1(nind([1:19,25:36]))'-T1stdlr_2(nind([1:19,25:36])),'bo');
+lsline;
+xlabel('Conditional Mutual Information'); ylabel('Delta T1 Std. Dev. (s)');
+title('Prediction of Scan 2 High Res.');
+saveas(gcf,'Figures/Pred_scan2_T1','png');
+
+figure; hold on;
+plot(Hzmulr+T2Hlr_1(nind(3:end))-T2H2(nind(3:end)),T2std_2(nind(3:end))'-T2stdlr_1(nind(3:end)),'bo');
+lsline;
+xlabel('Conditional Mutual Information'); ylabel('Delta T2 Std. Dev. (s)');
+title('Prediction of Scan 1 High Res.');
+saveas(gcf,'Figures/Pred_scan1_T2','png');
+
+figure; hold on;
+plot(Hzmulr+T2Hlr_2(nind(3:end))-T2H1(nind(3:end)),T2std_1(nind(3:end))'-T2stdlr_2(nind(3:end)),'bo');
+lsline;
+xlabel('Conditional Mutual Information'); ylabel('Delta T2 Std. Dev. (s)');
+title('Prediction of Scan 2 High Res.');
+saveas(gcf,'Figures/Pred_scan2_T2','png');
+
+%% Synthetic Patient Population Images
+load('/rsrch1/ip/dmitchell2/github/SyntheticMR/Code/syntheticPatientPopulation.mat');
+figure('pos',[10,10,1810,1210]);
+for iii=1:10
+    subplot(2,5,iii); imagesc(syntheticPatientPop{iii,1}(:,:,92)); axis off;
+    title(sprintf('Model %i',iii));
+end
+saveas(gcf,'Figures/synthPatientPop_hires','png');
+figure('pos',[10,10,1810,1210]);
+for iii=1:10
+    subplot(2,5,iii); imagesc(syntheticPatientPop{iii,2}(:,:,23)); axis off;
+    title(sprintf('Model %i',iii));
+end
+saveas(gcf,'Figures/synthPatientPop_lores','png');
