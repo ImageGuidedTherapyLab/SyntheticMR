@@ -351,3 +351,47 @@ for iii=1:10
     title(sprintf('Model %i',iii));
 end
 saveas(gcf,'Figures/synthPatientPop_lores','png');
+
+%% Phantom Images
+scanArchivePath='/home/dmitchell412/QALASData/ScanArchive_713792AMR16_20180808_141752849';
+load([scanArchivePath,'.mat'],'realimg','bartrecon');
+
+% for iii=1:5
+%     tmpnii=load_untouch_nii([scanArchivePath,'_realimg.nii']);
+%     tmpnii.img=realimg(:,:,:,iii);
+%     save_untouch_nii(tmpnii,'tmpnii.nii.gz');
+%     system(sprintf('/opt/apps/itksnap/c3d-1.1.0-Linux-x86_64/bin/c3d %s -interpolation NearestNeighbor -resample 50x50x50 -o resampleimg.nii.gz','tmpnii.nii.gz'));
+%     tmprealimg = load_untouch_nii('resampleimg.nii.gz');
+%     system('rm resampleimg.nii.gz');
+%     system('rm tmpnii.nii.gz');
+%     realimg_lores(:,:,:,iii) = tmprealimg.img;
+% end
+
+
+tmpim=fftshift(fftn(bartrecon(:,:,:,1)));
+tmplo=zeros(size(tmpim));
+tmplo(87:137,71:121,75:125)=tmpim(87:137,71:121,75:125);
+tmplo=fftn(tmplo);
+
+magnimg=abs(tmplo);
+phaseimg=angle(bartrecon);
+phasecorr=phaseimg-repmat(phaseimg(:,:,:,5),[1,1,1,5]);
+realimg_lores=magnimg.*cos(phasecorr);
+imagimg_lores=magnimg.*sin(phasecorr);
+
+
+% tmpim=fftshift(fftn(realimg(:,:,:,1)));
+% tmplo=zeros(size(tmpim));
+% % kc=[size(tmplo)./2-25;size(tmplo)./2+25]';
+% tmplo(87:137,71:121,75:125)=tmpim(87:137,71:121,75:125);
+% tmplo=fftn(tmplo);
+
+% figure;imagesc(realimg_lores(:,:,32,1)); axis off; colormap hot;
+figure;imagesc(realimg(:,:,120,1)); axis off; colormap hot; caxis([-.5,2]);
+saveas(gcf,'Figures/nistphantom_hires','png');
+
+figure;imagesc(4.*realimg_lores(end:-1:1,end:-1:1,80)./max(realimg_lores(:))); axis off; colormap hot; caxis([-.5,2]);
+saveas(gcf,'Figures/nistphantom_lores','png');
+
+% scanArchivePath='/home/dmitchell412/QALASData/ScanArchive_713792AMR16_20180808_144530716';
+% load([scanArchivePath,'.mat'],'realimg');

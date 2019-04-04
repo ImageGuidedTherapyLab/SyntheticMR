@@ -4,11 +4,37 @@ size(mi)
 delayit=0:.02:1;
 maxpoints=[delayit(i)',y];
 
+figure;hold on;
 for iii=1:10
-plot(delayit,-mi(iii,:));
+plot(delayit,-mi(iii,:),'LineWidth',1.5);
 end
-plot(maxpoints(:,1),maxpoints(:,2),'rx');
+plot(maxpoints(:,1),maxpoints(:,2),'rx','LineWidth',3.5);
 legend('1','2','3','4','5','6','7','8','9','10');
+
+figure; hold on;
+for iii=1:10
+    plot(delayit,-mi(iii,:)+mi(iii,26),'LineWidth',1.25);
+end
+[y,i]=max(-mi+repmat(mi(:,26),[1,51]),[],2);
+delayit=0:.02:1;
+maxpoints=[delayit(i)',y];
+plot(maxpoints(:,1),maxpoints(:,2),'rx','LineWidth',3.5);
+legend('1','2','3','4','5','6','7','8','9','10','Optimum');
+xlabel('Delay Times (s)'); ylabel('Conditional Mutual Information');
+saveas(gcf,'Figures/cmi_glob_10pat','png');
+
+figure; hold on;
+for iii=1:10
+    plot(delayit,-mi(iii,:)+mi(iii,26),'LineWidth',1.25);
+end
+[y,i]=max(-mi+repmat(mi(:,26),[1,51]),[],2);
+delayit=0:.02:1;
+maxpoints=[delayit(i)',y];
+plot(maxpoints(:,1),maxpoints(:,2),'rx','LineWidth',3.5);
+legend('1','2','3','4','5','6','7','8','9','10','Optimum');
+axis([0,1,-500,500]);
+xlabel('Delay Times (s)'); ylabel('Conditional Mutual Information');
+saveas(gcf,'Figures/cmi_glob_10pat_zoom','png');
 
 load cmivartestresultswithftest.mat;
 ps31=std(post_samples{3,1}(:,1:9));
