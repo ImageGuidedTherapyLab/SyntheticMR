@@ -12,7 +12,7 @@ evalind=find(~isnan(Mmeasvec(:,1)));
 neval=length(evalind);
 Mmeasvec=Mmeasvec(evalind,:);
 parfor iii=1:neval
-    [M0eval(iii),T1eval(iii),T2eval(iii),objeval(iii),M(iii,:)]=qalas1pfit(Mmeasvec(iii,:),TR,TE_T2prep,flipAngle,nacq,dt);
+    [M0eval(iii),T1eval(iii),T2eval(iii),objeval(iii),M(iii,:)]=qalas1pfitlocal(Mmeasvec(iii,:),TR,TE_T2prep,flipAngle,nacq,dt);
 end
 M0predvec=zeros([prod(smeas(1:imgdim)),1]);
 T1predvec=zeros([prod(smeas(1:imgdim)),1]);
@@ -41,7 +41,7 @@ end
 end
 
 
-function[M0,T1,T2,objval,M]=qalas1pfit(Mmeas1p,TR,TE_T2prep,flipAngle,nacq,dt)
+function[M0,T1,T2,objval,M]=qalas1pfitlocal(Mmeas1p,TR,TE_T2prep,flipAngle,nacq,dt)
 
 maxmeas=max(abs(Mmeas1p(2:end)));
 mpass=Mmeas1p(2:end)/maxmeas;
@@ -49,19 +49,19 @@ mpass=Mmeas1p(2:end)/maxmeas;
 xinit=[mpass(1),max(abs(mpass)),.5]; %(dt(6)-dt(end-4))/log((mpass(sortind(1))-mpass(sortind(2)))/(mpass(sortind(1))-mpass(1)))];
 % if isempty(xinit); xinit=[0,1,1]; end;
 % options=optimoptions('fmincon','MaxIterations',30000,'MaxFunctionEvaluations',30000);
-[xm,objval]=fmincon(@(x) qalasobjfunflex(x,mpass',TR,flipAngle,nacq,dt),xinit,[],[],[],[],[-5.,0.,0.],[0.,5.,4.],[]);%,options);
+[xm,objval]=fmincon(@(x) qalasobjfunflexlocal(x,mpass',TR,flipAngle,nacq,dt),xinit,[],[],[],[],[-5.,0.,0.],[0.,5.,4.],[]);%,options);
 M0=xm(2)*maxmeas;
 T1=xm(3);
 % Mend=M0-(M0-Mmeas1p(end)).*exp(-dt(end)./T1);
 % T2=-TE_T2prep./log(Mmeas1p(1)./Mend);
 
-M=qalasflex(xm(1)*maxmeas,M0,T1,TR,flipAngle,nacq,dt);
+M=qalasflexlocal(xm(1)*maxmeas,M0,T1,TR,flipAngle,nacq,dt);
 T2=-TE_T2prep./log(Mmeas1p(1)./M(end));
 
 end
 
 
-function[objfun]=qalasobjfunflex(input,Mmeas,TR,flipAngle,nacq,dt)
+function[objfun]=qalasobjfunflexlocal(input,Mmeas,TR,flipAngle,nacq,dt)
 
 Mflex=input(1);
 M0=input(2);
@@ -85,7 +85,7 @@ objfun=norm(Mopt-Mmeas);
 end
 
 
-function[M]=qalasflex(M5,M0,T1,TR,flipAngle,nacq,dt)
+function[M]=qalasflexlocal(M5,M0,T1,TR,flipAngle,nacq,dt)
 
 star=(1-exp(-TR./T1))./(1-cosd(flipAngle).*exp(-TR./T1));
 

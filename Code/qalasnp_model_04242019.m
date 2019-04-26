@@ -1,4 +1,4 @@
-function Mmeas = qalasnp_model(x, parnames, parvals)
+function Mmeas = qalasnp_model_04242019(x, parnames, parvals)
 
 % y = line_model(x, parnames, parvals)
 %
@@ -34,6 +34,7 @@ nparams = lpn;
 % %     eval(sprintf('T1_%i=parvals{ii};',ii));
 % %     eval(sprintf('T2_%i=parvals{ii};',ii));
 % end
+
 for ii=1:nparams
     switch parnames{ii}
         case 'M0_GM'
@@ -64,11 +65,12 @@ for ii=1:nparams
             nacq = parvals{ii};
         case 'dt'
             dt = parvals{ii};
+        case 'materialID'
+            materialID = parvals{ii};
     end
 end
 
-for tisind=1:3
-    switch tisind
+    switch materialID
         case 1
             M0=M0_GM; T1=T1_GM; T2=T2_GM;
         case 2
@@ -113,16 +115,16 @@ for tisind=1:3
         if norm(M(1,:)-M(end,:))<=0.0001; break; end;
     end
     % Mmeas=reshape(Mmeas,[5,szm]);
-    switch tisind
-        case 1
-            Mmeas_GM=Mmeas(:);
-        case 2
-            Mmeas_WM=Mmeas(:);
-        case 3
-            Mmeas_CSF=Mmeas(:);
-    end    
-end
+%     switch tisind
+%         case 1
+%             Mmeas_GM=Mmeas(:);
+%         case 2
+%             Mmeas_WM=Mmeas(:);
+%         case 3
+%             Mmeas_CSF=Mmeas(:);
+%     end    
 
-Mmeas=[Mmeas_GM,Mmeas_WM,Mmeas_CSF];
+
+% Mmeas=[Mmeas_GM,Mmeas_WM,Mmeas_CSF];
 
 return

@@ -60,6 +60,10 @@ ylabel('Mutual Information');
 legend('Signal Model SNR','Information Model MI','location','east');
 saveas(gcf,'Figures/mi_globsrch_ernstangles','png');
 
+figure; plot(svalue/.05,-MIobjfun,'LineWidth',2);
+xlabel('SNR'); ylabel('Mutual Information');
+saveas(gcf,'Figures/mi_globsrch_corr','png');
+
 figure; contourf(TR,T1,popt,15); cbar=colorbar;
 ylabel(cbar,'Flip Angle (^\circ)');
 xlabel('TR (s)'); ylabel('T1 (s)'); %title('Mutual Information-Optimized Flip Angle');

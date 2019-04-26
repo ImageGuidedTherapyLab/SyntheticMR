@@ -217,87 +217,173 @@ Hzmulr=0.5.*(5+length(T1vlr_1{1})).*log(2*pi*2.7183*(0.05*M0(3)*T1(3)*T2(3)));
 % xlabel('Conditional Mutual Information'); ylabel('T2 Standard Deviation (s)');
 
 
-figure;
+figure; hold on;
+x=Hzmulr+T1Hlr_1(nind2(1))-T1H1(nind2);
+y=T1std_1(nind2)-T1stdlr_1(nind2(1));
 plot(Hzmulr+T1Hlr_1(nind2(1))-T1H1(nind2),T1std_1(nind2)-T1stdlr_1(nind2(1)),'bo');
 xlabel('Conditional Mutual Information'); ylabel('Delta T1 Std. Dev.');
 % title('Prediction from Element 3 Properties');
+[lfit,gof]=robustfit(x',y');
+% coef=coeffvalues(lfit)l;
+xl=xlim;
+plot(xl,lfit(2)*xl+lfit(1),'color','black');
+text(0,-0.03,sprintf('y=%fx+%f\nr^2=%f\nRMSE=%f',lfit(2),lfit(1),gof.coeffcorr(2)^2,gof.s));
 saveas(gcf,'Figures/Pred_el3','png');
 
-figure;
+figure; hold on;
+x=Hzmulr+T1Hlr_1(nind2(11))-T1H1(nind2);
+y=T1std_1(nind2)-T1stdlr_1(nind2(11));
 plot(Hzmulr+T1Hlr_1(nind2(11))-T1H1(nind2),T1std_1(nind2)-T1stdlr_1(nind2(11)),'bo');
 xlabel('Conditional Mutual Information'); ylabel('Delta T1 Std. Dev.');
 % title('Prediction from Element 13 Properties');
+[lfit,gof]=robustfit(x',y');
+% coef=coeffvalues(lfit)l;
+xl=xlim;
+plot(xl,lfit(2)*xl+lfit(1),'color','black');
+text(0,-0.03,sprintf('y=%fx+%f\nr^2=%f\nRMSE=%f',lfit(2),lfit(1),gof.coeffcorr(2)^2,gof.s));
 saveas(gcf,'Figures/Pred_el13','png');
 
-figure;
+figure; hold on;
+x=Hzmulr+T1Hlr_1(nind2(21))-T1H1(nind2);
+y=T1std_1(nind2)-T1stdlr_1(nind2(21));
 plot(Hzmulr+T1Hlr_1(nind2(21))-T1H1(nind2),T1std_1(nind2)-T1stdlr_1(nind2(21)),'bo');
+f=@(b,x) b(1).*exp(b(2).*x)+b(3);
+[B,R,J,COVB,MSE]=nlinfit(x',y,@(b,x) b(1).*exp(b(2).*x)+b(3),[1;-1;0]);
+[~,fitsortind]=sort(x);
+plot(x(fitsortind),B(1).*exp(B(2).*x(fitsortind))+B(3),'color','black');
+
+[lfit,gob]=fit(x',y,'exp1','StartPoint',[0,0.1]);
+plot(x,lfit(1)*exp(lfit(2)*x));
+[lfit,gof]=robustfit(x',y');
+% coef=coeffvalues(lfit);
+xl=xlim;
+plot(xl,lfit(2)*xl+lfit(1),'color','black');
+text(-0.7,-0.03,sprintf('y=%fx+%f\nr^2=%f\nRMSE=%f',lfit(2),lfit(1),gof.coeffcorr(2)^2,gof.s));
 xlabel('Conditional Mutual Information'); ylabel('Delta T1 Std. Dev.');
 % title('Prediction from Element 10 Properties');
 saveas(gcf,'Figures/Pred_el10','png');
 
-
-figure; hold on;
-[~,sortind]=sort(M0std_1(nind2));
-for iii=1:length(nind2)
-    plot(Hzmulr+M0Hlr_1(nind2(iii))-M0H1(nind2(sortind)),M0std_1(nind2(sortind))-M0stdlr_1(nind2(iii)),'-o');
-end
-xlabel('Conditional Mutual Information'); ylabel('Delta M0 Std. Dev.');
-% title('Prediction between Elements');
-saveas(gcf,'Figures/Pred_els_M0_lines','png');
+%%
+nind2=[6:10,20:23,34:39];
+% figure; hold on;
+% [~,sortind]=sort(M0std_1(nind2));
+% for iii=1:length(nind2)
+%     plot(Hzmulr+M0Hlr_1(nind2(iii))-M0H1(nind2(sortind)),M0std_1(nind2(sortind))-M0stdlr_1(nind2(iii)),'-o');
+% end
+% xlabel('Conditional Mutual Information'); ylabel('Delta M0 Std. Dev.');
+% % title('Prediction between Elements');
+% saveas(gcf,'Figures/Pred_els_M0_lines','png');
 figure; hold on;
 [~,sortind]=sort(M0std_1(nind2));
 for iii=1:length(nind2)
     plot(Hzmulr+M0Hlr_1(nind2(iii))-M0H1(nind2(sortind)),M0std_1(nind2(sortind))-M0stdlr_1(nind2(iii)),'bo');
 end
 xlabel('Conditional Mutual Information'); ylabel('Delta M0 Std. Dev.');
+
+x=[];y=[];
+for iii=1:length(nind2)
+    x=[x,Hzmulr+M0Hlr_1(nind2(iii))-M0H1(nind2(sortind))];
+    y=[y;M0std_1(nind2(sortind))-M0stdlr_1(nind2(iii))];
+end
+[lfit,gof]=robustfit(x',y);
+% coef=coeffvalues(lfit)l;
+xl=xlim;
+plot(xl,lfit(2)*xl+lfit(1),'color','black');
+text(-2.8,-0.15,sprintf('y=%fx+%f\nr^2=%f\nRMSE=%f',lfit(2),lfit(1),gof.coeffcorr(2)^2,gof.s));
+
 % title('Prediction between Elements');
 saveas(gcf,'Figures/Pred_els_M0','png');
 
-figure; hold on;
-[~,sortind]=sort(T1std_1(nind2));
-for iii=1:length(nind2)
-    plot(Hzmulr+T1Hlr_1(nind2(iii))-T1H1(nind2(sortind)),T1std_1(nind2(sortind))-T1stdlr_1(nind2(iii)),'-o');
-end
-xlabel('Conditional Mutual Information'); ylabel('Delta T1 Std. Dev.');
-% title('Prediction between Elements');
-saveas(gcf,'Figures/Pred_els_T1_lines','png');
+% figure; hold on;
+% [~,sortind]=sort(T1std_1(nind2));
+% x=[]; y=[];
+% for iii=1:length(nind2)
+%     plot(Hzmulr+T1Hlr_1(nind2(iii))-T1H1(nind2(sortind)),T1std_1(nind2(sortind))-T1stdlr_1(nind2(iii)),'-o');
+%     x=[x,Hzmulr+T1Hlr_1(nind2(iii))-T1H1(nind2(sortind))];
+%     y=[y;T1std_1(nind2(sortind))-T1stdlr_1(nind2(iii))];
+% end
+% xlabel('Conditional Mutual Information'); ylabel('Delta T1 Std. Dev.');
+% % title('Prediction between Elements');
+% saveas(gcf,'Figures/Pred_els_T1_lines','png');
 figure; hold on;
 [~,sortind]=sort(T1std_1(nind2));
 for iii=1:length(nind2)
     plot(Hzmulr+T1Hlr_1(nind2(iii))-T1H1(nind2(sortind)),T1std_1(nind2(sortind))-T1stdlr_1(nind2(iii)),'bo');
 end
 xlabel('Conditional Mutual Information'); ylabel('Delta T1 Std. Dev.');
+
+x=[];y=[];
+for iii=1:length(nind2)
+    x=[x,Hzmulr+T1Hlr_1(nind2(iii))-T1H1(nind2(sortind))];
+    y=[y;T1std_1(nind2(sortind))-T1stdlr_1(nind2(iii))];
+end
+[lfit,gof]=robustfit(x',y);
+% coef=coeffvalues(lfit)l;
+xl=xlim;
+plot(xl,lfit(2)*xl+lfit(1),'color','black');
+text(-2.8,-0.3,sprintf('y=%fx+%f\nr^2=%f\nRMSE=%f',lfit(2),lfit(1),gof.coeffcorr(2)^2,gof.s));
+
 % title('Prediction between Elements');
 saveas(gcf,'Figures/Pred_els_T1','png');
 
-figure; hold on;
-[~,sortind]=sort(T2std_1(nind2));
-for iii=1:length(nind2)
-    plot(Hzmulr+T2Hlr_1(nind2(iii))-T2H1(nind2(sortind(1:end-2))),T2std_1(nind2(sortind(1:end-2)))-T2stdlr_1(nind2(iii)),'-o');
-end
-xlabel('Conditional Mutual Information'); ylabel('Delta T2 Std. Dev.');
-% title('Prediction between Elements');
-saveas(gcf,'Figures/Pred_els_T2_lines','png');
+% figure; hold on;
+% [~,sortind]=sort(T2std_1(nind2));
+% for iii=1:length(nind2)
+%     plot(Hzmulr+T2Hlr_1(nind2(iii))-T2H1(nind2(sortind(1:end-2))),T2std_1(nind2(sortind(1:end-2)))-T2stdlr_1(nind2(iii)),'-o');
+% end
+% xlabel('Conditional Mutual Information'); ylabel('Delta T2 Std. Dev.');
+% % title('Prediction between Elements');
+% saveas(gcf,'Figures/Pred_els_T2_lines','png');
 figure; hold on;
 [~,sortind]=sort(T2std_1(nind2));
 for iii=1:length(nind2)
     plot(Hzmulr+T2Hlr_1(nind2(iii))-T2H1(nind2(sortind(1:end-2))),T2std_1(nind2(sortind(1:end-2)))-T2stdlr_1(nind2(iii)),'bo');
 end
 xlabel('Conditional Mutual Information'); ylabel('Delta T2 Std. Dev.');
+
+x=[];y=[];
+for iii=1:length(nind2)
+    x=[x,Hzmulr+T2Hlr_1(nind2(iii))-T2H1(nind2(sortind))];
+    y=[y;T2std_1(nind2(sortind))-T2stdlr_1(nind2(iii))];
+end
+[lfit,gof]=robustfit(x',y);
+% coef=coeffvalues(lfit)l;
+xl=xlim;
+plot(xl,lfit(2)*xl+lfit(1),'color','black');
+text(-3.5,-0.2,sprintf('y=%fx+%f\nr^2=%f\nRMSE=%f',lfit(2),lfit(1),gof.coeffcorr(2)^2,gof.s));
+
 % title('Prediction between Elements');
 saveas(gcf,'Figures/Pred_els_T2','png');
 
 
+%% Intra Scan STD
+
+x=Hzmulr+M0Hlr_1(nind2)-M0H2(nind2);
+y=M0std_2(nind2)'-M0stdlr_1(nind2);
+% [~,maxind]=max(y); x(maxind)=[]; y(maxind)=[];
+% [~,minind]=min(y); x(minind)=[]; y(minind)=[];
 figure; hold on;
 plot(Hzmulr+M0Hlr_1(nind2)-M0H2(nind2),M0std_2(nind2)'-M0stdlr_1(nind2),'bo');
-lsline;
+% h=lsline; set(h(1),'color','black');
+[lfit,gof]=robustfit(x',y');
+% coef=coeffvalues(lfit)l;
+xl=xlim;
+plot(xl,lfit(2)*xl+lfit(1),'color','black');
+text(-0.7,-0.03,sprintf('y=%fx+%f\nr^2=%f\nRMSE=%f',lfit(2),lfit(1),gof.coeffcorr(2)^2,gof.s));
 xlabel('Conditional Mutual Information'); ylabel('Delta M0 Std. Dev.');
 % title('Prediction of Scan 1 High Res.');
 saveas(gcf,'Figures/Pred_scan1_M0','png');
 
+x=Hzmulr+M0Hlr_2(nind)-M0H1(nind);
+y=M0std_1(nind)'-M0stdlr_2(nind);
 figure; hold on;
 plot(Hzmulr+M0Hlr_2(nind)-M0H1(nind),M0std_1(nind)'-M0stdlr_2(nind),'bo');
-lsline;
+% h=lsline; set(h(1),'color','black');
+[lfit,gof]=robustfit(x',y');
+% coef=coeffvalues(lfit)l;
+xl=xlim;
+plot(xl,lfit(2)*xl+lfit(1),'color','black');
+text(-0.5,-0.1,sprintf('y=%fx+%f\nr^2=%f\nRMSE=%f',lfit(2),lfit(1),gof.coeffcorr(2)^2,gof.s));
 xlabel('Conditional Mutual Information'); ylabel('Delta M0 Std. Dev.');
 % title('Prediction of Scan 2 High Res.');
 saveas(gcf,'Figures/Pred_scan2_M0','png');
@@ -312,34 +398,59 @@ figure; hold on;
 y=T1std_2(nind([1:19,25:36]))'-T1stdlr_1(nind([1:19,25:36]));
 x=Hzmulr+T1Hlr_1(nind([1:19,25:36]))-T1H2(nind([1:19,25:36]));
 plot(Hzmulr+T1Hlr_1(nind([1:19,25:36]))-T1H2(nind([1:19,25:36])),T1std_2(nind([1:19,25:36]))'-T1stdlr_1(nind([1:19,25:36])),'bo');
-[p,s]=polyfit(x,y,1);
-[r,p]=corrcoef(x,y);
-lsline;
+% h=lsline; set(h(1),'color','black');
+[lfit,gof]=robustfit(x',y');
+% coef=coeffvalues(lfit)l;
+xl=xlim;
+plot(xl,lfit(2)*xl+lfit(1),'color','black');
+text(-0.4,-0.075,sprintf('y=%fx+%f\nr^2=%f\nRMSE=%f',lfit(2),lfit(1),gof.coeffcorr(2)^2,gof.s));
 xlabel('Conditional Mutual Information'); ylabel('Delta T1 Std. Dev. (s)');
 % title('Prediction of Scan 1 High Res.');
 saveas(gcf,'Figures/Pred_scan1_T1','png');
 
+x=Hzmulr+T1Hlr_2(nind([1:19,25:36]))-T1H1(nind([1:19,25:36]));
+y=T1std_1(nind([1:19,25:36]))'-T1stdlr_2(nind([1:19,25:36]));
 figure; hold on;
 [~,sortind]=sort(Hzmulr+T1Hlr_2(nind)-T1H1(nind));
 plot(Hzmulr+T1Hlr_2(nind([1:19,25:36]))-T1H1(nind([1:19,25:36])),T1std_1(nind([1:19,25:36]))'-T1stdlr_2(nind([1:19,25:36])),'bo');
-lsline;
+% h=lsline; set(h(1),'color','black');
+[lfit,gof]=robustfit(x',y');
+% coef=coeffvalues(lfit);
+xl=xlim;
+plot(xl,lfit(2)*xl+lfit(1),'color','black');
+text(-0.9,-0.06,sprintf('y=%fx+%f\nr^2=%f\nRMSE=%f',lfit(2),lfit(1),gof.coeffcorr(2)^2,gof.s));
 xlabel('Conditional Mutual Information'); ylabel('Delta T1 Std. Dev. (s)');
 % title('Prediction of Scan 2 High Res.');
 saveas(gcf,'Figures/Pred_scan2_T1','png');
 
+x=Hzmulr+T2Hlr_1(nind(3:end))-T2H2(nind(3:end));
+y=T2std_2(nind(3:end))'-T2stdlr_1(nind(3:end));
 figure; hold on;
 plot(Hzmulr+T2Hlr_1(nind(3:end))-T2H2(nind(3:end)),T2std_2(nind(3:end))'-T2stdlr_1(nind(3:end)),'bo');
-lsline;
+% h=lsline; set(h(1),'color','black');
+[lfit,gof]=robustfit(x',y');
+% coef=coeffvalues(lfit)l;
+xl=xlim;
+plot(xl,lfit(2)*xl+lfit(1),'color','black');
+text(0.60,0.08,sprintf('y=%fx+%f\nr^2=%f\nRMSE=%f',lfit(2),lfit(1),gof.coeffcorr(2)^2,gof.s));
 xlabel('Conditional Mutual Information'); ylabel('Delta T2 Std. Dev. (s)');
 % title('Prediction of Scan 1 High Res.');
 saveas(gcf,'Figures/Pred_scan1_T2','png');
 
+x=Hzmulr+T2Hlr_2(nind(3:end))-T2H1(nind(3:end));
+y=T2std_1(nind(3:end))'-T2stdlr_2(nind(3:end));
 figure; hold on;
 plot(Hzmulr+T2Hlr_2(nind(3:end))-T2H1(nind(3:end)),T2std_1(nind(3:end))'-T2stdlr_2(nind(3:end)),'bo');
-lsline;
+% h=lsline; set(h(1),'color','black');
+[lfit,gof]=robustfit(x',y');
+% coef=coeffvalues(lfit)l;
+xl=xlim;
+plot(xl,lfit(2)*xl+lfit(1),'color','black');
+text(0.60,.08,sprintf('y=%fx+%f\nr^2=%f\nRMSE=%f',lfit(2),lfit(1),gof.coeffcorr(2)^2,gof.s));
 xlabel('Conditional Mutual Information'); ylabel('Delta T2 Std. Dev. (s)');
 % title('Prediction of Scan 2 High Res.');
 saveas(gcf,'Figures/Pred_scan2_T2','png');
+
 
 %% Synthetic Patient Population Images
 load('/rsrch1/ip/dmitchell2/github/SyntheticMR/Code/syntheticPatientPopulation.mat');

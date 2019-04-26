@@ -3,7 +3,10 @@ function[realimg,bartrecon,kSpace,sensmag,sensphs] = OrchBART3DRecon_ScanArch(sc
 % scanArchivePath1='/home/dmitchell412/QALASData/ScanArchive_713792AMR16_20180808_141752849';
 % scanArchivePath2='/home/dmitchell412/QALASData/ScanArchive_713792AMR16_20180808_144530716';
 
-scanArchivePath='/home/khwang/Documents/MATLAB/qalasCS/data/20181004phant/ScanArchive_713792AMR16_20181004_162834615';
+% scanArchivePath='/home/khwang/Documents/MATLAB/qalasCS/data/20181004phant/ScanArchive_713792AMR16_20181004_162834615';
+
+% scanArchivePath='/rsrch1/ip/dmitchell2/github/SyntheticMR/Code/Scan Data/ScanArchive_713792CMR1_20190424_160439142.h5';
+% scanArchivePath='/rsrch1/ip/dmitchell2/github/SyntheticMR/Code/Scan Data/ScanArchive_713792CMR1_20190424_161933252.h5';
 
 if nargin==0
     scanArchivePath='/home/dmitchell412/QALASData/ScanArchive_713792AMR16_20180808_141752849';
@@ -19,6 +22,10 @@ if nargin==1
         scanArchivePath='/rsrch1/ip/dmitchell2/github/SyntheticMR/Code/Scan Data/ScanArchive_SCRB3MR_20190124_163251485';
     elseif scanArchivePath==5
         scanArchivePath='/rsrch1/ip/dmitchell2/github/SyntheticMR/Code/Scan Data/ScanArchive_SCRB3MR_20190124_163430054';
+    elseif scanArchivePath==6
+        scanArchivePath='/rsrch1/ip/dmitchell2/github/SyntheticMR/Code/Scan Data/ScanArchive_713792CMR1_20190424_160439142';
+    elseif scanArchivePath==7
+        scanArchivePath='/rsrch1/ip/dmitchell2/github/SyntheticMR/Code/Scan Data/ScanArchive_713792CMR1_20190424_161933252';
     else
         scanArchivePath='/home/dmitchell412/QALASData/ScanArchive_713792AMR16_20180808_141752849';
     end

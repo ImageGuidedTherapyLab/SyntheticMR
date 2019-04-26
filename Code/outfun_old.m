@@ -2,7 +2,6 @@ function stop = outfun(x,optimValues,state)
 stop = false;
 phistory.fval=[];
 phistory.x=[];
-phistory.iteration=[];
 grad=[];
 figmarkstr={'bo','gx','r+','c*','ms','yd','kv','w^'};
 switch state
@@ -16,16 +15,18 @@ switch state
         % value with history. x must be a row vector.
         phistory.fval = [phistory.fval; optimValues.fval];
         phistory.x = [phistory.x; x];
-        phistory.iteration = [phistory.iteration; optimValues.iteration];
         % Concatenate current search direction with
         % searchdir.
         grad = [grad;...
             optimValues.gradient'];
         %            plot(x(1),x(2),'o');
         figure(1);
-        plot(optimValues.iteration,-optimValues.fval,'r-o','linewidth',1.5);
+        plot(optimValues.iteration,-optimValues.fval,'o');
         figure(2);
-        for iii=1:length(x)
+        yyaxis left
+        plot(optimValues.iteration,x(1),'o');
+        yyaxis right
+        for iii=2:length(x)
             plot(optimValues.iteration,x(iii),figmarkstr{iii});
         end
         %            plot(optimValues.iteration,x(2),'o');
@@ -49,8 +50,11 @@ switch state
         figure(2);
         hold off
         xlabel('Iteration Number');
+        yyaxis left
+        ylabel('Flip Angle (deg)');
+        yyaxis right
         ylabel('Delay Times (s)');
-        legend('TD1','TD2','TD3','TD4','TD5','Location','NorthEast');
+        legend('FA','TD2','TD3','TD4','TD5','Location','NorthEast');
     otherwise
 end
 end

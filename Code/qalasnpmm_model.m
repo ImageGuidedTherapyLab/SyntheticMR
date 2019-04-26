@@ -1,4 +1,4 @@
-function Mmeas = qalasnp_model(x, parnames, parvals)
+function Mmeas = qalasnpmm_model(x, parnames, parvals)
 
 % y = line_model(x, parnames, parvals)
 %
@@ -64,18 +64,52 @@ for ii=1:nparams
             nacq = parvals{ii};
         case 'dt'
             dt = parvals{ii};
+        case 'materialID'
+            materialID = parvals{ii};
     end
 end
 
-for tisind=1:3
-    switch tisind
-        case 1
-            M0=M0_GM; T1=T1_GM; T2=T2_GM;
-        case 2
-            M0=M0_WM; T1=T1_WM; T2=T2_WM;
-        case 3
-            M0=M0_CSF; T1=T1_CSF; T2=T2_CSF;
-    end
+%% Full Independence
+% tisind1=4-sum(rand<cumsum(materialID));
+% tisind2=4-sum(rand<cumsum(materialID));
+% tisind3=4-sum(rand<cumsum(materialID));
+% 
+% switch tisind1
+%     case 1
+%         M0=M0_GM;
+%     case 2
+%         M0=M0_WM;
+%     case 3
+%         M0=M0_CSF;
+% end
+% switch tisind2
+%     case 1
+%         T1=T1_GM;
+%     case 2
+%         T1=T1_WM;
+%     case 3
+%         T1=T1_CSF;
+% end
+% switch tisind3
+%     case 1
+%         T2=T2_GM;
+%     case 2
+%         T2=T2_WM;
+%     case 3
+%         T2=T2_CSF;
+% end
+
+%% Dependence
+tisind=4-sum(rand<cumsum(materialID));
+switch tisind
+    case 1
+        M0=M0_GM; T1=T1_GM; T2=T2_GM;
+    case 2
+        M0=M0_WM; T1=T1_WM; T2=T2_WM;
+    case 3
+        M0=M0_CSF; T1=T1_CSF; T2=T2_CSF;
+end
+
     % szm=size(M0);
     star=(1-exp(-TR./T1(:)'))./(1-cosd(flipAngle).*exp(-TR./T1(:)'));
     % T2 sensitization
@@ -91,7 +125,7 @@ for tisind=1:3
         M(5+2*iii,:)=M0(:)'.*star-(M0(:)'.*star-M(4+2*iii,:)).*exp(-dt(5+2*iii)./(T1(:)'.*star));
         M(6+2*iii,:)=M0(:)'-(M0(:)'-M(5+2*iii,:)).*exp(-dt(6+2*iii)./T1(:)');
     end
-    Mmeas=sind(flipAngle).*[M(2,:);M(6:2:end-1,:)];
+    Mmeas=[M(2,:);M(6:2:end-1,:)];
     
     for jjj=1:100
         %     [M,Mmeas]=qalas1time(M(end),M0,T1,T2,TR,TE_T2prep,flipAngle,nacq,dt);
@@ -109,20 +143,21 @@ for tisind=1:3
             M(5+2*iii,:)=M0(:)'.*star-(M0(:)'.*star-M(4+2*iii,:)).*exp(-dt(5+2*iii)./(T1(:)'.*star));
             M(6+2*iii,:)=M0(:)'-(M0(:)'-M(5+2*iii,:)).*exp(-dt(6+2*iii)./T1(:)');
         end
-        Mmeas=sind(flipAngle).*[M(2,:);M(6:2:end-1,:)];
+        Mmeas=[M(2,:);M(6:2:end-1,:)];
         if norm(M(1,:)-M(end,:))<=0.0001; break; end;
     end
     % Mmeas=reshape(Mmeas,[5,szm]);
-    switch tisind
-        case 1
-            Mmeas_GM=Mmeas(:);
-        case 2
-            Mmeas_WM=Mmeas(:);
-        case 3
-            Mmeas_CSF=Mmeas(:);
-    end    
-end
+%     switch tisind
+%         case 1
+%             Mmeas_GM=Mmeas(:);
+%         case 2
+%             Mmeas_WM=Mmeas(:);
+%         case 3
+%             Mmeas_CSF=Mmeas(:);
+%     end    
+% end
 
-Mmeas=[Mmeas_GM,Mmeas_WM,Mmeas_CSF];
+% Mmeas=materialID(1)*Mmeas_GM+materialID(2)*Mmeas_WM+materialID(3)*Mmeas_CSF;
+% Mmeas=[Mmeas_GM,Mmeas_WM,Mmeas_CSF];
 
 return

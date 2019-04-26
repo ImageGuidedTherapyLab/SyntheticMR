@@ -11,6 +11,12 @@ if nargin==1
     elseif scanArchivePath==2
         scanArchivePath='/home/dmitchell412/QALASData/ScanArchive_713792AMR16_20180808_144530716';
         fileflag=2;
+    elseif scanArchivePath==6
+        scanArchivePath='/rsrch1/ip/dmitchell2/github/SyntheticMR/Code/Scan Data/ScanArchive_713792CMR1_20190424_160439142';
+        fileflag=3;
+    elseif scanArchivePath==7
+        scanArchivePath='/rsrch1/ip/dmitchell2/github/SyntheticMR/Code/Scan Data/ScanArchive_713792CMR1_20190424_161933252';
+        fileflag=4;
     else
         scanArchivePath='/home/dmitchell412/QALASData/ScanArchive_713792AMR16_20180808_141752849';
         fileflag=1;
@@ -27,9 +33,11 @@ archive = GERecon('Archive.Load', [scanArchivePath,'.h5']);
 % realimg=load_untouch_nii([scanArchivePath,'_realimg.nii']);
 % realimg=realimg.img;
 load([scanArchivePath,'.mat'],'realimg');
-evalmask=load_untouch_nii([scanArchivePath,'_segimg.nii.gz']);
-evalmask=evalmask.img;
-load /rsrch1/ip/dmitchell2/github/SyntheticMR/Code/phantomProp.mat;
+if ~or(fileflag==3,fileflag==4)
+    evalmask=load_untouch_nii([scanArchivePath,'_segimg.nii.gz']);
+    evalmask=evalmask.img;
+    load /rsrch1/ip/dmitchell2/github/SyntheticMR/Code/phantomProp.mat;
+end
 
 % QALAS Fit
 % TI = archive.DownloadData.rdb_hdr_image.ti/1E6;                     % s
@@ -47,15 +55,43 @@ TD = [325168,325168,325168,221636]./1E6;          % s
 if fileflag==2
     TDpT2=500000/1E6;
     TD = [142592,142592,142592,500000]./1E6;
+    qalasimg=realimg;
+    qalasimg(evalmask==0)=nan;
+elseif fileflag==3
+    Tacq = TR*130;
+    TDpT2=23.4/1000;
+    TD=[117.448,117.448,117.448,0]/1000;
+    qalasimg=realimg;
+    qalasimg(sum(abs(qalasimg(:)),4)==0)=nan;
+    twodflag=130;
+    if twodflag~=0
+        qalasimg=qalasimg(:,:,twodflag,:);
+    end
+elseif fileflag==4
+    Tacq = TR*130;
+    TDpT2=500/1000;
+    TD=[150,0.5,0.5,150]/1000;
+    qalasimg=realimg;
+    qalasimg(sum(abs(qalasimg(:)),4)==0)=nan;
+    twodflag=130;
+    if twodflag~=0
+        qalasimg=qalasimg(:,:,twodflag,:);
+    end
+else
+    qalasimg=realimg;
+    qalasimg(evalmask==0)=nan;
 end
 dt=[0,TE_T2prep,Tacq,TDpT2,0,TDinv,Tacq,TD(1),Tacq,TD(2),Tacq,TD(3),Tacq,TD(4)];
 
 GERecon('Archive.Close', archive);
    
-qalasimg=realimg;
-qalasimg(evalmask==0)=nan;
 [M0pred,T1pred,T2pred]=qalasrecon(qalasimg,3,TR,TE_T2prep,flipAngle,nacq,dt);
 
+if or(fileflag==3,fileflag==4)
+    save([scanArchivePath,'_parampred.mat'],'M0pred','T1pred','T2pred','-v7.3');
+end
+
+if ~or(fileflag==3,fileflag==4)
 % Make figures
 for iii=1:42
     M0v(iii,:)=M0pred(evalmask==iii);
@@ -248,6 +284,8 @@ for iii=29:42
     subplot(2,7,iii-28); boxplot(cat(1,M1v(iii,:)./nanmedian(M5v(iii,:)),M2v(iii,:)./nanmedian(M5v(iii,:)),M3v(iii,:)./nanmedian(M5v(iii,:)),M4v(iii,:)./nanmedian(M5v(iii,:)),M5v(iii,:)./nanmedian(M5v(iii,:)),M6v(iii,:)./nanmedian(M5v(iii,:)))','Positions',csdt([2,6:2:end]));
     xticklabels(strtrim(cellstr(num2str(csdt([2,6:2:end-1]),'%2.1f\n'))));
     title(['TD2 Elem ',num2str(iii-28)]);
+end
+
 end
 
 end
