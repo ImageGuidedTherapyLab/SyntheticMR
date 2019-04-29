@@ -1,5 +1,5 @@
 
-function [logZ,nest_samples,post_samples,prior]=mn_qalasnp_04242019(TDin,materialID,Nlive,Nmcmc)
+function [logZ,nest_samples,post_samples,prior]=mn_qalasnp_04242019(TDin,tisinput,acqparam,materialID,Nlive,Nmcmc)
 
 global verbose;
 verbose = 1;
@@ -12,40 +12,52 @@ DEBUG = 0;
 %% Tissue Properties
 % GM/WM/CSF M0/T1/T2 Values
 %              GM    WM   CSF  Tumor
-T1mean = [1200,  900, 4000, 1200]./1000; % s
-    T1stdd = [ 100,  100,  200,  150]./1000; % s
-
-T2mean = [ 100,   80, 1000,  110]./1000; % s
-    T2stdd = [   5,    4,   50,   10]./1000; % s
-
-M0mean = [ 0.9,  0.9,  1.0,  0.9];       % relative intensity
-    M0stdd = [ .05,  .05,  .05,   .1];       % relative intensity
-
-overwritecsf=1;
-if overwritecsf==1
-    T1mean = [1200,  900, 900, 1200]./1000; % s
-    T1stdd = [ 100,  100,  100,  150]./1000; % s
-    
-    T2mean = [ 100,   80, 80,  110]./1000; % s
-    T2stdd = [   5,    4,   4,   10]./1000; % s
-    
-    M0mean = [ 0.9,  0.9,  0.9,  0.9];       % relative intensity
-    M0stdd = [ .05,  .05,  .05,   .1];       % relative intensity
-end
-
-tisinput=[M0mean;M0stdd;T1mean;T1stdd;T2mean;T2stdd];
+% T1mean = [1200,  900, 4000, 1200]./1000; % s
+%     T1stdd = [ 100,  100,  200,  150]./1000; % s
+% 
+% T2mean = [ 100,   80, 1000,  110]./1000; % s
+%     T2stdd = [   5,    4,   50,   10]./1000; % s
+% 
+% M0mean = [ 0.9,  0.9,  1.0,  0.9];       % relative intensity
+%     M0stdd = [ .05,  .05,  .05,   .1];       % relative intensity
+% 
+% overwritecsf=1;
+% if overwritecsf==1
+%     T1mean = [1200,  900, 900, 1200]./1000; % s
+%     T1stdd = [ 100,  100,  100,  150]./1000; % s
+%     
+%     T2mean = [ 100,   80, 80,  110]./1000; % s
+%     T2stdd = [   5,    4,   4,   10]./1000; % s
+%     
+%     M0mean = [ 0.9,  0.9,  0.9,  0.9];       % relative intensity
+%     M0stdd = [ .05,  .05,  .05,   .1];       % relative intensity
+% end
+% 
+% tisinput=[M0mean;M0stdd;T1mean;T1stdd;T2mean;T2stdd];
 
 %% Default Acquisition Parameters
-flipAngle = 4;           % deg
-TR = 0.005;              % s
-TE_T2prep = 0.100;       % s
-Tacq = 0.700;            % s
-TDpT2 = TDin(1);             % s
-TDinv = 0.03;            % s
-nacq = 5;
-TD = TDin(2:end); %[10,10,10,10]; %[0.5,0.5,0.5,0.5];          % s
+% flipAngle = 4;           % deg
+% TR = 0.005;              % s
+% TE_T2prep = 0.100;       % s
+% Tacq = 0.700;            % s
+% TDpT2 = TDin(1);             % s
+% TDinv = 0.03;            % s
+% nacq = 5;
+% TD = TDin(2:end); %[10,10,10,10]; %[0.5,0.5,0.5,0.5];          % s
+% 
+% acqparam=[flipAngle,TR,TE_T2prep,Tacq,TDpT2,TDinv,nacq,TD];
+% Default Parameters
+flipAngle=acqparam(1);
+TR=acqparam(2);
+TE_T2prep=acqparam(3);
+Tacq=acqparam(4);
+TDpT2=acqparam(5);
+TDinv=acqparam(6);
+nacq=acqparam(7);
+TD=acqparam(8:6+nacq);
 
-acqparam=[flipAngle,TR,TE_T2prep,Tacq,TDpT2,TDinv,nacq,TD];
+TDpT2=TDin(1);
+TD=TDin(2:end);
 
 dt=[0,TE_T2prep,Tacq,TDpT2,0,TDinv,Tacq,TD(1),Tacq,TD(2),Tacq,TD(3),Tacq,TD(4)];
 [~,Mmodel_GM]=qalas1p(tisinput(1,1),tisinput(1,1),tisinput(3,1),tisinput(5,1),TR,TE_T2prep,flipAngle,nacq,dt);

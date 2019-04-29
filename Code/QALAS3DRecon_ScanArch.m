@@ -63,20 +63,20 @@ elseif fileflag==3
     TD=[117.448,117.448,117.448,0]/1000;
     qalasimg=realimg;
     qalasimg(sum(abs(qalasimg(:)),4)==0)=nan;
-    twodflag=130;
-    if twodflag~=0
-        qalasimg=qalasimg(:,:,twodflag,:);
-    end
+%     twodflag=130;
+%     if twodflag~=0
+%         qalasimg=qalasimg(:,:,twodflag,:);
+%     end
 elseif fileflag==4
     Tacq = TR*130;
     TDpT2=500/1000;
     TD=[150,0.5,0.5,150]/1000;
     qalasimg=realimg;
     qalasimg(sum(abs(qalasimg(:)),4)==0)=nan;
-    twodflag=130;
-    if twodflag~=0
-        qalasimg=qalasimg(:,:,twodflag,:);
-    end
+%     twodflag=130;
+%     if twodflag~=0
+%         qalasimg=qalasimg(:,:,twodflag,:);
+%     end
 else
     qalasimg=realimg;
     qalasimg(evalmask==0)=nan;

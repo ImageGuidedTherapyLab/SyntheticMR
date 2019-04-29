@@ -14,6 +14,7 @@ TDpT2=acqparam(5);
 TDinv=acqparam(6);
 nacq=acqparam(7);
 TD=acqparam(8:6+nacq);
+signu=acqparam(end);
 
 TD=xopt;
 
@@ -57,7 +58,7 @@ N=length(xn);
 % std of patient csf = 9.8360; max signal in patient brain = 500; 
 % max approx signal in synthdata = 0.0584
 % std of noise in patient raw data = 17.8574; max signal approx 3000;
-signu=3.4762E-4;
+% signu=3.4762E-4;
 detSigz=(pi^(-N/2)*signu^2 + Sigrr - Ezr.^2).*(pi^(-N/2)*signu^2 + Sigii - Ezi.^2) - (Sigri - Ezr.*Ezi).^2;
 Hz=0.5.*log((2*pi*2.7183)^2.*detSigz);
 Hzmu=0.5.*log((2*pi*2.7183)^2.*signu.^4);

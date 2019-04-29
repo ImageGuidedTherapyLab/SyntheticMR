@@ -1,5 +1,5 @@
 
-function [] = MI_QALAS_04242019_driver(acqparam,tisinput,materialID)
+function [popt] = MI_QALAS_04242019_driverfun(tisinput,acqparam,materialID)
 
 %% MI_QALAS_popt_driver
                        
@@ -13,6 +13,7 @@ TDpT2=acqparam(5);
 TDinv=acqparam(6);
 nacq=acqparam(7);
 TD=acqparam(8:6+nacq);
+signu=acqparam(end);
 
 % TD=xopt;
 
