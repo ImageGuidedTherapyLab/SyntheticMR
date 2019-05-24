@@ -67,7 +67,9 @@ dt=[0,TE_T2prep,Tacq,TDpT2,0,TDinv,Tacq,TD(1),Tacq,TD(2),Tacq,TD(3),Tacq,TD(4)];
 % std of patient csf = 9.8360; max signal in patient brain = 500;
 % max approx signal in synthdata = 0.0584
 % std of noise in patient raw data = 17.8574; max signal approx 3000;
-signu=3.4762E-4;
+
+% signu=3.4762E-4;
+signu=acqparam(end);
 
 % Dummy variables
 data{1}=1:15;
