@@ -1,0 +1,340 @@
+\documentclass{article}         % Must use LaTeX 2e
+\usepackage[plainpages=false, colorlinks=true, citecolor=black, filecolor=black, linkcolor=black, urlcolor=black]{hyperref}		
+\usepackage[left=.75in,right=.75in,top=.75in,bottom=.75in]{geometry}
+\usepackage{makeidx,color,parskip}
+\usepackage{graphicx,float}
+\usepackage{amsmath,amsthm,amsfonts,amscd,amssymb} 
+\allowdisplaybreaks
+\graphicspath{{./Figures/}}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%	Some math support.					     %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+%	Theorem environments (these need the amsthm package)
+%
+%% \theoremstyle{plain} %% This is the default
+
+\newtheorem{thm}{Theorem}[section]
+\newtheorem{cor}[thm]{Corollary}
+\newtheorem{lem}[thm]{Lemma}
+\newtheorem{prop}[thm]{Proposition}
+\newtheorem{ax}{Axiom}
+
+\theoremstyle{definition}
+\newtheorem{defn}{Definition}[section]
+
+\theoremstyle{remark}
+\newtheorem{rem}{Remark}[section]
+\newtheorem*{notation}{Notation}
+\newtheorem*{exrcs}{Exercise}
+\newtheorem*{exmple}{Example}
+
+%\numberwithin{equation}{section}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%	Macros.							     %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\newcommand{\eq}[1]{\begin{equation} #1 \end{equation}}
+\newcommand{\eqn}[1]{\begin{equation*} #1 \end{equation*}}
+\newcommand{\ml}[1]{\begin{multline} #1 \end{multline}}
+\newcommand{\mln}[1]{\begin{multline*} #1 \end{multline*}}
+\newcommand{\spl}[1]{\begin{split} #1 \end{split}}
+\newcommand{\eqsp}[1]{\begin{equation}\begin{split} #1 \end{split}\end{equation}}
+\newcommand{\eqspn}[1]{\begin{equation*}\begin{split} #1 \end{split}\end{equation*}}
+\newcommand{\al}[1]{\begin{align} #1 \end{align}}
+\newcommand{\aln}[1]{\begin{align*} #1 \end{align*}}
+\newcommand{\gt}[1]{\begin{gather} #1 \end{gather}}
+\newcommand{\gtn}[1]{\begin{gather*} #1 \end{gather*}}
+
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\mbf}{\mathbf{m}}
+\newcommand{\Pbf}{\mathbf{P}}
+\newcommand{\Rbf}{\mathbf{R}}
+\newcommand{\Vbf}{\mathbf{V}}
+\newcommand{\xbf}{\mathbf{x}}
+\newcommand{\Xbf}{\mathbf{X}}
+\newcommand{\Ybf}{\mathbf{Y}}
+\newcommand{\zbf}{\mathbf{z}}
+\newcommand{\Zbf}{\mathbf{Z}}
+\newcommand{\mubf}{\boldsymbol{\mu}}
+\newcommand{\nubf}{\boldsymbol{\nu}}
+\newcommand{\Gammabf}{\mathbf{\Gamma}}
+\newcommand{\Cbf}{\mathbf{C}}
+\newcommand{\Sigmabf}{\boldsymbol{\Sigma}}
+\newcommand{\zcond}{\mathbf{z}\middle|\mu}
+\newcommand{\zcondbf}{\mathbf{z}\middle|\boldsymbol{\mu}}
+\newcommand{\signalG}{\mathcal{G}\paren{\mu,\mathbf{k}}}
+\newcommand{\Gscript}{\mathcal{G}}
+\newcommand{\Nscript}{\mathcal{N}}
+\newcommand{\CNscript}{\mathcal{CN}}
+\newcommand{\im}{\mathrm{i}}
+
+\newcommand{\paren}[1]{\left(#1\right)}
+\newcommand{\bracket}[1]{\left[#1\right]}
+\newcommand{\braced}[1]{\left\{#1\right\}}
+\newcommand{\arr}[2]{\begin{array}{#1} #2 \end{array}}
+\newcommand{\parenarray}[2]{\paren{\arr{#1}{#2}}}
+\newcommand{\brkarray}[2]{\bracket{\arr{#1}{#2}}}
+
+\newcommand{\expect}[1]{\mathrm{E}\left[#1\right]}
+\newcommand{\intinfty}{\int\limits_{-\infty}^\infty}
+\newcommand{\prodin}{\prod\limits_{i=1}^N}
+\newcommand{\sumin}{\sum\limits_{i=1}^N}
+\newcommand{\sumkn}{\sum\limits_{k=1}^N}
+\newcommand{\sumnn}{\sum\limits_{n=1}^N}
+\newcommand{\summn}{\sum\limits_{m=1}^N}
+\newcommand{\sumpp}{\sum\limits_{p=1}^P}
+\newcommand{\sumqq}{\sum\limits_{q=1}^Q}
+\newcommand{\sumqone}{\sum\limits_{q_1=1}^{Q_1}}
+\newcommand{\sumqN}{\sum\limits_{q_N=1}^{Q_N}}
+\newcommand{\reop}[1]{\operatorname{Re}\paren{#1}}
+\newcommand{\imop}[1]{\operatorname{Im}\paren{#1}}
+
+\newcommand{\qq}{\qquad\qquad}
+
+\newcommand{\normpdf}[3]{\frac{1}{\sqrt{2\pi#3^2}
+		}\exp\paren{-\frac{\paren{#1-#2}^2}{2#3^2}}}
+\newcommand{\CNpdf}[4]{\frac{1}{\pi^k\sqrt{\mathrm{det}\paren{#3}\mathrm{det}\paren{\bar{#3} - \bar{#4}^T#3^{-1}#4}}} \exp\left\{-\frac{1}{2} \paren{\begin{array}{cc}\paren{\bar{#1} - \bar{#2}}^T & \paren{#1 - #2}^T\end{array}} \paren{\begin{array}{cc} #3 & #4 \ \bar{#4}^T & \bar{#3} \end{array}}\paren{\begin{array}{c} #1 - #2 \ \bar{#1} - \bar{#2} \end{array}}\right\}}
+
+% END PREAMBLE
+\begin{document}
+
+
+\title{Mutual Information Calculation for QALAS Signal Model}
+\author{Drew Mitchell}
+\maketitle
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Objectives}\label{Objectives}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Mutual Information:
+\eq{I(z;\eta)=H(z)-H(z|\eta)}
+
+$H(z|\eta)$ is known and is only a function of the normally distributed model machine noise:
+\eq{H(z|\eta)=\frac{1}{2}\ln\left((2\pi e)^2\cdot|\Sigma_{\mathbf{\eta}}|\right)=\frac{1}{2}\ln\left((2\pi e)^2\sigma_{\nu,r}^2\sigma_{\nu,i}^2\right)}
+
+The difficulty is in calculating the entropy $H(z)$ of the non-Gaussian distribution $p(z)$, which is a function of a nonlinear signal model.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{QALAS Signal Model}\label{qalasmodel}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\eqsp{\vec{\mu}&=\mathrm{acquisition\ parameters}\\
+	\vec{\theta}&=\mathrm{subsampling\ parameters}\\
+	\vec{\eta}&=[M_0,T_1,T_2]=\mathrm{parametric\ map}\\
+	Q(\cdot)&=\mathrm{QALAS\ operator}\\
+	\Omega&=\mathrm{synthetic\ phantom\ domain}}
+
+QALAS Forward Solve: \eq{\mathbf{M}(\mathbf{\mu},\mathbf{x})=Q(\mathbf{\mu},M_0(\mathbf{x}),T_1(\mathbf{x}),T_2(\mathbf{x}))=Q(\mathbf{\mu},\mathbf{\eta}(\mathbf{x}))}
+
+QALAS Inverse Solve: \eq{\mathbf{\eta}_{\mathrm{meas}}=\underset{\mathbf{\eta}}{\mathrm{argmin}}\left(\left\|\mathbf{M}_{\mathrm{meas}}-Q(\mathbf{\eta})\right\|_2\right)}
+
+QALAS Signal Model:
+\eqsp{z(\mathbf{\mu},\mathbf{\theta},\mathbf{k})&=S(\mathbf{\theta},\mathbf{k})\odot\int\limits_{\Omega}\mathbf{M}(\mathbf{x})e^{-2\pi i\mathbf{k}\cdot\mathbf{x}}d\mathbf{x}+\nu(\mathbf{k})=S(\mathbf{\theta},\mathbf{k})\odot\mathcal{Q}(\mathbf{\mu},\mathbf{k})+\nu(\mathbf{k})\\
+\nu&\sim\mathcal{N}(\mathbf{0},\Sigma_\nu)\\
+\Sigma_\nu&=\brkarray{cc}{\sigma_{\nu,r}^2 & 0 \\ 0 & \sigma_{\nu,i}^2}}
+
+\eq{p(\mathbf{z}|\mathbf{\eta})\sim\mathcal{N}(S(\mathbf{\theta},\mathbf{k})\odot\mathcal{Q}(\mathbf{\mu},\mathbf{k}),\Sigma_\nu)}
+\eq{p(\mathbf{z}|\mathbf{\eta})\sim\mathcal{N}(S(\mathbf{\theta},\mathbf{k})\odot\mathcal{Q}(\mathbf{\mu},\mathbf{k}),\Sigma_\nu)=\mathcal{N}_{z_r}(S(\mathbf{\theta},\mathbf{k})\odot\mathcal{Q}_r(\mathbf{\mu},\mathbf{k}),\sigma_{\nu_r})\cdot\mathcal{N}_{z_i}(S(\mathbf{\theta},\mathbf{k})\odot\mathcal{Q}_i(\mathbf{\mu},\mathbf{k}),\sigma_{\nu_i})\sim p(z_r|\mathbf{\eta})p(z_i|\mathbf{\eta})}
+
+\subsection{QALAS Operator}
+M0 and T1 optimization.
+
+During delay:
+\eq{M_{n+1}=M_0-(M_0-M_n)\cdot e^{-\Delta t/T_1}}
+\begin{center}
+	\includegraphics[width=5in]{qalasdelay.png}
+\end{center}
+
+During acquisition:
+\eq{M_{n+1}=M^*_0-(M^*_0-M_n)\cdot e^{-\Delta t/T^*_1}}
+\eq{\frac{T^*_1}{T_1}=\frac{M^*_0}{M_0}=\frac{1-e^{-T_R/T_1}}{1-\cos(\alpha)\cdot e^{-T_R/T_1}}}
+\begin{center}
+	\includegraphics[width=5in]{qalasacq.png}
+\end{center}
+
+\eq{S(T_1)=\frac{1-e^{-TR/T_1}}{1-\cos(\alpha)\cdot e^{-TR/T_1}}}
+\eqsp{M_{opt}(1,M_0,T_1)&=M_0\\
+M_{opt}(2,M_0,T_1)&=M_0\cdot e^{TE_{T2prep}/T2}\\
+M_{opt}(3,M_0,T_1)&=M_0\cdot S(T_1)-(M_0\cdot S(T_1)-M_{opt}(2,M_0,T_1))\cdot e^{\frac{-\Delta t}{T_1\cdot S}}\\
+M_{opt}(4,M_0,T_1)&=M_0-(M_0-M_{opt}(3,M_0,T_1))\cdot e^{-\Delta t/T_1}\\
+M_{opt}(5,M_0,T_1)&=-M_{opt}(4,M_0,T_1)\\
+M_{opt}(6,M_0,T_1)&=M_0-(M_0-M_{opt}(5,M_0,T_1))\cdot e^{-\Delta t/T_1}\\
+M_{opt}(2n+5,M_0,T_1)&=M_0 S-(M_0 S-M_{opt}(2n+4,M_0,T_1)) e^{-\Delta t/T_1 S}=M_0 S(1-e^{-\Delta t/T_1 S})+M_{opt}(2n+4,M_0,T_1)e^{-\Delta t/T_1 S}\\
+M_{opt}(2n+6,M_0,T_1)&=M_0-(M_0-M_{opt}(2n+5,M_0,T_1))e^{-\Delta t/T_1}=M_0(1-e^{-\Delta t/T_1})+M_{opt}(2n+5,M_0,T_1)e^{-\Delta t/T_1}}
+
+Modified forward problem: To accurately model measured signal and penalize small flip angles for reducing signal, the $M_z$ magnetization is multiplied by a factor of $\sin\alpha$.
+
+\eq{M_{meas}=\sin\alpha\cdot M_{opt}}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Synthetic Phantom Definition}\label{synphan}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The synthetic phantom on domain $\Omega$ is defined by $N$ mutually disjoint tissue labels:
+\eqsp{\mathbf{\eta}(\mathbf{x})&=\sum\limits_{n=1}^{N}\mathbf{\eta}_n U(\mathbf{x}-\Omega_n)\\
+\bigcup\limits_{n=1}^{N}\Omega_n&=\Omega\\
+\Omega_n\cap\Omega_m&=\emptyset\quad\mathrm{for\ }n\ne m\\
+U(\mathbf{x}-\Omega_n)&=\left\{\arr{l}{1,\quad x\in\Omega_n \\ 0,\quad\mathrm{otherwise}}\right.}
+
+Physical tissue properties, $\mathbf{\eta}(\mathbf{x})=[M_0(\mathbf{x}),T_1(\mathbf{x}),T_2(\mathbf{x})]$, for tissue $n$ (white matter, gray matter, CSF, etc.) are normally distributed about literature values $\mathbf{m}_{\eta,n}$ with covariance matrix $\Sigma_{\eta,n}$:
+\eqsp{p_n(\mathbf{\eta})&\sim\mathcal{N}(\mathbf{m}_{\mathbf{\eta},n},\Sigma_{\mathbf{\eta},n})\\
+\mathbf{m}_{\mathbf{\eta},n}&=\brkarray{c}{m_{\mathbf{\eta}_1} \\ \vdots \\ m_{\mathbf{\eta}_N}}\\
+\Sigma_{\mathbf{\eta},n}&=\brkarray{ccccc}{\sigma_{\eta_1}^2 & 0 & \hdots & 0 & 0 \\
+											0 & \sigma_{\eta_2}^2 & \ddots & \ddots & 0 \\
+											\vdots & \ddots & \ddots & \ddots & \vdots \\
+											0 & \ddots & \ddots & \sigma_{\eta_{N-1}}^2 & 0 \\
+											0 & 0 & \hdots & 0 & \sigma_{\eta_N}^2}}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Gauss-Hermite Quadrature}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Gauss-Hermite Quadrature:
+\eq{\int\limits_{-\infty}^{\infty}\exp(-x^2)f(x)dx\approx\sum\limits_{i=1}^{N}\omega_i f(x_i)}
+\eq{\omega_i=\frac{2^{n-1}n!\sqrt{\pi}}{n^2[H_{n-1}(x_i)]^2}}
+
+\eqsp{n&=\mathrm{number\ of\ sample\ points\ used}\\
+	H_n(x)&=\mathrm{physicists'\ Hermite\ polynomial}\\
+	x_i&=\mathrm{roots\ of\ the\ Hermite\ polynomial}\\
+	\omega_i&=\mathrm{associated\ Gauss-Hermite\ weights}}
+
+Substitution for normal distributions using Gauss-Hermite quadrature:
+\eq{E[h(y)]=\int\limits_{-\infty}^{\infty}\frac{1}{\sigma\sqrt{2\pi}}\exp\left(-\frac{(y-\mu)^2}{2\sigma^2}\right)h(y)dy}
+$h$ is some function of $y$, and random variable $Y$ is normally distributed.
+
+\eq{x=\frac{y-\mu}{\sqrt{2}\sigma}\Leftrightarrow y=\sqrt{2}\sigma x+\mu}
+\eq{E[h(y)]=\int\limits_{-\infty}^{\infty}\frac{1}{\sqrt{\pi}}\exp\left(-x^2\right)h\left(\sqrt{2}\sigma x+\mu\right)dx}
+\eq{E[h(y)]\approx\frac{1}{\sqrt{\pi}}\sum\limits_{i=1}^N \omega_i h\left(\sqrt{2}\sigma x_i+\mu\right)}
+
+For a multivariate normal distribution with independent variables:
+\eqsp{E[h(\mathbf{y})]&=\int\paren{(2\pi)^2|\Sigma|}^{-1/2}\exp\paren{-\frac{1}{2}(\mathbf{y}-\mathbf{\mu})^T\Sigma^{-1}(\mathbf{y}-\mathbf{\mu})}h(\mathbf{y})d\mathbf{y}\\
+	\mathbf{\mu}&=\brkarray{c}{\mu_1 \\ \vdots \\ \mu_N}\\
+	\Sigma&=\brkarray{ccc}{\sigma_1^2 & & 0 \\ & \ddots & \\ 0 & & \sigma_N^2}}
+
+\eq{\mathbf{x}=\frac{1}{\sqrt{2}}\Sigma^{-1}(\mathbf{y}-\mathbf{\mu})\Leftrightarrow\mathbf{y}=\sqrt{2}\Sigma\mathbf{x}+\mathbf{\mu}}
+
+\eq{\int f(\mathbf{y}|\mathbf{\mu},\Sigma)h(\mathbf{y})d\mathbf{y}\approx\pi^{-N/2}\sum\limits_{i_1=1}^{N}\omega_{i_1}\hdots\sum\limits_{i_N=1}^{N}\omega_{i_N}h\paren{\sqrt{2}\Sigma\mathbf{x}+\mathbf{\mu}}}		
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Mutual Information Calculation}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsection{Nonlinear Case}
+
+\eqsp{z(\mathbf{\mu},\mathbf{\theta},\mathbf{k})&=S(\mathbf{\theta},\mathbf{k})\odot\mathcal{Q}(\mathbf{\mu},\mathbf{k})+\nu(\mathbf{k})\\
+\mathcal{Q}(\mathbf{\mu},\mathbf{k})&=\mathrm{nonlinear\ function\ of\ }\mathbf{\mu}}
+
+\eqsp{p(\mathbf{z(\mathbf{\mu},\mathbf{\theta},\mathbf{k})}|\mathbf{\eta(\mathbf{x})})&=f(\mathbf{z}(\mathbf{\mu},\mathbf{\theta},\mathbf{k})|S(\mathbf{\theta},\mathbf{k})\odot\mathcal{Q}(\mathbf{\mu},\mathbf{k}),\Sigma_\nu)\sim\mathcal{N}(S(\mathbf{\theta},\mathbf{k})\odot\mathcal{Q}(\mathbf{\mu},\mathbf{k}),\Sigma_\nu)\\
+p(\mathbf{\eta}(\mathbf{x}))&=f(\mathbf{\eta}(\mathbf{x})|\mathbf{m}_{\mathbf{\eta}},\Sigma_{\mathbf{\eta}})\sim\mathcal{N}(\mathbf{m}_{\mathbf{\eta}},\Sigma_{\mathbf{\eta}})\\
+f&=\mathrm{normal\ PDF}}
+
+\eqsp{H(z)&=\int p(z)\ln(p(z))dz=\int\left(\int p(z|\eta)p(\eta)d\eta\right)\ln(p(z))dz=\int\left(\int p(z|\eta)f(\eta|m_{\mathbf{\eta}},\Sigma_{\mathbf{\eta}})d\eta\right)\cdot\ln(p(z))dz\\
+&\approx \int\left[\pi^{-N/2}\sum\limits_{q_1=1}^{Q_1}\omega_{q_1}\cdots\sum\limits_{q_N=1}^{Q_N}\omega_{q_N}p(z|\eta_q)\right]\cdot\ln(p(z))dz\\
+\eta_q&=\sqrt{2}\Sigma_{\mathbf{\eta}}\mathbf{x}_q+\mathbf{m}_{\mathbf{\eta}}}
+
+\eqsp{H(z)&=\pi^{-N/2}\sum\limits_{q_1=1}^{Q_1}\omega_{q_1}\cdots\sum\limits_{q_N=1}^{Q_N}\omega_{q_N}\int p(z|\eta_q)\cdot\ln(p(z))dz\\
+&=\pi^{-N/2}\sum\limits_{q_1=1}^{Q_1}\omega_{q_1}\cdots\sum\limits_{q_N=1}^{Q_N}\omega_{q_N}\int f(z|S\odot\mathcal{Q}(\eta_q),\Sigma_\nu)\cdot\ln(p(z))dz\\
+&\approx\pi^{-N/2}\sum\limits_{q_1=1}^{Q_1}\omega_{q_1}\cdots\sum\limits_{q_N=1}^{Q_N}\omega_{q_N}\left[\pi^{-1}\sum\limits_{k_r=1}^{K_r}\omega_{k_r}\sum\limits_{k_i=1}^{K_i}\omega_{k_i}\cdot\ln(p(z_k))\right]\\
+\mathbf{z}_k&=\sqrt{2}\Sigma_\nu\mathbf{x}_k+S\odot\mathcal{Q}(\eta_q)}
+
+\eqsp{H(z)&=\pi^{-N/2-1}\sum\limits_{q_1=1}^{Q_1}\omega_{q_1}\cdots\sum\limits_{q_N=1}^{Q_N}\omega_{q_N}\sum\limits_{k_r=1}^{K_r}\omega_{k_r}\sum\limits_{k_i=1}^{K_i}\omega_{k_i}\cdot\ln\left[\int p(\mathbf{z}_k|\eta)p(\eta)d\eta\right]\\
+&=\pi^{-N/2-1}\sum\limits_{q_1=1}^{Q_1}\omega_{q_1}\cdots\sum\limits_{q_N=1}^{Q_N}\omega_{q_N}\sum\limits_{k_r=1}^{K_r}\omega_{k_r}\sum\limits_{k_i=1}^{K_i}\omega_{k_i}\cdot\ln\left[\int p(\mathbf{z}_k|\eta)f(\eta|\mathbf{m}_\eta,\Sigma_{\mathbf{\eta}})d\eta\right]\\
+&\approx\pi^{-N/2-1}\sum\limits_{q_1=1}^{Q_1}\omega_{q_1}\cdots\sum\limits_{q_N=1}^{Q_N}\omega_{q_N}\sum\limits_{k_r=1}^{K_r}\omega_{k_r}\sum\limits_{k_i=1}^{K_i}\omega_{k_i}\cdot\ln\left[\pi^{-N/2}\sum\limits_{s_1=1}^{S_1}\omega_{s_1}\cdots\sum\limits_{s_N=1}^{S_N}\omega_{s_N}p(\mathbf{z}_k|\mathbf{\eta}_s)\right]\\
+\mathbf{\eta}_s&=\sqrt{2}\Sigma_{\mathbf{\eta}}\mathbf{x}_s+\mathbf{m}_{\mathbf{\eta}}}
+
+\ml{H(z)\approx\pi^{-N/2-1}\sum\limits_{q_1=1}^{Q_1}\omega_{q_1}\cdots\sum\limits_{q_N=1}^{Q_N}\omega_{q_N}\sum\limits_{k_r=1}^{K_r}\omega_{k_r}\sum\limits_{k_i=1}^{K_i}\omega_{k_i}\\
+\cdot\ln\left[\pi^{-N/2}\sum\limits_{s_1=1}^{S_1}\omega_{s_1}\cdots\sum\limits_{s_N=1}^{S_N}\omega_{s_N}p(\sqrt{2}\Sigma_\nu\mathbf{x}_k+S(\mathbf{\theta},\mathbf{k})\odot\mathcal{Q}(\sqrt{2}\Sigma_{\mathbf{\eta}}\mathbf{x}_q+\mathbf{m}_\eta,\mu,\mathbf{k})|\sqrt{2}\Sigma_{\mathbf{\eta}}\mathbf{x}_s+\mathbf{m}_\eta)\right]}
+
+\eq{I(\eta;z)=H(z)-H(z|\eta)=H(z)-\frac{1}{2}\ln\left((2\pi e)^2\sigma_{\nu,r}^2\sigma_{\nu,i}^2\right)}
+
+\subsection{Linear Approximation}
+
+\eq{I(\eta;z)=H(z)-H(z|\eta)=\frac{1}{2}\ln\paren{(2\pi e)^2\cdot|\Sigma_z|}-\frac{1}{2}\ln\paren{(2\pi e)^2\cdot|\Sigma_\nu|}}
+\eq{|\Sigma_\nu|=\sigma_\nu^2\sigma_\nu^2-0=\sigma_\nu^4}
+\eq{\Sigma_z=\brkarray{cc}{E\left[(z_r-E[z_r])^2\right] & E\left[(z_r-E[z_r])(z_i-E[z_i])\right] \\ E\left[(z_i-E[z_i])(z_r-E[z_r])\right] & E\left[(z_i-E[z_i])^2\right]}}
+\eq{p(z)=\int p(z|\eta)p(\eta)d\eta}
+\eq{p(z|\eta)=p(z_r|\eta)p(z_i|\eta)}
+\eq{p(\eta)=\prod\limits_{i=1}^N p(\eta_i)}
+
+\ml{|\Sigma_z|=\paren{\pi^{-N/2}\sigma_\nu^2+\pi^{-N/2}\sum\limits_{q_1=1}^{Q_1}\omega_{q_1}\hdots\sum\limits_{q_N=1}^{Q_N}\omega_{q_N}S\odot\mathcal{Q}_r(\eta_q)-(E[z_r])^2}\\
+\cdot\paren{\pi^{-N/2}\sigma_\nu^2+\pi^{-N/2}\sum\limits_{q_1=1}^{Q_1}\omega_{q_1}\hdots\sum\limits_{q_N=1}^{Q_N}\omega_{q_N}S\odot\mathcal{Q}_i(\eta_q)-(E[z_i])^2}\\
+-\paren{\pi^{-N/2}\sum\limits_{q_1=1}^{Q_1}\omega_{q_1}\hdots\sum\limits_{q_N=1}^{Q_N}\omega_{q_N}S\odot\mathcal{Q}_r(\eta_q)\odot\mathcal{Q}_i(\eta_q)-E[z_r]E[z_i]}^2}
+\eq{E[z_r]=\pi^{-N/2}\sum\limits_{q_1=1}^{Q_1}\omega_{q_1}\hdots\sum\limits_{q_N=1}^{Q_N}\omega_{q_N}S\odot\mathcal{Q}_r(\eta_q)}
+\eq{E[z_i]=\pi^{-N/2}\sum\limits_{q_1=1}^{Q_1}\omega_{q_1}\hdots\sum\limits_{q_N=1}^{Q_N}\omega_{q_N}S\odot\mathcal{Q}_i(\eta_q)}
+\eq{\eta_q=\sqrt{2}\Sigma_\eta\mathbf{x}_q+\mathbf{m}_\eta}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Mutual Information in Flip Angle-Delay Time Parameter Space}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsection{Parameter Space}
+
+Current results are for a QALAS model with six acquisitions, as in the above figure with a fifth acquisition, Acq6, added after the T1 sensitizing pulse. The acquisition timings are fixed, while the TD between acquisitions 2 through 6 and the flip angle are varied.
+
+\begin{tabular}{|l|l|}
+	\hline
+	Flip angle values & 1, 1.5, 2, 2.5, 3, 3.5, ..., 10 deg \\\hline
+	TD1 values & 10, 30, 50, 70, ..., 190 ms \\\hline
+	TD2 values & 10, 30, 50, 70, ..., 190 ms \\\hline
+	TD3 values & 10, 30, 50, 70, ..., 190 ms \\\hline
+	TD4 values & 10, 30, 50, 70, ..., 190 ms \\\hline
+	TD5 values & 10, 30, 50, 70, ..., 190 ms \\\hline
+	T1 quadrature points & 1.11, 1.26, 1.4, 1.54, 1.69 s \\\hline
+	T2 quadrature points & 85.7, 93.2, 100, 106.8, 114.3 ms \\\hline
+\end{tabular}
+
+This results in a $181\times217\times181\times19\times10\times10\times10\times10\times10\times5\times5$ array with $3.38\mathrm{E}14$ elements in parameter-quadrature space when considering only one tissue label.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Mutual Information Calculation for QALAS Forward Model}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsection{Prior Distributions and Fixed Parameters}
+
+Prior distributions for T1 and T2 in GM, WM, and CSF:
+
+\begin{tabular}{|l|l|l|l|l|}
+	\hline
+	&& GM & WM & CSF \\\hline
+	T1 (s) & Mean & 1.4 & 1.0 & 4.0 \\\hline
+	& Std & 0.1 & 0.1 & 0.1 \\\hline
+	T2 (ms) & Mean & 100 & 75 & 600 \\\hline
+	& Std & 5 & 5 & 30 \\\hline
+	M0 & Mean & 0.9 & 0.9 & 0.9 \\\hline
+	& Std & 0 & 0 & 0 \\\hline
+\end{tabular}
+
+Fixed acquisition parameters:
+
+\begin{tabular}{|l|l|}
+	\hline
+	TR (ms) & 2.6 \\\hline
+	$\mathrm{TE}_\mathrm{T2prep}$ (ms) & 100 \\\hline
+	$\mathrm{T}_\mathrm{acq}$ (ms) & 100 \\\hline
+	$\mathrm{N}_\mathrm{acq}$ & 1 + 5 \\\hline
+\end{tabular}
+
+\subsection{Optimal Acquisition Parameters}
+
+To quickly get a sense of results from multiple tissue labels, I averaged the signal model results for one voxel each of GM, WM, and CSF. I summed the mutual information results over the 5 acquisition time points. For five acquisitions after the T1 sensitizing pulse, the optimal parameters were near the following values:
+
+\begin{tabular}{|l|l|}
+	\hline
+	Flip angle (deg) & 11 \\\hline
+	TD1 (ms) & 1010 \\\hline
+	TD2 (ms) & 600 \\\hline
+	TD3 (ms) & 620 \\\hline
+	TD4 (ms) & 680 \\\hline
+	TD5 (ms) & 900 \\\hline
+\end{tabular}
+
+TD1 is the time between the T1 sensitizing pulse and the first 100-ms acquisition, TD2 is the time between the end of the first 100-ms acquisition and the start of the second 100-ms acquisition, etc.
+
+
+\end{document}
+
